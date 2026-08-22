@@ -11,6 +11,8 @@ import { DreResult } from "./DreResult";
 import { DreChart } from "./DreChart";
 import { DreBreakdown } from "./DreBreakdown";
 
+import type { DrePeriod } from "./DrePeriodSelector";
+
 export interface DreTransaction {
   id: string;
   type: "income" | "expense";
@@ -21,14 +23,20 @@ export interface DreTransaction {
   date: string;
 }
 
-interface DreProps {
+export interface DreProps {
   transactions: DreTransaction[];
   userName?: string;
   companyName?: string;
+  onExport?: () => void;
 }
 
-export function Dre({ transactions, userName, companyName }: DreProps) {
-  const [period, setPeriod] = useState("month");
+export function Dre({
+  transactions,
+  userName,
+  companyName,
+  onExport,
+}: DreProps) {
+  const [period, setPeriod] = useState<DrePeriod>("month");
 
   const financialData = useMemo(() => {
     const revenue = transactions
@@ -196,8 +204,13 @@ export function Dre({ transactions, userName, companyName }: DreProps) {
   );
 
   return (
-    <div className="space-y-6">
-      <DreHeader period={period} onPeriodChange={setPeriod} />
+    <div className="relative z-0 min-w-0 space-y-6">
+      <DreHeader
+        companyName={companyName}
+        period={period}
+        onPeriodChange={setPeriod}
+        onExport={onExport}
+      />
 
       <DreCards
         revenue={financialData.revenue}
@@ -206,7 +219,7 @@ export function Dre({ transactions, userName, companyName }: DreProps) {
         result={financialData.result}
       />
 
-      <div className="grid gap-5 xl:grid-cols-2">
+      <div className="grid min-w-0 gap-5 xl:grid-cols-2">
         <DreRevenue revenue={financialData.revenue} items={revenueItems} />
 
         <DreCosts total={financialData.costs} items={costItems} />
@@ -218,7 +231,6 @@ export function Dre({ transactions, userName, companyName }: DreProps) {
         revenue={financialData.revenue}
         costs={financialData.costs}
         expenses={financialData.expenses}
-        result={financialData.result}
       />
 
       <DreChart data={chartData} />

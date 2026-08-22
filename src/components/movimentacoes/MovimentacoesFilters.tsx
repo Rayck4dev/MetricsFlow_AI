@@ -70,7 +70,6 @@ function FilterDropdown({
 
   return (
     <div ref={ref} className="relative z-[80] min-w-[185px]">
-      {/* Trigger */}
 
       <motion.button
         type="button"
@@ -82,7 +81,6 @@ function FilterDropdown({
             : "border-surface-border bg-surface-sidebar hover:border-slate-600 hover:bg-surface-panel"
         }`}
       >
-        {/* Icon */}
 
         <span
           className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border transition-all ${
@@ -93,8 +91,6 @@ function FilterDropdown({
         >
           <Icon size={14} />
         </span>
-
-        {/* Text */}
 
         <span className="min-w-0 flex-1">
           <span className="block text-[7px] font-bold uppercase tracking-[0.14em] text-slate-600">
@@ -110,8 +106,6 @@ function FilterDropdown({
           </span>
         </span>
 
-        {/* Chevron */}
-
         <motion.span
           animate={{
             rotate: open ? 180 : 0,
@@ -126,7 +120,6 @@ function FilterDropdown({
         </motion.span>
       </motion.button>
 
-      {/* Dropdown */}
 
       <AnimatePresence>
         {open && (
@@ -152,7 +145,6 @@ function FilterDropdown({
             }}
             className="absolute left-0 top-[calc(100%+8px)] z-[9999] w-full min-w-[210px] origin-top overflow-hidden rounded-xl border border-surface-border bg-[#0b1329]/[98%] p-1.5 shadow-[0_20px_50px_rgba(0,0,0,0.45)] backdrop-blur-xl"
           >
-            {/* Glow */}
 
             <div className="pointer-events-none absolute -right-8 -top-8 h-20 w-20 rounded-full bg-brand-500/10 blur-2xl" />
 
@@ -291,7 +283,6 @@ export function MovimentacoesFilters({
 
   return (
     <section className="relative z-[70] overflow-visible border-t border-surface-border bg-[#0d2038]/60">
-      {/* Header */}
 
       <button
         type="button"
@@ -339,7 +330,6 @@ export function MovimentacoesFilters({
         </motion.span>
       </button>
 
-      {/* Content */}
 
       <AnimatePresence initial={false}>
         {expanded && (
@@ -389,7 +379,6 @@ export function MovimentacoesFilters({
                 onChange={onPeriodChange}
               />
 
-              {/* Limpar */}
 
               <motion.button
                 type="button"

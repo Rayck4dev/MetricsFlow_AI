@@ -69,7 +69,6 @@ export function TransactionModal({
   );
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Formatação de Moeda BRL em Tempo Real
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, "");
     if (!value) {
@@ -107,7 +106,6 @@ export function TransactionModal({
       date,
     });
 
-    // Animação de sucesso rápida antes de fechar
     setIsSuccess(true);
     setTimeout(() => {
       setIsSuccess(false);
@@ -128,7 +126,6 @@ export function TransactionModal({
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 select-none">
-          {/* Backdrop Escuro */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -137,7 +134,6 @@ export function TransactionModal({
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
           />
 
-          {/* Card / Modal */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 15 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -145,7 +141,6 @@ export function TransactionModal({
             transition={{ type: "spring", stiffness: 350, damping: 25 }}
             className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-surface-border bg-surface-sidebar p-6 shadow-2xl shadow-black/60 z-10"
           >
-            {/* Animação de Sucesso ao Finalizar */}
             {isSuccess ? (
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -164,7 +159,6 @@ export function TransactionModal({
               </motion.div>
             ) : (
               <>
-                {/* Header do Modal */}
                 <div className="flex items-center justify-between pb-4 border-b border-surface-border">
                   <h2 className="text-lg font-bold text-white tracking-tight">
                     Novo Lançamento
@@ -178,7 +172,6 @@ export function TransactionModal({
                   </button>
                 </div>
 
-                {/* Alternador de Tipo (Receita vs Despesa) */}
                 <div className="mt-5 grid grid-cols-2 gap-2 rounded-xl bg-surface-panel p-1 border border-surface-border">
                   <button
                     type="button"
@@ -235,9 +228,7 @@ export function TransactionModal({
                   </button>
                 </div>
 
-                {/* Formulário */}
                 <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-                  {/* Valor */}
                   <div>
                     <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
                       Valor
@@ -264,7 +255,6 @@ export function TransactionModal({
                     </div>
                   </div>
 
-                  {/* Descrição */}
                   <div>
                     <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
                       Descrição
@@ -284,9 +274,7 @@ export function TransactionModal({
                     </div>
                   </div>
 
-                  {/* Grid Categoria e Forma de Pagamento */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Categoria */}
                     <div>
                       <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
                         Categoria
@@ -321,7 +309,6 @@ export function TransactionModal({
                       </div>
                     </div>
 
-                    {/* Forma de Pagamento */}
                     <div>
                       <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
                         Pagamento
@@ -349,7 +336,6 @@ export function TransactionModal({
                     </div>
                   </div>
 
-                  {/* Data */}
                   <div>
                     <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
                       Data da Transação
@@ -368,7 +354,6 @@ export function TransactionModal({
                     </div>
                   </div>
 
-                  {/* Botões de Ação */}
                   <div className="pt-3 flex items-center justify-end gap-3">
                     <button
                       type="button"

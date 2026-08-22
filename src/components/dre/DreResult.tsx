@@ -1,13 +1,17 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CheckCircle2, TrendingUp } from "lucide-react";
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  BadgeDollarSign,
+  TrendingUp,
+} from "lucide-react";
 
 interface DreResultProps {
   revenue: number;
   costs: number;
   expenses: number;
-  result: number;
 }
 
 function formatCurrency(value: number) {
@@ -17,80 +21,226 @@ function formatCurrency(value: number) {
   }).format(value);
 }
 
-export function DreResult({
-  revenue,
-  costs,
-  expenses,
-  result,
-}: DreResultProps) {
-  const margin = revenue > 0 ? (result / revenue) * 100 : 0;
+export function DreResult({ revenue, costs, expenses }: DreResultProps) {
+  const grossResult = revenue - costs;
+  const netResult = grossResult - expenses;
+
+  const margin = revenue > 0 ? (netResult / revenue) * 100 : 0;
+
+  const positive = netResult >= 0;
 
   return (
     <motion.section
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.15 }}
-      className="relative overflow-hidden rounded-2xl border border-cpm-income/20 bg-gradient-to-br from-cpm-income/[0.08] via-surface-panel to-surface-panel p-6 shadow-2xl shadow-black/20"
+      transition={{
+        delay: 0.18,
+        duration: 0.45,
+      }}
+      className="relative overflow-hidden rounded-2xl border border-surface-border bg-surface-panel shadow-xl shadow-black/10"
     >
-      <div className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-cpm-income/10 blur-3xl" />
+      <div
+        className={`pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full blur-3xl ${
+          positive ? "bg-emerald-500/[0.08]" : "bg-red-500/[0.08]"
+        }`}
+      />
 
-      <div className="relative grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
-        <div>
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cpm-income/10">
-              <TrendingUp size={17} className="text-cpm-income" />
+      <div className="relative p-5 sm:p-6">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <div className="mb-3 flex items-center gap-2">
+              <div
+                className={`flex h-9 w-9 items-center justify-center rounded-xl ${
+                  positive ? "bg-emerald-500/10" : "bg-red-500/10"
+                }`}
+              >
+                {positive ? (
+                  <TrendingUp size={17} className="text-emerald-400" />
+                ) : (
+                  <ArrowDownRight size={17} className="text-red-400" />
+                )}
+              </div>
+
+              <div>
+                <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-slate-500">
+                  Resultado líquido
+                </p>
+
+                <p className="text-[8px] text-slate-600">
+                  Após custos e despesas
+                </p>
+              </div>
             </div>
 
-            <div>
-              <p className="text-[9px] font-bold uppercase tracking-wider text-cpm-income">
-                Resultado
-              </p>
+            <motion.h2
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              transition={{
+                delay: 0.3,
+                type: "spring",
+                stiffness: 180,
+              }}
+              className={`font-heading text-3xl font-bold sm:text-4xl ${
+                positive ? "text-emerald-400" : "text-red-400"
+              }`}
+            >
+              {formatCurrency(netResult)}
+            </motion.h2>
 
-              <h2 className="mt-0.5 text-sm font-bold text-white">
-                Resultado líquido
-              </h2>
+            <div className="mt-2 flex items-center gap-2">
+              <span
+                className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[8px] font-semibold ${
+                  positive
+                    ? "bg-emerald-500/10 text-emerald-400"
+                    : "bg-red-500/10 text-red-400"
+                }`}
+              >
+                {positive ? (
+                  <ArrowUpRight size={10} />
+                ) : (
+                  <ArrowDownRight size={10} />
+                )}
+                {Math.abs(margin).toFixed(1)}% de margem
+              </span>
+
+              <span className="text-[8px] text-slate-600">sobre a receita</span>
             </div>
           </div>
 
-          <p className="mt-5 max-w-xl text-[10px] leading-5 text-slate-500">
-            Depois de considerar custos e despesas operacionais, este é o
-            resultado financeiro do período selecionado.
-          </p>
+          <div className="grid w-full max-w-md grid-cols-3 gap-3">
+            <ResultMiniCard label="Receita" value={revenue} color="emerald" />
 
-          <div className="mt-5 flex flex-wrap gap-2">
-            <span className="rounded-full border border-surface-border bg-surface-sidebar px-3 py-1.5 text-[8px] font-semibold text-slate-400">
-              Receita: {formatCurrency(revenue)}
-            </span>
+            <ResultMiniCard label="Custos" value={costs} color="orange" />
 
-            <span className="rounded-full border border-surface-border bg-surface-sidebar px-3 py-1.5 text-[8px] font-semibold text-slate-400">
-              Custos: {formatCurrency(costs)}
-            </span>
-
-            <span className="rounded-full border border-surface-border bg-surface-sidebar px-3 py-1.5 text-[8px] font-semibold text-slate-400">
-              Despesas: {formatCurrency(expenses)}
-            </span>
+            <ResultMiniCard label="Despesas" value={expenses} color="red" />
           </div>
         </div>
 
-        <div className="flex flex-col items-start lg:items-end">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 size={14} className="text-cpm-income" />
+        <div className="mt-6 rounded-xl border border-surface-border bg-surface-sidebar/50 p-4">
+          <div className="mb-3 flex items-center gap-2">
+            <BadgeDollarSign size={14} className="text-brand-400" />
 
-            <span className="text-[9px] font-bold text-cpm-income">
-              Margem de {margin.toFixed(1)}%
+            <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">
+              Composição do resultado
             </span>
           </div>
 
-          <motion.p
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 }}
-            className="mt-2 font-heading text-3xl font-bold tracking-tight text-white"
-          >
-            {formatCurrency(result)}
-          </motion.p>
+          <div className="space-y-3">
+            <ResultLine
+              label="Receita bruta"
+              value={revenue}
+              color="text-emerald-400"
+            />
+
+            <ResultLine
+              label="(-) Custos"
+              value={costs}
+              color="text-orange-400"
+              negative
+            />
+
+            <div className="h-px bg-surface-border" />
+
+            <ResultLine
+              label="Resultado bruto"
+              value={grossResult}
+              color="text-brand-300"
+              strong
+            />
+
+            <ResultLine
+              label="(-) Despesas"
+              value={expenses}
+              color="text-red-400"
+              negative
+            />
+
+            <div className="h-px bg-surface-border" />
+
+            <ResultLine
+              label="Resultado líquido"
+              value={netResult}
+              color={positive ? "text-emerald-400" : "text-red-400"}
+              strong
+              large
+            />
+          </div>
         </div>
       </div>
     </motion.section>
+  );
+}
+
+interface ResultMiniCardProps {
+  label: string;
+  value: number;
+  color: "emerald" | "orange" | "red";
+}
+
+function ResultMiniCard({ label, value, color }: ResultMiniCardProps) {
+  const styles = {
+    emerald: "border-emerald-500/15 bg-emerald-500/[0.05] text-emerald-400",
+    orange: "border-orange-500/15 bg-orange-500/[0.05] text-orange-400",
+    red: "border-red-500/15 bg-red-500/[0.05] text-red-400",
+  };
+
+  return (
+    <motion.div
+      whileHover={{
+        y: -3,
+        scale: 1.02,
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 300,
+        damping: 18,
+      }}
+      className={`rounded-xl border p-3 ${styles[color]}`}
+    >
+      <p className="text-[8px] font-semibold uppercase tracking-wider opacity-70">
+        {label}
+      </p>
+
+      <p className="mt-1 text-sm font-bold">{formatCurrency(value)}</p>
+    </motion.div>
+  );
+}
+
+interface ResultLineProps {
+  label: string;
+  value: number;
+  color: string;
+  negative?: boolean;
+  strong?: boolean;
+  large?: boolean;
+}
+
+function ResultLine({
+  label,
+  value,
+  color,
+  negative = false,
+  strong = false,
+  large = false,
+}: ResultLineProps) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <span
+        className={`${
+          strong ? "font-semibold text-slate-200" : "text-slate-400"
+        } ${large ? "text-sm" : "text-xs"}`}
+      >
+        {label}
+      </span>
+
+      <span
+        className={`${color} ${
+          strong ? "font-bold" : "font-semibold"
+        } ${large ? "text-base" : "text-xs"}`}
+      >
+        {negative ? "-" : ""}
+        {formatCurrency(Math.abs(value))}
+      </span>
+    </div>
   );
 }

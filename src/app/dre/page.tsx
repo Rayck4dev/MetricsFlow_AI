@@ -74,10 +74,12 @@ export default function DrePage() {
   return (
     <div className="min-h-screen bg-surface-main text-slate-100">
       <div className="flex min-h-screen">
-        <Sidebar companyName="Carlos Design" />
-
-        <main className="min-w-0 flex-1">
-          <div className="mx-auto w-full max-w-[1400px] p-5 sm:p-6 lg:p-8">
+        <Sidebar
+          userName="Carlos"
+          companyName="Carlos Design"
+        />
+        <main className="min-w-0 flex-1 overflow-x-hidden">
+          <div className="mx-auto w-full max-w-[1400px] min-w-0 px-5 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
             <Dre
               transactions={mockTransactions}
               userName="Carlos"

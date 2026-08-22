@@ -60,7 +60,6 @@ export function Dashboard({
 
   return (
     <div className="relative space-y-6 pb-10">
-      {/* Background ambient glow */}
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute left-[30%] top-0 h-[400px] w-[400px] rounded-full bg-brand-500/[0.035] blur-[120px]" />
 

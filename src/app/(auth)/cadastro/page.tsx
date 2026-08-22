@@ -108,7 +108,7 @@ export default function CadastroPage() {
             </Link>
           </div>
 
-          <div className="flex flex-1 items-center justify-center px-6 py-8 sm:px-10">
+          <div className="flex flex-1 items-center justify-center px-10 py-8 sm:px-10">
             <div className="w-full max-w-[440px]">
               <RegisterForm />
             </div>

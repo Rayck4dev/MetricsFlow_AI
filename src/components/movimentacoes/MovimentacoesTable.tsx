@@ -17,7 +17,6 @@ import type { Movimentacao } from "./types";
 interface MovimentacoesTableProps {
   transactions: Movimentacao[];
   totalTransactions: number;
-
   onEdit?: (transaction: Movimentacao) => void;
   onDelete?: (transaction: Movimentacao) => void;
 }
@@ -54,11 +53,10 @@ export function MovimentacoesTable({
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.22, duration: 0.45 }}
-      className="overflow-hidden rounded-2xl border border-surface-border bg-surface-panel shadow-xl shadow-black/10"
+      className="min-w-0 overflow-hidden rounded-2xl border border-surface-border bg-surface-panel shadow-xl shadow-black/10"
     >
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-surface-border px-5 py-4">
-        <div>
+      <div className="flex min-w-0 items-center justify-between gap-4 border-b border-surface-border px-5 py-4">
+        <div className="min-w-0">
           <h2 className="font-heading text-sm font-bold text-white">
             Histórico de movimentações
           </h2>
@@ -68,7 +66,7 @@ export function MovimentacoesTable({
           </p>
         </div>
 
-        <div className="hidden items-center gap-2 sm:flex">
+        <div className="hidden shrink-0 items-center gap-2 sm:flex">
           <span className="relative flex h-1.5 w-1.5">
             <span className="absolute h-full w-full animate-ping rounded-full bg-emerald-400/50" />
             <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-400" />
@@ -80,7 +78,6 @@ export function MovimentacoesTable({
         </div>
       </div>
 
-      {/* Empty state */}
       {transactions.length === 0 ? (
         <div className="flex min-h-[300px] flex-col items-center justify-center px-6 text-center">
           <motion.div
@@ -102,21 +99,20 @@ export function MovimentacoesTable({
         </div>
       ) : (
         <>
-          {/* Cabeçalho da tabela */}
-          <div className="hidden grid-cols-[2fr_1fr_1fr_1fr_auto_auto] gap-4 border-b border-surface-border bg-surface-sidebar/50 px-5 py-3 md:grid">
-            <span className="text-[8px] font-bold uppercase tracking-wider text-slate-600">
+          <div className="hidden min-w-0 grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto_auto] gap-4 border-b border-surface-border bg-surface-sidebar/50 px-5 py-3 md:grid">
+            <span className="min-w-0 text-[8px] font-bold uppercase tracking-wider text-slate-600">
               Movimentação
             </span>
 
-            <span className="text-[8px] font-bold uppercase tracking-wider text-slate-600">
+            <span className="min-w-0 text-[8px] font-bold uppercase tracking-wider text-slate-600">
               Categoria
             </span>
 
-            <span className="text-[8px] font-bold uppercase tracking-wider text-slate-600">
+            <span className="min-w-0 text-[8px] font-bold uppercase tracking-wider text-slate-600">
               Pagamento
             </span>
 
-            <span className="text-[8px] font-bold uppercase tracking-wider text-slate-600">
+            <span className="min-w-0 text-[8px] font-bold uppercase tracking-wider text-slate-600">
               Data
             </span>
 
@@ -127,8 +123,7 @@ export function MovimentacoesTable({
             <span className="w-8" />
           </div>
 
-          {/* Linhas */}
-          <div className="divide-y divide-surface-border">
+          <div className="min-w-0 divide-y divide-surface-border">
             {transactions.map((transaction, index) => {
               const income = transaction.type === "income";
               const PaymentIcon = getPaymentIcon(transaction.paymentMethod);
@@ -142,9 +137,8 @@ export function MovimentacoesTable({
                     delay: 0.04 * index,
                     duration: 0.3,
                   }}
-                  className="group relative grid gap-3 px-5 py-4 transition-colors hover:bg-white/[0.015] md:grid-cols-[2fr_1fr_1fr_1fr_auto_auto] md:items-center md:gap-4"
+                  className="group relative grid min-w-0 gap-3 px-5 py-4 transition-colors hover:bg-white/[0.015] md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto_auto] md:items-center md:gap-4"
                 >
-                  {/* Movimentação */}
                   <div className="flex min-w-0 items-center gap-3">
                     <motion.div
                       whileHover={{
@@ -180,38 +174,33 @@ export function MovimentacoesTable({
                     </div>
                   </div>
 
-                  {/* Categoria */}
-                  <div>
+                  <div className="min-w-0">
                     <span className="inline-flex max-w-full truncate rounded-full border border-surface-border bg-surface-sidebar px-2 py-1 text-[8px] font-semibold text-slate-500">
                       {transaction.category}
                     </span>
                   </div>
 
-                  {/* Pagamento */}
-                  <div className="flex items-center gap-1.5 text-[9px] text-slate-500">
-                    <PaymentIcon size={12} />
+                  <div className="flex min-w-0 items-center gap-1.5 text-[9px] text-slate-500">
+                    <PaymentIcon size={12} className="shrink-0" />
 
                     <span className="truncate">
                       {transaction.paymentMethod}
                     </span>
                   </div>
 
-                  {/* Data */}
-                  <div className="text-[9px] text-slate-600">
+                  <div className="min-w-0 truncate text-[9px] text-slate-600">
                     {transaction.date}
                   </div>
 
-                  {/* Valor */}
                   <div
-                    className={`text-left text-[10px] font-bold md:text-right ${
+                    className={`shrink-0 text-left text-[10px] font-bold md:text-right ${
                       income ? "text-emerald-400" : "text-red-400"
                     }`}
                   >
                     {income ? "+" : "-"} {formatCurrency(transaction.amount)}
                   </div>
 
-                  {/* Ações desktop */}
-                  <div className="hidden justify-end md:flex">
+                  <div className="hidden shrink-0 justify-end md:flex">
                     <div className="flex items-center gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                       {onEdit && (
                         <motion.button
@@ -241,7 +230,6 @@ export function MovimentacoesTable({
                     </div>
                   </div>
 
-                  {/* Ações mobile */}
                   <div className="absolute right-4 top-4 md:hidden">
                     <details className="relative">
                       <summary className="flex h-7 w-7 cursor-pointer list-none items-center justify-center rounded-lg border border-surface-border bg-surface-sidebar text-slate-500 transition-colors hover:text-slate-300">

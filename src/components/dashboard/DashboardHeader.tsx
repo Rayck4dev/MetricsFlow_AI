@@ -26,12 +26,10 @@ export function DashboardHeader({
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="group relative overflow-hidden rounded-3xl border border-surface-border bg-surface-panel p-5 shadow-2xl shadow-black/10 sm:p-6"
     >
-      {/* Background glow */}
       <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-brand-500/[0.09] blur-3xl transition-all duration-700 group-hover:bg-brand-500/[0.14]" />
 
       <div className="pointer-events-none absolute bottom-0 left-1/3 h-24 w-64 rounded-full bg-cpm-accent/[0.035] blur-3xl" />
 
-      {/* Grid */}
       <div className="pointer-events-none absolute inset-0 opacity-[0.025]">
         <div
           className="h-full w-full"

@@ -86,12 +86,10 @@ export function MovimentacoesCards({
             }}
             className="group relative overflow-hidden rounded-2xl border border-surface-border bg-surface-panel p-5 shadow-lg shadow-black/10"
           >
-            {/* Glow */}
             <div
               className={`pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full blur-3xl ${card.glowClass} opacity-60 transition-opacity duration-300 group-hover:opacity-100`}
             />
 
-            {/* Reflexo */}
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/[0.035] via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
             <div className="relative">
@@ -122,7 +120,6 @@ export function MovimentacoesCards({
               </div>
             </div>
 
-            {/* Linha inferior animada */}
             <motion.div
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}

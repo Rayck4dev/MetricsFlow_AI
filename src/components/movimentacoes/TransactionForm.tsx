@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 import { TransactionSelect } from "@/components/movimentacoes/TransactionSelect";
 import { TransactionDatePicker } from "@/components/movimentacoes/TransactionDatePicker";
-import { formatBRLInput, parseBRL, toInputDate } from "@/types/formatters";
+import { formatBRLInput, parseBRL } from "@/types/formatters";
 
 import type { Movimentacao, MovimentacaoTipo } from "@/components/movimentacoes/Movimentacoes";
 
@@ -171,7 +171,6 @@ export function TransactionForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {/* Tipo */}
       <div>
         <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">
           Tipo de movimentação
@@ -217,7 +216,6 @@ export function TransactionForm({
         </div>
       </div>
 
-      {/* Valor */}
       <div className="space-y-2">
         <label className="block text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">
           Valor
@@ -250,7 +248,6 @@ export function TransactionForm({
         )}
       </div>
 
-      {/* Descrição */}
       <div className="space-y-2">
         <label
           htmlFor="transaction-description"
@@ -281,7 +278,6 @@ export function TransactionForm({
         )}
       </div>
 
-      {/* Categoria + pagamento */}
       <div className="grid gap-4 sm:grid-cols-2">
         <TransactionSelect
           label="Categoria"
@@ -302,7 +298,6 @@ export function TransactionForm({
         />
       </div>
 
-      {/* Data */}
       <TransactionDatePicker
         value={date}
         onChange={setDate}
@@ -310,7 +305,6 @@ export function TransactionForm({
         max={getToday()}
       />
 
-      {/* Ações */}
       <div className="flex items-center justify-end gap-2 border-t border-surface-border pt-4">
         {onCancel && (
           <button

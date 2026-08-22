@@ -5,19 +5,6 @@ import { Sidebar } from "@/components/layout/Sidebar";
 
 import type { DashboardTransaction } from "@/components/dashboard/DashboardTransactions";
 
-/*
-|--------------------------------------------------------------------------
-| Dados temporários
-|--------------------------------------------------------------------------
-|
-| Futuramente estes dados virão do backend:
-|
-| const transactions = await getTransactions(user.id);
-|
-| O Dashboard não precisa saber de onde os dados vieram.
-|
-*/
-
 const dashboardTransactions: DashboardTransaction[] = [
   {
     id: "1",
@@ -76,26 +63,15 @@ const dashboardTransactions: DashboardTransaction[] = [
 ];
 
 export default function DashboardPage() {
-  /*
-   * Futuramente:
-   *
-   * const user = await getCurrentUser();
-   * const company = await getCurrentCompany();
-   * const transactions = await getTransactions(company.id);
-   *
-   * O restante do componente permanece praticamente igual.
-   */
 
   return (
     <div className="min-h-screen bg-surface-main text-slate-100">
       <div className="flex min-h-screen">
-        {/* Sidebar oficial */}
         <Sidebar
           userName="Carlos"
           companyName="Carlos Design"
         />
 
-        {/* Conteúdo */}
         <main className="min-w-0 flex-1">
           <div className="mx-auto w-full max-w-[1500px] p-4 sm:p-6 lg:p-8">
             <Dashboard

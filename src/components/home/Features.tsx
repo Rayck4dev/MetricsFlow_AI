@@ -411,10 +411,6 @@ export function Features() {
   );
 }
 
-/* =========================================================
-   MINI ICONS
-========================================================= */
-
 function MessageSquareIcon() {
   return (
     <MessageSquare
