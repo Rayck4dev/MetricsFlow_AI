@@ -8,7 +8,7 @@ import { TransactionSelect } from "@/components/movimentacoes/TransactionSelect"
 import { TransactionDatePicker } from "@/components/movimentacoes/TransactionDatePicker";
 import { formatBRLInput, parseBRL } from "@/types/formatters";
 
-import type { Movimentacao, MovimentacaoTipo } from "@/components/movimentacoes/Movimentacoes";
+import type { Movimentacao, MovimentacaoTipo } from "./types";
 
 export interface TransactionFormValues {
   type: MovimentacaoTipo;

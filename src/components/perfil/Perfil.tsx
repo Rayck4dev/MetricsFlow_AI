@@ -2,56 +2,57 @@
 
 import { motion } from "framer-motion";
 import { CalendarDays, CheckCircle2, UserRound } from "lucide-react";
-
 import { FaChrome } from "react-icons/fa";
 
-import { PerfilHeader } from "./PerfilHeader";
 import { PerfilForm } from "./PerfilForm";
 import { PerfilSecurity } from "./PerfilSecurity";
 
-interface PerfilProps {
-  initialValues: {
-    name: string;
-    email: string;
-    phone: string;
-  };
+export interface PerfilUser {
+  id?: string;
+  name: string;
+  email: string;
+  phone: string;
+  role?: string;
+  avatarUrl?: string | null;
+  authProvider?: string;
+}
 
-  userName: string;
-  companyName: string;
+export interface PerfilProps {
+  user?: PerfilUser;
+  initialValues?: PerfilUser;
+  userName?: string;
+  companyName?: string;
 
-  onSubmit?: (values: {
-    name: string;
-    email: string;
-    phone: string;
-  }) => void | Promise<void>;
-
-  onChangePassword?: (password: string) => void | Promise<void>;
-
+  onUpdateProfile?: (values: PerfilUser) => void | Promise<void>;
+  onSubmit?: (values: PerfilUser) => void | Promise<void>;
+  onChangePassword?: (password?: string) => void | Promise<void>;
   onManageSessions?: () => void;
 }
 
 export function Perfil({
+  user,
   initialValues,
   userName,
   companyName,
+  onUpdateProfile,
   onSubmit,
   onChangePassword,
   onManageSessions,
 }: PerfilProps) {
+  const profileData = user ||
+    initialValues || {
+      name: userName || "",
+      email: "",
+      phone: "",
+    };
+
+  const handleSave = onUpdateProfile || onSubmit;
+
   return (
     <div className="space-y-6">
-      <PerfilForm
-        initialValues={{
-          name: "Usuário Demo",
-          email: "usuario@exemplo.com",
-          phone: "",
-        }}
-      />
-
       <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(380px,0.85fr)]">
         <div className="space-y-5">
-          <PerfilForm initialValues={initialValues} onSubmit={onSubmit} />
-
+          <PerfilForm initialValues={profileData} onSubmit={handleSave} />
           <AccountInfo />
         </div>
 
@@ -70,18 +71,9 @@ export function Perfil({
 function AccountInfo() {
   return (
     <motion.section
-      initial={{
-        opacity: 0,
-        y: 16,
-      }}
-      animate={{
-        opacity: 1,
-        y: 0,
-      }}
-      transition={{
-        duration: 0.45,
-        delay: 0.18,
-      }}
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, delay: 0.18 }}
       className="overflow-hidden rounded-2xl border border-surface-border bg-surface-panel/90 shadow-xl shadow-black/10 backdrop-blur-xl"
     >
       <div className="border-b border-surface-border px-5 py-4 sm:px-6">
@@ -92,7 +84,6 @@ function AccountInfo() {
 
           <div>
             <h2 className="text-sm font-bold text-white">Sobre sua conta</h2>
-
             <p className="mt-0.5 text-[9px] text-slate-600">
               Informações gerais da sua conta.
             </p>

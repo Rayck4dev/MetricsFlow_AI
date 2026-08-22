@@ -5,7 +5,7 @@ import { ArrowDownLeft, ArrowUpRight, Pencil, X } from "lucide-react";
 
 import { TransactionForm, type TransactionFormValues } from "./TransactionForm";
 
-import type { Movimentacao } from "./Movimentacoes";
+import type { Movimentacao } from "./types";
 
 interface TransactionEditModalProps {
   transaction: Movimentacao;
