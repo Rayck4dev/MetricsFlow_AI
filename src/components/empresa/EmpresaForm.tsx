@@ -18,7 +18,9 @@ interface EmpresaFormProps {
 
 export function EmpresaForm({ initialValues, onSubmit }: EmpresaFormProps) {
   const [name, setName] = useState(initialValues.name);
+
   const [document, setDocument] = useState(initialValues.document);
+
   const [phoneNumber, setPhoneNumber] = useState(initialValues.phoneNumber);
 
   const [saving, setSaving] = useState(false);
@@ -104,6 +106,12 @@ export function EmpresaForm({ initialValues, onSubmit }: EmpresaFormProps) {
       window.setTimeout(() => {
         setSaved(false);
       }, 2200);
+    } catch (error) {
+      console.error("Erro ao salvar dados da empresa:", error);
+
+      setErrors({
+        submit: "Não foi possível salvar as alterações.",
+      });
     } finally {
       setSaving(false);
     }
@@ -111,9 +119,18 @@ export function EmpresaForm({ initialValues, onSubmit }: EmpresaFormProps) {
 
   return (
     <motion.section
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, delay: 0.08 }}
+      initial={{
+        opacity: 0,
+        y: 16,
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+      }}
+      transition={{
+        duration: 0.45,
+        delay: 0.08,
+      }}
       className="overflow-hidden rounded-2xl border border-surface-border bg-surface-panel/90 shadow-xl shadow-black/10 backdrop-blur-xl"
     >
       <div className="border-b border-surface-border px-5 py-4 sm:px-6">
@@ -166,14 +183,22 @@ export function EmpresaForm({ initialValues, onSubmit }: EmpresaFormProps) {
           />
         </div>
 
+        {errors.submit && (
+          <div className="rounded-xl border border-red-500/15 bg-red-500/5 px-3.5 py-3">
+            <p className="text-[9px] font-medium text-red-400">
+              {errors.submit}
+            </p>
+          </div>
+        )}
+
         <div className="rounded-xl border border-brand-500/10 bg-brand-500/[0.035] p-3.5">
           <p className="text-[9px] font-semibold text-brand-300">
             Dados vinculados à empresa
           </p>
 
           <p className="mt-1 text-[8px] leading-4 text-slate-600">
-            Essas informações serão sincronizadas com a empresa cadastrada no
-            backend.
+            Essas informações são armazenadas e sincronizadas diretamente com a
+            empresa cadastrada.
           </p>
         </div>
 

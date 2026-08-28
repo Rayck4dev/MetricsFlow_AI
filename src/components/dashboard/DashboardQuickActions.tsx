@@ -9,6 +9,8 @@ import {
   WalletCards,
 } from "lucide-react";
 
+import { useCompanyRole } from "@/hooks/useCompanyRole";
+
 interface DashboardQuickActionsProps {
   onAddIncome?: () => void;
   onAddExpense?: () => void;
@@ -22,6 +24,10 @@ export function DashboardQuickActions({
   onViewFinance,
   onViewDre,
 }: DashboardQuickActionsProps) {
+  const { isCollaborator, loading: roleLoading } = useCompanyRole();
+
+  const showDre = !roleLoading && !isCollaborator;
+
   const actions = [
     {
       title: "Adicionar receita",
@@ -50,15 +56,19 @@ export function DashboardQuickActions({
       bg: "bg-brand-500/10",
       border: "hover:border-brand-500/30",
     },
-    {
-      title: "DRE",
-      description: "Analisar resultado financeiro",
-      icon: FileText,
-      onClick: onViewDre,
-      color: "text-cpm-accent",
-      bg: "bg-cpm-accent/10",
-      border: "hover:border-cpm-accent/30",
-    },
+    ...(showDre
+      ? [
+          {
+            title: "DRE",
+            description: "Analisar resultado financeiro",
+            icon: FileText,
+            onClick: onViewDre,
+            color: "text-cpm-accent",
+            bg: "bg-cpm-accent/10",
+            border: "hover:border-cpm-accent/30",
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -84,7 +94,7 @@ export function DashboardQuickActions({
         </div>
       </div>
 
-      <div className="relative grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className={`relative grid grid-cols-1 gap-3 sm:grid-cols-2 ${showDre ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}>
         {actions.map((action, index) => {
           const Icon = action.icon;
 

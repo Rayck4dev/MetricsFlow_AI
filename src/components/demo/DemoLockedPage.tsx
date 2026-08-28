@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import {
   ArrowRight,
   BarChart3,
@@ -123,7 +124,6 @@ export function DemoLockedPage({
   title,
   description,
   icon = "movimentacoes",
-  onRegister,
 }: DemoLockedPageProps) {
   const Icon = iconMap[icon];
   const preview = previewData[icon];
@@ -254,17 +254,30 @@ export function DemoLockedPage({
                     recursos do MetricsFlow AI.
                   </p>
                 </div>
-
-                <motion.button
-                  type="button"
-                  onClick={onRegister}
-                  whileHover={{ y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="mt-6 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 text-[10px] font-bold text-white shadow-lg shadow-brand-600/20 transition-colors hover:bg-brand-500"
+                <Link
+                  href="/cadastro"
+                  className="
+                  group
+                  flex w-full items-center justify-center gap-2
+                  rounded-xl
+                  bg-brand-600
+                  px-7 py-3.5
+                  text-sm font-semibold text-white
+                  shadow-xl shadow-brand-600/20
+                  transition-all duration-300
+                  hover:-translate-y-0.5
+                  hover:bg-brand-500
+                  hover:shadow-2xl
+                  hover:shadow-brand-500/20
+                  sm:w-auto
+                "
                 >
-                  Criar minha conta
-                  <ArrowRight size={14} />
-                </motion.button>
+                  Criar Conta Grátis
+                  <ArrowRight
+                    size={17}
+                    className="transition-transform duration-300 group-hover:translate-x-1"
+                  />
+                </Link>
 
                 <p className="mt-3 text-[8px] text-slate-600">
                   É rápido, gratuito e você poderá explorar todos os módulos.

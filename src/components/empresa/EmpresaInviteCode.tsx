@@ -6,7 +6,9 @@ import { motion } from "framer-motion";
 
 interface EmpresaInviteCodeProps {
   code: string;
+
   onCopy?: () => void | Promise<void>;
+
   onRegenerate?: () => void | Promise<void>;
 }
 
@@ -16,30 +18,41 @@ export function EmpresaInviteCode({
   onRegenerate,
 }: EmpresaInviteCodeProps) {
   const [copied, setCopied] = useState(false);
-  const [regenerating, setRegenerating] =
-    useState(false);
+  const [regenerating, setRegenerating] = useState(false);
+
+  const [error, setError] = useState("");
 
   async function handleCopy() {
+    if (!code) return;
+
     try {
-      await navigator.clipboard?.writeText(code);
-    } catch {
-      // Backend/produção poderá fornecer outro método.
+      await navigator.clipboard.writeText(code);
+
+      await onCopy?.();
+
+      setCopied(true);
+      setError("");
+
+      window.setTimeout(() => {
+        setCopied(false);
+      }, 1800);
+    } catch (error) {
+      console.error("Erro ao copiar código:", error);
+
+      setError("Não foi possível copiar o código.");
     }
-
-    await onCopy?.();
-
-    setCopied(true);
-
-    window.setTimeout(() => {
-      setCopied(false);
-    }, 1800);
   }
 
   async function handleRegenerate() {
     setRegenerating(true);
+    setError("");
 
     try {
       await onRegenerate?.();
+    } catch (error) {
+      console.error("Erro ao regenerar código:", error);
+
+      setError("Não foi possível gerar um novo código.");
     } finally {
       setRegenerating(false);
     }
@@ -47,24 +60,28 @@ export function EmpresaInviteCode({
 
   return (
     <motion.section
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, delay: 0.14 }}
+      initial={{
+        opacity: 0,
+        y: 16,
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+      }}
+      transition={{
+        duration: 0.45,
+        delay: 0.14,
+      }}
       className="overflow-hidden rounded-2xl border border-surface-border bg-surface-panel/90 shadow-xl shadow-black/10 backdrop-blur-xl"
     >
       <div className="border-b border-surface-border px-5 py-4">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500/10">
-            <KeyRound
-              size={16}
-              className="text-brand-400"
-            />
+            <KeyRound size={16} className="text-brand-400" />
           </div>
 
           <div>
-            <h2 className="text-sm font-bold text-white">
-              Código de convite
-            </h2>
+            <h2 className="text-sm font-bold text-white">Código de convite</h2>
 
             <p className="mt-0.5 text-[9px] text-slate-600">
               Convide colaboradores para sua empresa.
@@ -81,31 +98,38 @@ export function EmpresaInviteCode({
 
           <motion.p
             key={code}
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{
+              opacity: 0,
+              y: 5,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
             className="mt-2 font-mono text-2xl font-bold tracking-[0.22em] text-brand-300"
           >
-            {code}
+            {code || "------"}
           </motion.p>
         </div>
 
         <p className="text-[9px] leading-4 text-slate-600">
-          Envie este código para o colaborador. Ele poderá
-          utilizá-lo para entrar na empresa.
+          Envie este código para o colaborador. Ele poderá utilizá-lo para
+          entrar na empresa.
         </p>
+
+        {error && (
+          <p className="text-[9px] font-medium text-red-400">{error}</p>
+        )}
 
         <div className="grid gap-2 sm:grid-cols-2">
           <motion.button
             type="button"
             onClick={handleCopy}
+            disabled={!code}
             whileTap={{ scale: 0.98 }}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-surface-border bg-surface-sidebar text-[9px] font-bold text-slate-400 transition-all hover:border-brand-500/30 hover:bg-brand-500/5 hover:text-brand-300"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-surface-border bg-surface-sidebar text-[9px] font-bold text-slate-400 transition-all hover:border-brand-500/30 hover:bg-brand-500/5 hover:text-brand-300 disabled:pointer-events-none disabled:opacity-40"
           >
-            {copied ? (
-              <Check size={13} />
-            ) : (
-              <Copy size={13} />
-            )}
+            {copied ? <Check size={13} /> : <Copy size={13} />}
 
             {copied ? "Copiado" : "Copiar código"}
           </motion.button>
@@ -119,16 +143,10 @@ export function EmpresaInviteCode({
           >
             <RefreshCw
               size={13}
-              className={
-                regenerating
-                  ? "animate-spin"
-                  : ""
-              }
+              className={regenerating ? "animate-spin" : ""}
             />
 
-            {regenerating
-              ? "Gerando..."
-              : "Novo código"}
+            {regenerating ? "Gerando..." : "Novo código"}
           </motion.button>
         </div>
       </div>

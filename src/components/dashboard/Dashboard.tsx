@@ -28,8 +28,8 @@ interface DashboardProps {
 
 export function Dashboard({
   transactions,
-  userName = "Carlos",
-  companyName = "Carlos Design",
+  userName,
+  companyName,
   demo = false,
   onAddIncome,
   onAddExpense,

@@ -1,13 +1,22 @@
-import type { Metadata } from 'next';
-import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
-import './globals.css';
+import type { Metadata } from "next";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
-const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-heading' });
+import "./globals.css";
+import { UserProvider } from "@/contexts/UserContext";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-heading",
+});
 
 export const metadata: Metadata = {
-  title: 'MetricsFlow AI - CPM para MEI',
-  description: 'Gestão de Desempenho Corporativo simplificada via WhatsApp',
+  title: "MetricsFlow AI - CPM para MEI",
+  description: "Gestão de Desempenho Corporativo simplificada via WhatsApp",
 };
 
 export default function RootLayout({
@@ -16,9 +25,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" className={`${inter.variable} ${jakarta.variable}`}>
+    <html
+      lang="pt-BR"
+      data-scroll-behavior="smooth"
+      className={`${inter.variable} ${jakarta.variable}`}
+    >
       <body className="bg-surface-main antialiased selection:bg-brand-500 selection:text-white">
-        {children}
+        <UserProvider>{children}</UserProvider>
       </body>
     </html>
   );

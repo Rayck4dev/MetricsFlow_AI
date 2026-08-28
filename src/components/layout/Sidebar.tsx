@@ -15,8 +15,12 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+
+import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/contexts/UserContext";
+import { useCompanyRole } from "@/hooks/useCompanyRole";
 
 export type SidebarSection =
   | "dashboard"
@@ -48,6 +52,10 @@ interface NavigationItem {
   comingSoon?: boolean;
 }
 
+/* =========================================================
+   NAVEGAÇÃO PRINCIPAL
+========================================================= */
+
 const navigation: NavigationItem[] = [
   {
     id: "dashboard",
@@ -76,6 +84,10 @@ const navigation: NavigationItem[] = [
   },
 ];
 
+/* =========================================================
+   NAVEGAÇÃO DA CONTA
+========================================================= */
+
 const accountNavigation: NavigationItem[] = [
   {
     id: "profile",
@@ -98,18 +110,149 @@ const accountNavigation: NavigationItem[] = [
 ];
 
 export function Sidebar({
-  userName = "Usuário",
-  companyName = "Minha empresa",
+  userName,
+  companyName,
   demo = false,
   activeDemoSection = "dashboard",
   onDemoSectionChange,
   onLogout,
 }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  /* =========================================================
+     USUÁRIO
+  ========================================================= */
+
+  const { user, loading: userLoading } = useUser();
+
+  /* =========================================================
+     PAPEL NA EMPRESA
+  ========================================================= */
+
+  const {
+    role,
+    loading: roleLoading,
+    isOwner,
+    isCollaborator,
+  } = useCompanyRole();
+
+  const supabase = createClient();
+
+  /* =========================================================
+     ESTADOS
+  ========================================================= */
 
   const [hoveredTab, setHoveredTab] = useState<SidebarSection | null>(null);
 
   const [showUserMenu, setShowUserMenu] = useState(false);
+
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  /* =========================================================
+     DADOS EXIBIDOS
+  ========================================================= */
+
+  const displayUserName = demo
+    ? userName || "Carlos"
+    : user?.name || userName || "Usuário";
+
+  const displayCompanyName = demo
+    ? companyName || "Carlos Design"
+    : user?.companyName || companyName || "Empresa";
+
+  /* =========================================================
+     PERMISSÕES
+  =========================================================
+
+     OWNER:
+
+     Dashboard
+     WhatsApp
+     DRE
+     Movimentações
+     Perfil
+     Empresa
+     Preferências
+
+     COLLABORATOR:
+
+     Dashboard
+     WhatsApp
+     Movimentações
+     Perfil
+     Preferências
+
+     NÃO pode acessar:
+
+     DRE
+     Empresa
+  ========================================================= */
+
+  function canSeeMainItem(item: NavigationItem) {
+    /*
+     * DEMO
+     */
+    if (demo) {
+      return true;
+    }
+
+    /*
+     * Itens liberados para qualquer membro.
+     */
+    if (
+      item.id === "dashboard" ||
+      item.id === "transactions" ||
+      item.id === "whatsapp"
+    ) {
+      return true;
+    }
+
+    /*
+     * DRE:
+     * somente proprietário.
+     *
+     * Enquanto o papel estiver carregando,
+     * NÃO mostramos.
+     */
+    if (item.id === "dre") {
+      return role === "owner";
+    }
+
+    return false;
+  }
+
+  function canSeeAccountItem(item: NavigationItem) {
+    /*
+     * DEMO
+     */
+    if (demo) {
+      return true;
+    }
+
+    /*
+     * Perfil e Preferências são pessoais.
+     *
+     * Colaborador pode acessar.
+     */
+    if (item.id === "profile" || item.id === "preferences") {
+      return true;
+    }
+
+    /*
+     * Empresa:
+     * somente proprietário.
+     */
+    if (item.id === "company") {
+      return role === "owner";
+    }
+
+    return false;
+  }
+
+  /* =========================================================
+     NAVEGAÇÃO DEMO
+  ========================================================= */
 
   function handleDemoNavigation(section: SidebarSection) {
     if (!demo) return;
@@ -117,11 +260,39 @@ export function Sidebar({
     onDemoSectionChange?.(section);
   }
 
-  function handleLogout() {
-    if (demo) return;
+  /* =========================================================
+     LOGOUT
+  ========================================================= */
 
-    onLogout?.();
+  async function handleLogout() {
+    if (demo || isLoggingOut) return;
+
+    setIsLoggingOut(true);
+
+    try {
+      setShowUserMenu(false);
+
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        console.error("Erro ao sair:", error);
+        return;
+      }
+
+      onLogout?.();
+
+      router.replace("/login");
+      router.refresh();
+    } catch (error) {
+      console.error("Erro inesperado ao fazer logout:", error);
+    } finally {
+      setIsLoggingOut(false);
+    }
   }
+
+  /* =========================================================
+     ACTIVE
+  ========================================================= */
 
   function isDemoActive(id: SidebarSection) {
     return demo && activeDemoSection === id;
@@ -130,6 +301,10 @@ export function Sidebar({
   function isRealActive(href: string) {
     return pathname === href || pathname.startsWith(`${href}/`);
   }
+
+  /* =========================================================
+     ITEM PRINCIPAL
+  ========================================================= */
 
   function renderNavigationItem(item: NavigationItem) {
     const Icon = item.icon;
@@ -164,11 +339,11 @@ export function Sidebar({
           <motion.div
             layoutId="sidebar-hover-tab"
             className="
-              absolute
-              inset-0
-              rounded-xl
-              bg-surface-panel/60
-            "
+                absolute
+                inset-0
+                rounded-xl
+                bg-surface-panel/60
+              "
             transition={{
               type: "spring",
               stiffness: 400,
@@ -258,7 +433,11 @@ export function Sidebar({
         </div>
       </>
     );
-    
+
+    /* =======================================================
+       DEMO
+    ======================================================= */
+
     if (demo) {
       if (item.comingSoon) {
         return (
@@ -307,6 +486,10 @@ export function Sidebar({
       );
     }
 
+    /* =======================================================
+       EM BREVE
+    ======================================================= */
+
     if (item.comingSoon) {
       return (
         <motion.div
@@ -329,6 +512,10 @@ export function Sidebar({
       );
     }
 
+    /* =======================================================
+       ITEM NORMAL
+    ======================================================= */
+
     return (
       <motion.div key={item.id} whileTap={{ scale: 0.97 }}>
         <Link
@@ -350,6 +537,10 @@ export function Sidebar({
       </motion.div>
     );
   }
+
+  /* =========================================================
+     ITEM DA CONTA
+  ========================================================= */
 
   function renderAccountItem(item: NavigationItem) {
     const Icon = item.icon;
@@ -443,6 +634,10 @@ export function Sidebar({
       </>
     );
 
+    /* =======================================================
+       DEMO
+    ======================================================= */
+
     if (demo) {
       return (
         <motion.button
@@ -468,6 +663,10 @@ export function Sidebar({
       );
     }
 
+    /* =======================================================
+       ITEM REAL
+    ======================================================= */
+
     return (
       <motion.div key={item.id} whileTap={{ scale: 0.97 }}>
         <Link
@@ -490,6 +689,18 @@ export function Sidebar({
     );
   }
 
+  /* =========================================================
+     ITENS VISÍVEIS
+  ========================================================= */
+
+  const visibleNavigation = navigation.filter(canSeeMainItem);
+
+  const visibleAccountNavigation = accountNavigation.filter(canSeeAccountItem);
+
+  /* =========================================================
+     SIDEBAR
+  ========================================================= */
+
   return (
     <aside
       className="
@@ -507,6 +718,9 @@ export function Sidebar({
       "
     >
       <div className="sticky top-0 flex min-h-screen flex-col">
+        {/* =====================================================
+            LOGO / EMPRESA
+        ===================================================== */}
 
         <div className="border-b border-surface-border p-4">
           <Link
@@ -583,13 +797,16 @@ export function Sidebar({
                 <Store size={9} className="shrink-0 text-slate-600" />
 
                 <p className="truncate text-[10px] font-medium text-slate-500">
-                  {companyName}
+                  {displayCompanyName}
                 </p>
               </div>
             </div>
           </Link>
         </div>
 
+        {/* =====================================================
+            ÁREA PRINCIPAL
+        ===================================================== */}
 
         <div className="flex min-h-0 flex-1 flex-col">
           <nav
@@ -602,6 +819,10 @@ export function Sidebar({
             "
             onMouseLeave={() => setHoveredTab(null)}
           >
+            {/* =================================================
+                TÍTULO
+            ================================================= */}
+
             <div className="flex items-center justify-between px-3 pb-2.5 pt-2">
               <p
                 className="
@@ -631,10 +852,17 @@ export function Sidebar({
               )}
             </div>
 
+            {/* =================================================
+                NAVEGAÇÃO PRINCIPAL
+            ================================================= */}
+
             <div className="space-y-1">
-              {navigation.map(renderNavigationItem)}
+              {visibleNavigation.map(renderNavigationItem)}
             </div>
 
+            {/* =================================================
+                CONTA
+            ================================================= */}
 
             <div className="mt-5 border-t border-surface-border pt-4">
               <div className="flex items-center justify-between px-3 pb-2">
@@ -654,10 +882,14 @@ export function Sidebar({
               </div>
 
               <div className="space-y-1">
-                {accountNavigation.map(renderAccountItem)}
+                {visibleAccountNavigation.map(renderAccountItem)}
               </div>
             </div>
           </nav>
+
+          {/* =====================================================
+              STATUS
+          ===================================================== */}
 
           <div className="border-t border-surface-border p-3">
             <motion.div
@@ -692,6 +924,7 @@ export function Sidebar({
               <div className="mb-1.5 flex items-center gap-2">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
                 </span>
 
@@ -707,6 +940,11 @@ export function Sidebar({
               </p>
             </motion.div>
           </div>
+
+          {/* =====================================================
+              USUÁRIO
+          ===================================================== */}
+
           <div className="relative border-t border-surface-border p-3">
             <motion.button
               type="button"
@@ -746,11 +984,17 @@ export function Sidebar({
 
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[10px] font-bold text-slate-200">
-                  {userName}
+                  {userLoading && !demo ? "Carregando..." : displayUserName}
                 </p>
 
                 <p className="truncate text-[8px] text-slate-600">
-                  {demo ? "Visitante" : "Conta MetricsFlow"}
+                  {demo
+                    ? "Visitante"
+                    : isCollaborator
+                      ? "Colaborador"
+                      : isOwner
+                        ? "Proprietário"
+                        : "Conta MetricsFlow"}
                 </p>
               </div>
 
@@ -765,6 +1009,10 @@ export function Sidebar({
                 </motion.span>
               )}
             </motion.button>
+
+            {/* =================================================
+                MENU DO USUÁRIO
+            ================================================= */}
 
             {!demo && showUserMenu && (
               <motion.div
@@ -798,25 +1046,81 @@ export function Sidebar({
                   shadow-black/40
                 "
               >
+                {/* =================================================
+                    PERFIL — TODOS
+                ================================================= */}
+
                 <Link
                   href="/perfil"
-                  className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[10px] font-semibold text-slate-400 transition-colors hover:bg-surface-sidebar hover:text-white"
+                  onClick={() => setShowUserMenu(false)}
+                  className="
+                    flex
+                    items-center
+                    gap-2.5
+                    rounded-lg
+                    px-3
+                    py-2.5
+                    text-[10px]
+                    font-semibold
+                    text-slate-400
+                    transition-colors
+                    hover:bg-surface-sidebar
+                    hover:text-white
+                  "
                 >
                   <CircleUserRound size={13} />
                   Meu perfil
                 </Link>
 
-                <Link
-                  href="/empresa"
-                  className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[10px] font-semibold text-slate-400 transition-colors hover:bg-surface-sidebar hover:text-white"
-                >
-                  <Store size={13} />
-                  Minha empresa
-                </Link>
+                {/* =================================================
+                    EMPRESA — SOMENTE OWNER
+                ================================================= */}
+
+                {role === "owner" && (
+                  <Link
+                    href="/empresa"
+                    onClick={() => setShowUserMenu(false)}
+                    className="
+                      flex
+                      items-center
+                      gap-2.5
+                      rounded-lg
+                      px-3
+                      py-2.5
+                      text-[10px]
+                      font-semibold
+                      text-slate-400
+                      transition-colors
+                      hover:bg-surface-sidebar
+                      hover:text-white
+                    "
+                  >
+                    <Store size={13} />
+                    Empresa
+                  </Link>
+                )}
+
+                {/* =================================================
+                    PREFERÊNCIAS — TODOS
+                ================================================= */}
 
                 <Link
                   href="/preferencias"
-                  className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[10px] font-semibold text-slate-400 transition-colors hover:bg-surface-sidebar hover:text-white"
+                  onClick={() => setShowUserMenu(false)}
+                  className="
+                    flex
+                    items-center
+                    gap-2.5
+                    rounded-lg
+                    px-3
+                    py-2.5
+                    text-[10px]
+                    font-semibold
+                    text-slate-400
+                    transition-colors
+                    hover:bg-surface-sidebar
+                    hover:text-white
+                  "
                 >
                   <Settings size={13} />
                   Preferências
@@ -824,9 +1128,27 @@ export function Sidebar({
 
                 <div className="my-1 h-px bg-surface-border" />
 
+                {/* =================================================
+                    SITE
+                ================================================= */}
+
                 <Link
                   href="/"
-                  className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[10px] font-semibold text-slate-400 transition-colors hover:bg-surface-sidebar hover:text-white"
+                  onClick={() => setShowUserMenu(false)}
+                  className="
+                    flex
+                    items-center
+                    gap-2.5
+                    rounded-lg
+                    px-3
+                    py-2.5
+                    text-[10px]
+                    font-semibold
+                    text-slate-400
+                    transition-colors
+                    hover:bg-surface-sidebar
+                    hover:text-white
+                  "
                 >
                   <ExternalLink size={13} />
                   Voltar ao site
@@ -834,9 +1156,14 @@ export function Sidebar({
 
                 <div className="my-1 h-px bg-surface-border" />
 
+                {/* =================================================
+                    LOGOUT
+                ================================================= */}
+
                 <button
                   type="button"
                   onClick={handleLogout}
+                  disabled={isLoggingOut}
                   className="
                     flex
                     w-full
@@ -850,10 +1177,16 @@ export function Sidebar({
                     text-red-400
                     transition-colors
                     hover:bg-red-500/10
+                    disabled:cursor-not-allowed
+                    disabled:opacity-50
                   "
                 >
-                  <LogOut size={13} />
-                  Sair da conta
+                  <LogOut
+                    size={13}
+                    className={isLoggingOut ? "animate-pulse" : ""}
+                  />
+
+                  {isLoggingOut ? "Saindo..." : "Sair da conta"}
                 </button>
               </motion.div>
             )}

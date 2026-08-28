@@ -12,6 +12,7 @@ interface PerfilValues {
 
 interface PerfilFormProps {
   initialValues?: Partial<PerfilValues>;
+
   onSubmit?: (values: PerfilValues) => void | Promise<void>;
 }
 
@@ -28,16 +29,22 @@ export function PerfilForm({ initialValues, onSubmit }: PerfilFormProps) {
   };
 
   const [name, setName] = useState(values.name);
+
   const [email, setEmail] = useState(values.email);
+
   const [phone, setPhone] = useState(values.phone);
 
   const [saving, setSaving] = useState(false);
+
   const [saved, setSaved] = useState(false);
+
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     setName(initialValues?.name ?? "");
+
     setEmail(initialValues?.email ?? "");
+
     setPhone(initialValues?.phone ?? "");
   }, [initialValues]);
 
@@ -87,7 +94,7 @@ export function PerfilForm({ initialValues, onSubmit }: PerfilFormProps) {
       await onSubmit?.({
         name: name.trim(),
         email: email.trim(),
-        phone,
+        phone: phone.trim(),
       });
 
       setSaved(true);
@@ -95,6 +102,8 @@ export function PerfilForm({ initialValues, onSubmit }: PerfilFormProps) {
       window.setTimeout(() => {
         setSaved(false);
       }, 2200);
+    } catch {
+      // O erro é tratado pela página.
     } finally {
       setSaving(false);
     }
@@ -102,9 +111,18 @@ export function PerfilForm({ initialValues, onSubmit }: PerfilFormProps) {
 
   return (
     <motion.section
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, delay: 0.08 }}
+      initial={{
+        opacity: 0,
+        y: 16,
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+      }}
+      transition={{
+        duration: 0.45,
+        delay: 0.08,
+      }}
       className="overflow-hidden rounded-2xl border border-surface-border bg-surface-panel/90 shadow-xl shadow-black/10 backdrop-blur-xl"
     >
       <div className="border-b border-surface-border px-5 py-4 sm:px-6">
@@ -166,7 +184,7 @@ export function PerfilForm({ initialValues, onSubmit }: PerfilFormProps) {
             label="Telefone"
             value={phone}
             onChange={(value) => setPhone(formatPhone(value))}
-            placeholder="(00) 00000-0000"
+            placeholder="Opcional — (00) 00000-0000"
           />
         </div>
 
@@ -176,21 +194,25 @@ export function PerfilForm({ initialValues, onSubmit }: PerfilFormProps) {
           </p>
 
           <p className="mt-1 text-[8px] leading-4 text-slate-600">
-            No backend, essas informações serão sincronizadas com a autenticação
-            da plataforma.
+            O telefone é opcional e pode ser adicionado ou alterado quando
+            quiser.
           </p>
         </div>
 
         <div className="flex flex-col gap-3 border-t border-surface-border pt-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-[8px] text-slate-600">
-            Alterações ficam disponíveis para sua conta.
+            As alterações são salvas na sua conta.
           </p>
 
           <motion.button
             type="submit"
             disabled={saving}
-            whileHover={{ y: -1 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{
+              y: -1,
+            }}
+            whileTap={{
+              scale: 0.98,
+            }}
             className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 text-[10px] font-bold text-white shadow-lg shadow-brand-600/10 transition-colors hover:bg-brand-500 disabled:pointer-events-none disabled:opacity-60"
           >
             {saving ? (

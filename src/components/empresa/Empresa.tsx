@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 import { EmpresaHeader } from "@/components/empresa/EmpresaHeader";
 import { EmpresaForm } from "@/components/empresa/EmpresaForm";
 import { EmpresaInviteCode } from "@/components/empresa/EmpresaInviteCode";
@@ -14,9 +12,9 @@ interface EmpresaProps {
   company: {
     id: string;
     name: string;
-    document: string;
-    phoneNumber: string;
-    inviteCode: string;
+    document: string | null;
+    phoneNumber: string | null;
+    inviteCode: string | null;
   };
 
   members: EmpresaMember[];
@@ -42,27 +40,6 @@ export function Empresa({
   onRegenerateInvite,
   onRemoveMember,
 }: EmpresaProps) {
-  const [inviteCode, setInviteCode] = useState(company.inviteCode);
-
-  async function handleRegenerateInvite() {
-    await onRegenerateInvite?.();
-
-    /*
-     * Mock temporário.
-     *
-     * No backend:
-     * o código retornará da API/RPC.
-     */
-    const characters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-
-    const nextCode = Array.from(
-      { length: 6 },
-      () => characters[Math.floor(Math.random() * characters.length)],
-    ).join("");
-
-    setInviteCode(nextCode);
-  }
-
   return (
     <div className="space-y-6">
       <EmpresaHeader companyName={company.name} />
@@ -72,8 +49,8 @@ export function Empresa({
           <EmpresaForm
             initialValues={{
               name: company.name,
-              document: company.document,
-              phoneNumber: company.phoneNumber,
+              document: company.document ?? "",
+              phoneNumber: company.phoneNumber ?? "",
             }}
             onSubmit={onUpdateCompany}
           />
@@ -87,18 +64,18 @@ export function Empresa({
 
         <div className="space-y-5">
           <EmpresaInviteCode
-            code={inviteCode}
-            onRegenerate={handleRegenerateInvite}
+            code={company.inviteCode ?? ""}
+            onRegenerate={onRegenerateInvite}
           />
 
-          <CompanyAccessInfo />
+          <CompanyAccessInfo memberCount={members.length} />
         </div>
       </div>
     </div>
   );
 }
 
-function CompanyAccessInfo() {
+function CompanyAccessInfo({ memberCount }: { memberCount: number }) {
   return (
     <div className="rounded-2xl border border-surface-border bg-surface-panel/60 p-5">
       <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-brand-400">
@@ -110,12 +87,12 @@ function CompanyAccessInfo() {
       </h3>
 
       <p className="mt-1.5 text-[9px] leading-5 text-slate-600">
-        Todos os colaboradores vinculados à empresa poderão acessar as
-        informações permitidas pela plataforma.
+        Os colaboradores vinculados à empresa poderão acessar as informações
+        permitidas pela plataforma.
       </p>
 
       <div className="mt-4 grid grid-cols-2 gap-2">
-        <InfoItem label="Membros" value="Ativo" />
+        <InfoItem label="Membros" value={String(memberCount)} />
 
         <InfoItem label="Convite" value="Disponível" />
       </div>

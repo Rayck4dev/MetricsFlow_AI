@@ -105,18 +105,6 @@ export function Preferencias() {
         <PreferenciasDangerZone onDeleteAccount={handleDeleteAccount} />
       </div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.35, duration: 0.4 }}
-        className="rounded-xl border border-surface-border bg-surface-panel/60 px-4 py-3 text-center"
-      >
-        <p className="text-[8px] leading-4 text-slate-600">
-          As preferências são armazenadas localmente nesta versão. A
-          sincronização com sua conta será adicionada na integração com o
-          backend.
-        </p>
-      </motion.div>
     </div>
   );
 }

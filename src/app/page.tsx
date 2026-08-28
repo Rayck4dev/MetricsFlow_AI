@@ -144,7 +144,7 @@ export default function Home() {
               className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
             >
               <Link
-                href="/login"
+                href="/cadastro"
                 className="
                   group
                   flex w-full items-center justify-center gap-2

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+
 import {
   AlertCircle,
   ArrowRight,
@@ -19,16 +20,22 @@ import { FaChrome } from "react-icons/fa";
 
 interface PerfilSecurityProps {
   authProvider?: "google" | "email";
+
   onChangePassword?: (password: string) => void | Promise<void>;
-  onManageSessions?: () => void;
+
+  onManageSessions?: () => void | Promise<void>;
 }
 
 export function PerfilSecurity({
-  authProvider = "google",
+  authProvider = "email",
   onChangePassword,
   onManageSessions,
 }: PerfilSecurityProps) {
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
+
+  const [sessionLoading, setSessionLoading] = useState(false);
+
+  const [sessionMessage, setSessionMessage] = useState("");
 
   const isGoogle = authProvider === "google";
 
@@ -40,12 +47,40 @@ export function PerfilSecurity({
     setIsPasswordOpen(false);
   }
 
+  async function handleManageSessions() {
+    if (!onManageSessions) {
+      return;
+    }
+
+    setSessionLoading(true);
+    setSessionMessage("");
+
+    try {
+      await onManageSessions();
+
+      setSessionMessage("As outras sessões foram encerradas.");
+    } catch {
+      setSessionMessage("Não foi possível encerrar as outras sessões.");
+    } finally {
+      setSessionLoading(false);
+    }
+  }
+
   return (
     <>
       <motion.section
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, delay: 0.14 }}
+        initial={{
+          opacity: 0,
+          y: 16,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
+        transition={{
+          duration: 0.45,
+          delay: 0.14,
+        }}
         className="overflow-hidden rounded-2xl border border-surface-border bg-surface-panel/90 shadow-xl shadow-black/10 backdrop-blur-xl"
       >
         <div className="border-b border-surface-border px-5 py-4 sm:px-6">
@@ -89,7 +124,7 @@ export function PerfilSecurity({
             description={
               isGoogle
                 ? "Você pode definir uma senha para ter uma forma alternativa de acesso à sua conta."
-                : "Atualize sua senha periodicamente para manter sua conta protegida."
+                : "Atualize sua senha para manter sua conta protegida."
             }
             actionLabel="Alterar senha"
             onClick={handleOpenPassword}
@@ -98,10 +133,21 @@ export function PerfilSecurity({
           <SecurityCard
             icon={<ShieldCheck size={15} className="text-brand-400" />}
             title="Sessões da conta"
-            description="Gerencie os dispositivos que possuem acesso à sua conta."
-            actionLabel="Gerenciar sessões"
-            onClick={onManageSessions}
+            description="Encerre o acesso da sua conta em outros dispositivos."
+            actionLabel={
+              sessionLoading ? "Encerrando..." : "Encerrar outras sessões"
+            }
+            onClick={handleManageSessions}
+            loading={sessionLoading}
           />
+
+          {sessionMessage && (
+            <div className="rounded-xl border border-emerald-500/10 bg-emerald-500/[0.05] p-3">
+              <p className="text-[9px] font-medium text-emerald-400">
+                {sessionMessage}
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="border-t border-surface-border bg-emerald-500/[0.025] px-5 py-4 sm:px-6">
@@ -117,8 +163,8 @@ export function PerfilSecurity({
               </p>
 
               <p className="mt-1 text-[8px] leading-4 text-slate-600">
-                Suas configurações de segurança serão sincronizadas com o
-                sistema de autenticação quando o backend estiver conectado.
+                As alterações de segurança são aplicadas diretamente à sua
+                conta.
               </p>
             </div>
           </div>
@@ -131,6 +177,7 @@ export function PerfilSecurity({
             onClose={handleClosePassword}
             onSubmit={async (password) => {
               await onChangePassword?.(password);
+
               handleClosePassword();
             }}
           />
@@ -147,6 +194,7 @@ interface SecurityCardProps {
   actionLabel: string;
   onClick?: () => void;
   disabled?: boolean;
+  loading?: boolean;
 }
 
 function SecurityCard({
@@ -156,6 +204,7 @@ function SecurityCard({
   actionLabel,
   onClick,
   disabled = false,
+  loading = false,
 }: SecurityCardProps) {
   return (
     <motion.div
@@ -185,7 +234,7 @@ function SecurityCard({
 
       <button
         type="button"
-        disabled={disabled}
+        disabled={disabled || loading}
         onClick={onClick}
         className={`inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg border px-3 text-[9px] font-bold transition-all ${
           disabled
@@ -193,9 +242,11 @@ function SecurityCard({
             : "border-surface-border bg-surface-panel text-slate-400 hover:border-brand-500/30 hover:bg-brand-500/[0.04] hover:text-brand-300 active:scale-[0.98]"
         }`}
       >
+        {loading && <Loader2 size={11} className="animate-spin" />}
+
         {actionLabel}
 
-        {!disabled && <ArrowRight size={11} />}
+        {!disabled && !loading && <ArrowRight size={11} />}
       </button>
     </motion.div>
   );
@@ -208,6 +259,7 @@ interface PasswordModalProps {
 
 function PasswordModal({ onClose, onSubmit }: PasswordModalProps) {
   const [password, setPassword] = useState("");
+
   const [confirmation, setConfirmation] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
@@ -228,11 +280,13 @@ function PasswordModal({ onClose, onSubmit }: PasswordModalProps) {
 
     if (!passwordIsValid) {
       setError("A senha precisa ter pelo menos 6 caracteres.");
+
       return;
     }
 
     if (!passwordsMatch) {
       setError("As senhas não coincidem.");
+
       return;
     }
 
@@ -241,8 +295,12 @@ function PasswordModal({ onClose, onSubmit }: PasswordModalProps) {
 
     try {
       await onSubmit(password);
-    } catch {
-      setError("Não foi possível alterar a senha. Tente novamente.");
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Não foi possível alterar a senha. Tente novamente.",
+      );
     } finally {
       setSaving(false);
     }
@@ -250,9 +308,15 @@ function PasswordModal({ onClose, onSubmit }: PasswordModalProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      initial={{
+        opacity: 0,
+      }}
+      animate={{
+        opacity: 1,
+      }}
+      exit={{
+        opacity: 0,
+      }}
       className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
@@ -389,7 +453,9 @@ function PasswordModal({ onClose, onSubmit }: PasswordModalProps) {
             <motion.button
               type="submit"
               disabled={saving || !passwordIsValid || !passwordsMatch}
-              whileTap={{ scale: 0.98 }}
+              whileTap={{
+                scale: 0.98,
+              }}
               className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 text-[10px] font-bold text-white shadow-lg shadow-brand-600/10 transition-colors hover:bg-brand-500 disabled:pointer-events-none disabled:opacity-40"
             >
               {saving ? (
@@ -433,9 +499,7 @@ function PasswordField({
           type={visible ? "text" : "password"}
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          autoComplete={
-            label === "Nova senha" ? "new-password" : "new-password"
-          }
+          autoComplete="new-password"
           className="h-11 w-full rounded-xl border border-surface-border bg-surface-sidebar px-3.5 pr-11 text-xs font-medium text-slate-200 outline-none transition-all placeholder:text-slate-700 hover:border-slate-600 focus:border-brand-500/60 focus:bg-surface-main focus:ring-2 focus:ring-brand-500/10"
           placeholder="Digite sua senha"
         />

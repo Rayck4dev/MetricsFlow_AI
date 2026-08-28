@@ -8,6 +8,8 @@ import {
   Sparkles,
 } from "lucide-react";
 
+import { useUser } from "@/contexts/UserContext";
+
 interface DashboardHeaderProps {
   userName?: string;
   companyName?: string;
@@ -15,10 +17,20 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({
-  userName = "Carlos",
-  companyName = "Carlos Design",
+  userName,
+  companyName,
   demo = false,
 }: DashboardHeaderProps) {
+  const { user } = useUser();
+
+  const displayUserName = demo
+    ? userName || "Carlos"
+    : user?.name || userName || "Usuário";
+
+  const displayCompanyName = demo
+    ? companyName || "Carlos Design"
+    : user?.companyName || companyName || "Empresa";
+
   return (
     <motion.header
       initial={{ opacity: 0, y: -18 }}
@@ -71,7 +83,7 @@ export function DashboardHeader({
           </div>
 
           <h1 className="mt-2 font-heading text-2xl font-bold tracking-tight text-white sm:text-3xl">
-            Olá, {userName}{" "}
+            Olá, {displayUserName}{" "}
             <motion.span
               initial={{ rotate: 0 }}
               animate={{ rotate: [0, 14, -8, 10, 0] }}
@@ -87,7 +99,7 @@ export function DashboardHeader({
           </h1>
 
           <p className="mt-2 max-w-xl text-xs leading-5 text-slate-500 sm:text-sm">
-            Acompanhe a saúde financeira da sua empresa em um só lugar.
+            Acompanhe a saúde financeira da empresa em um só lugar.
           </p>
         </div>
 
@@ -97,13 +109,13 @@ export function DashboardHeader({
               <Building2 size={18} className="text-brand-400" />
             </div>
 
-            <div>
+            <div className="min-w-0">
               <p className="text-[8px] font-semibold uppercase tracking-wider text-slate-600">
                 Empresa
               </p>
 
-              <p className="mt-0.5 text-xs font-bold text-slate-300">
-                {companyName}
+              <p className="mt-0.5 max-w-[180px] truncate text-xs font-bold text-slate-300">
+                {displayCompanyName}
               </p>
             </div>
           </div>

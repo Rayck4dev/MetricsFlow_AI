@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CalendarDays, CheckCircle2, UserRound } from "lucide-react";
+import { CalendarDays, CheckCircle2, Mail, UserRound } from "lucide-react";
 import { FaChrome } from "react-icons/fa";
 
 import { PerfilForm } from "./PerfilForm";
@@ -14,19 +14,32 @@ export interface PerfilUser {
   phone: string;
   role?: string;
   avatarUrl?: string | null;
-  authProvider?: string;
+  authProvider?: "google" | "email";
+  createdAt?: string;
 }
 
 export interface PerfilProps {
   user?: PerfilUser;
   initialValues?: PerfilUser;
+
   userName?: string;
   companyName?: string;
 
-  onUpdateProfile?: (values: PerfilUser) => void | Promise<void>;
-  onSubmit?: (values: PerfilUser) => void | Promise<void>;
-  onChangePassword?: (password?: string) => void | Promise<void>;
-  onManageSessions?: () => void;
+  onUpdateProfile?: (values: {
+    name: string;
+    email: string;
+    phone: string;
+  }) => void | Promise<void>;
+
+  onSubmit?: (values: {
+    name: string;
+    email: string;
+    phone: string;
+  }) => void | Promise<void>;
+
+  onChangePassword?: (password: string) => void | Promise<void>;
+
+  onManageSessions?: () => void | Promise<void>;
 }
 
 export function Perfil({
@@ -39,26 +52,41 @@ export function Perfil({
   onChangePassword,
   onManageSessions,
 }: PerfilProps) {
-  const profileData = user ||
-    initialValues || {
-      name: userName || "",
+  const profileData = user ??
+    initialValues ?? {
+      name: userName ?? "",
       email: "",
       phone: "",
     };
 
-  const handleSave = onUpdateProfile || onSubmit;
+  const handleSave = onUpdateProfile ?? onSubmit;
+
+  const authProvider =
+    user?.authProvider ?? initialValues?.authProvider ?? "email";
 
   return (
     <div className="space-y-6">
+      <PerfilHeader
+        userName={profileData.name}
+        email={profileData.email}
+        companyName={companyName ?? "Empresa"}
+        role={user?.role}
+        avatarUrl={profileData.avatarUrl}
+      />
+
       <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(380px,0.85fr)]">
         <div className="space-y-5">
           <PerfilForm initialValues={profileData} onSubmit={handleSave} />
-          <AccountInfo />
+
+          <AccountInfo
+            authProvider={authProvider}
+            createdAt={user?.createdAt}
+          />
         </div>
 
         <div className="space-y-5">
           <PerfilSecurity
-            authProvider="google"
+            authProvider={authProvider}
             onChangePassword={onChangePassword}
             onManageSessions={onManageSessions}
           />
@@ -68,12 +96,143 @@ export function Perfil({
   );
 }
 
-function AccountInfo() {
+/*
+ * =========================================================
+ * HEADER
+ * =========================================================
+ */
+
+interface PerfilHeaderProps {
+  userName: string;
+  email?: string;
+  companyName: string;
+  role?: string;
+  avatarUrl?: string | null;
+}
+
+function PerfilHeader({
+  userName,
+  email,
+  role = "Membro",
+  avatarUrl,
+}: PerfilHeaderProps) {
+  const initials = userName
+    ?.trim()
+    ?.split(/\s+/)
+    ?.slice(0, 2)
+    ?.map((part) => part.charAt(0).toUpperCase())
+    ?.join("");
+
+  return (
+    <motion.header
+      initial={{
+        opacity: 0,
+        y: -14,
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+      }}
+      transition={{
+        duration: 0.45,
+      }}
+      className="relative overflow-hidden rounded-2xl border border-surface-border bg-surface-panel/90 p-5 shadow-xl shadow-black/10 backdrop-blur-xl sm:p-6"
+    >
+      <div className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-brand-500/10 blur-3xl" />
+
+      <div className="pointer-events-none absolute -bottom-16 left-1/3 h-36 w-36 rounded-full bg-cpm-accent/5 blur-3xl" />
+
+      <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-4">
+          <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-brand-500/20 bg-brand-500/10">
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={userName}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span className="relative font-heading text-lg font-bold text-brand-300">
+                {initials || "U"}
+              </span>
+            )}
+          </div>
+
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="truncate font-heading text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                Meu perfil
+              </h1>
+
+              <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/15 bg-emerald-500/10 px-2 py-1 text-[8px] font-bold uppercase tracking-wider text-emerald-400">
+                <CheckCircle2 size={11} />
+                Conta ativa
+              </span>
+            </div>
+
+            <p className="mt-1.5 text-xs text-slate-500">
+              Gerencie seus dados pessoais e informações da sua conta.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center gap-2 rounded-xl border border-surface-border bg-surface-sidebar/70 px-3 py-2.5">
+            <UserRound size={13} className="text-brand-400" />
+
+            <span className="text-[9px] font-semibold text-slate-400">
+              {role}
+            </span>
+          </span>
+
+          <span className="inline-flex min-w-0 max-w-full items-center gap-2 rounded-xl border border-surface-border bg-surface-sidebar/70 px-3 py-2.5">
+            <Mail size={13} className="shrink-0 text-slate-500" />
+
+            <span className="truncate text-[9px] font-medium text-slate-500">
+              {email}
+            </span>
+          </span>
+        </div>
+      </div>
+    </motion.header>
+  );
+}
+
+/*
+ * =========================================================
+ * INFORMAÇÕES DA CONTA
+ * =========================================================
+ */
+
+function AccountInfo({
+  authProvider,
+  createdAt,
+}: {
+  authProvider: "google" | "email";
+  createdAt?: string;
+}) {
+  const createdLabel = createdAt
+    ? new Date(createdAt).toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })
+    : "Não disponível";
+
   return (
     <motion.section
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, delay: 0.18 }}
+      initial={{
+        opacity: 0,
+        y: 16,
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+      }}
+      transition={{
+        duration: 0.45,
+        delay: 0.18,
+      }}
       className="overflow-hidden rounded-2xl border border-surface-border bg-surface-panel/90 shadow-xl shadow-black/10 backdrop-blur-xl"
     >
       <div className="border-b border-surface-border px-5 py-4 sm:px-6">
@@ -84,6 +243,7 @@ function AccountInfo() {
 
           <div>
             <h2 className="text-sm font-bold text-white">Sobre sua conta</h2>
+
             <p className="mt-0.5 text-[9px] text-slate-600">
               Informações gerais da sua conta.
             </p>
@@ -100,15 +260,21 @@ function AccountInfo() {
         />
 
         <AccountItem
-          icon={<FaChrome size={13} />}
+          icon={
+            authProvider === "google" ? (
+              <FaChrome size={13} />
+            ) : (
+              <Mail size={13} />
+            )
+          }
           label="Autenticação"
-          value="Google"
+          value={authProvider === "google" ? "Google" : "E-mail"}
         />
 
         <AccountItem
           icon={<CalendarDays size={13} />}
           label="Conta criada"
-          value="Em breve"
+          value={createdLabel}
         />
 
         <AccountItem
@@ -116,13 +282,6 @@ function AccountInfo() {
           label="Tipo de conta"
           value="MEI"
         />
-      </div>
-
-      <div className="border-t border-surface-border bg-brand-500/[0.02] px-5 py-3.5 sm:px-6">
-        <p className="text-[8px] leading-4 text-slate-600">
-          Algumas informações serão preenchidas automaticamente quando a
-          autenticação e o backend estiverem conectados.
-        </p>
       </div>
     </motion.section>
   );

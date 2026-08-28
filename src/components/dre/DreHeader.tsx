@@ -48,7 +48,7 @@ export function DreHeader({
           </h1>
 
           <p className="mt-1.5 max-w-2xl text-xs leading-5 text-slate-500 sm:text-sm">
-            Acompanhe receitas, custos, despesas e o resultado da sua empresa.
+            Acompanhe receitas, custos, despesas e o resultado da empresa.
           </p>
 
           {companyName && (

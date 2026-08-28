@@ -6,7 +6,7 @@ import { BadgeCheck, Mail, UserRound } from "lucide-react";
 interface PerfilHeaderProps {
   userName: string;
   email?: string;
-  companyName: string;
+  companyName?: string;
   role?: string;
   avatarUrl?: string | null;
 }
@@ -14,7 +14,7 @@ interface PerfilHeaderProps {
 export function PerfilHeader({
   userName,
   email,
-  role = "Administrador",
+  role = "Colaborador",
   avatarUrl,
 }: PerfilHeaderProps) {
   const initials = userName
@@ -86,29 +86,24 @@ export function PerfilHeader({
 
         <div className="flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center gap-2 rounded-xl border border-surface-border bg-surface-sidebar/70 px-3 py-2.5">
-            <UserRound
-              size={13}
-              className="text-brand-400"
-            />
+            <UserRound size={13} className="text-brand-400" />
 
             <span className="text-[9px] font-semibold text-slate-400">
               {role}
             </span>
           </span>
 
-          <span className="inline-flex min-w-0 max-w-full items-center gap-2 rounded-xl border border-surface-border bg-surface-sidebar/70 px-3 py-2.5">
-            <Mail
-              size={13}
-              className="shrink-0 text-slate-500"
-            />
+          {email && (
+            <span className="inline-flex min-w-0 max-w-full items-center gap-2 rounded-xl border border-surface-border bg-surface-sidebar/70 px-3 py-2.5">
+              <Mail size={13} className="shrink-0 text-slate-500" />
 
-            <span className="truncate text-[9px] font-medium text-slate-500">
-              {email}
+              <span className="truncate text-[9px] font-medium text-slate-500">
+                {email}
+              </span>
             </span>
-          </span>
+          )}
         </div>
       </div>
     </motion.header>
   );
 }
-

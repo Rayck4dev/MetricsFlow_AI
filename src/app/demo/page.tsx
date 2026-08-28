@@ -113,7 +113,7 @@ export default function DemoPage() {
             {section === "dre" && (
               <DemoLockedPage
                 title="DRE"
-                description="Acompanhe receitas, custos, despesas e o resultado financeiro da sua empresa."
+                description="Acompanhe receitas, custos, despesas e o resultado financeiro da empresa."
               />
             )}
 

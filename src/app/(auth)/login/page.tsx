@@ -67,7 +67,7 @@ export default function LoginPage() {
 
                   <div>
                     <p className="text-xs font-semibold text-white">
-                      Acompanhe seus indicadores
+                      Acompanhe os indicadores
                     </p>
                     <p className="text-[10px] text-slate-500">
                       Tenha uma visão clara do seu negócio.

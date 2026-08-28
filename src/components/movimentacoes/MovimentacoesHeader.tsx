@@ -8,6 +8,8 @@ import {
   Sparkles,
 } from "lucide-react";
 
+import { useUser } from "@/contexts/UserContext";
+
 interface MovimentacoesHeaderProps {
   userName?: string;
   companyName?: string;
@@ -16,11 +18,17 @@ interface MovimentacoesHeaderProps {
 }
 
 export function MovimentacoesHeader({
-  userName = "Carlos",
-  companyName = "Minha empresa",
+  userName,
+  companyName,
   onAddIncome,
   onAddExpense,
 }: MovimentacoesHeaderProps) {
+  const { user } = useUser();
+
+  const displayUserName = user?.name || userName || "Usuário";
+  const displayCompanyName =
+    user?.companyName || companyName || "Empresa";
+
   return (
     <motion.header
       initial={{ opacity: 0, y: -14 }}
@@ -47,8 +55,10 @@ export function MovimentacoesHeader({
           </h1>
 
           <p className="mt-1.5 max-w-2xl text-xs leading-5 text-slate-500 sm:text-sm">
-            Olá, {userName}. Gerencie as entradas e saídas da{" "}
-            <span className="font-semibold text-slate-400">{companyName}</span>{" "}
+            Olá, {displayUserName}. Gerencie as entradas e saídas da{" "}
+            <span className="font-semibold text-slate-400">
+              {displayCompanyName}
+            </span>{" "}
             em um só lugar.
           </p>
         </div>
