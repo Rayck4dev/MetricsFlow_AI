@@ -21,12 +21,6 @@ export default function PerfilPage() {
     setError(null);
 
     try {
-      /*
-       * =========================================================
-       * USUÁRIO AUTENTICADO
-       * =========================================================
-       */
-
       const {
         data: { user: authUser },
         error: authError,
@@ -39,12 +33,6 @@ export default function PerfilPage() {
       if (!authUser) {
         throw new Error("Usuário não autenticado.");
       }
-
-      /*
-       * =========================================================
-       * PERFIL
-       * =========================================================
-       */
 
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
@@ -62,12 +50,6 @@ export default function PerfilPage() {
       if (profileError) {
         throw profileError;
       }
-
-      /*
-       * =========================================================
-       * EMPRESA / MEMBRO
-       * =========================================================
-       */
 
       const { data: membership, error: membershipError } = await supabase
         .from("company_members")
@@ -89,21 +71,9 @@ export default function PerfilPage() {
         throw membershipError;
       }
 
-      /*
-       * =========================================================
-       * EMPRESA
-       * =========================================================
-       */
-
       const company = Array.isArray(membership?.companies)
         ? membership.companies[0]
         : membership?.companies;
-
-      /*
-       * =========================================================
-       * DADOS DO USUÁRIO
-       * =========================================================
-       */
 
       const email = profile?.email?.trim() || authUser.email || "";
 
@@ -143,12 +113,6 @@ export default function PerfilPage() {
 
       setUser(profileUser);
 
-      /*
-       * =========================================================
-       * NOME DA EMPRESA
-       * =========================================================
-       */
-
       setCompanyName(company?.name?.trim() || "Empresa");
     } catch (err) {
       console.error("Erro ao carregar perfil:", err);
@@ -163,21 +127,9 @@ export default function PerfilPage() {
     }
   }, [supabase]);
 
-  /*
-   * =========================================================
-   * CARREGAMENTO INICIAL
-   * =========================================================
-   */
-
   useEffect(() => {
     loadProfile();
   }, [loadProfile]);
-
-  /*
-   * =========================================================
-   * ATUALIZAR PERFIL
-   * =========================================================
-   */
 
   async function handleUpdateProfile(values: {
     name: string;
@@ -195,12 +147,6 @@ export default function PerfilPage() {
       const email = values.email.trim();
       const phone = values.phone.trim();
 
-      /*
-       * ---------------------------------------------------------
-       * Atualiza dados da tabela profiles
-       * ---------------------------------------------------------
-       */
-
       const { error: profileError } = await supabase
         .from("profiles")
         .update({
@@ -215,12 +161,6 @@ export default function PerfilPage() {
         throw profileError;
       }
 
-      /*
-       * ---------------------------------------------------------
-       * Atualiza o e-mail do Supabase Auth caso tenha mudado
-       * ---------------------------------------------------------
-       */
-
       if (email !== user.email) {
         const { error: emailError } = await supabase.auth.updateUser({
           email,
@@ -230,12 +170,6 @@ export default function PerfilPage() {
           throw emailError;
         }
       }
-
-      /*
-       * ---------------------------------------------------------
-       * Atualiza o estado local
-       * ---------------------------------------------------------
-       */
 
       setUser((current) => {
         if (!current) {
@@ -261,12 +195,6 @@ export default function PerfilPage() {
       throw err;
     }
   }
-
-  /*
-   * =========================================================
-   * ALTERAR SENHA
-   * =========================================================
-   */
 
   async function handleChangePassword(password?: string) {
     if (!password) {
@@ -296,12 +224,6 @@ export default function PerfilPage() {
     }
   }
 
-  /*
-   * =========================================================
-   * GERENCIAR SESSÕES
-   * =========================================================
-   */
-
   async function handleManageSessions() {
     try {
       setError(null);
@@ -323,12 +245,6 @@ export default function PerfilPage() {
       );
     }
   }
-
-  /*
-   * =========================================================
-   * LOADING
-   * =========================================================
-   */
 
   if (loading) {
     return (
@@ -352,20 +268,11 @@ export default function PerfilPage() {
     );
   }
 
-  /*
-   * =========================================================
-   * ERRO / USUÁRIO NÃO ENCONTRADO
-   * =========================================================
-   */
-
   if (!user) {
     return (
       <div className="min-h-screen bg-surface-main text-slate-100">
         <div className="flex min-h-screen">
-          <Sidebar
-            userName="Usuário"
-            companyName={companyName || "Empresa"}
-          />
+          <Sidebar userName="Usuário" companyName={companyName || "Empresa"} />
 
           <main className="min-w-0 flex-1">
             <div className="flex min-h-screen items-center justify-center p-5">
@@ -393,19 +300,10 @@ export default function PerfilPage() {
     );
   }
 
-  /*
-   * =========================================================
-   * PERFIL
-   * =========================================================
-   */
-
   return (
     <div className="min-h-screen bg-surface-main text-slate-100">
       <div className="flex min-h-screen">
-        <Sidebar
-          userName={user.name}
-          companyName={companyName || "Empresa"}
-        />
+        <Sidebar userName={user.name} companyName={companyName || "Empresa"} />
 
         <main className="min-w-0 flex-1">
           <div className="mx-auto w-full max-w-[1500px] p-4 sm:p-6 lg:p-8">
@@ -427,12 +325,6 @@ export default function PerfilPage() {
     </div>
   );
 }
-
-/*
- * =========================================================
- * PROVEDOR DE AUTENTICAÇÃO
- * =========================================================
- */
 
 function getAuthProvider(user: {
   app_metadata?: {

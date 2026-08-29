@@ -61,8 +61,7 @@ export function Preferencias() {
   }
 
   function handleDeleteAccount() {
-    // Futuramente:
-    // chamar backend / Supabase para exclusão da conta.
+
     console.log("Excluir conta");
   }
 

@@ -31,10 +31,7 @@ export interface MovimentacoesProps {
     transaction: Omit<Movimentacao, "id">,
   ) => void | Promise<void>;
 
-  /**
-   * Futuramente:
-   * integração direta com Supabase/API.
-   */
+
   onUpdateTransaction?: (
     id: string,
     transaction: Omit<Movimentacao, "id">,
@@ -72,26 +69,12 @@ export function Movimentacoes({
 
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
 
-  /*
-   * Categorias disponíveis.
-   *
-   * Futuramente podem vir diretamente da tabela
-   * categories do Supabase.
-   */
   const categories = useMemo(() => {
     return Array.from(
       new Set(transactions.map((transaction) => transaction.category)),
     ).sort();
   }, [transactions]);
 
-  /*
-   * Filtros.
-   *
-   * Mantemos toda essa lógica no frontend por enquanto.
-   *
-   * Futuramente isso pode ser movido para uma query
-   * paginada no backend/Supabase.
-   */
   const filteredTransactions = useMemo(() => {
     const normalizedSearch = search.toLowerCase().trim();
 
@@ -121,12 +104,6 @@ export function Movimentacoes({
           normalizedDate.includes("hoje") || normalizedDate.includes("ontem");
       }
 
-      /*
-       * Mock atual.
-       *
-       * Quando o backend entrar, o período deverá ser
-       * baseado em transaction_date.
-       */
       if (periodFilter === "month") {
         matchesPeriod = true;
       }
@@ -135,9 +112,6 @@ export function Movimentacoes({
     });
   }, [transactions, search, typeFilter, categoryFilter, periodFilter]);
 
-  /*
-   * Totais dos dados filtrados.
-   */
   const totals = useMemo(() => {
     const income = filteredTransactions
       .filter((item) => item.type === "income")
@@ -167,13 +141,6 @@ export function Movimentacoes({
     setIsExpenseModalOpen(false);
   }
 
-  /*
-   * Edição.
-   *
-   * Atualmente funciona como callback/mock.
-   * Quando o Supabase entrar, onUpdateTransaction
-   * fará o update real.
-   */
   async function handleEdit(id: string, values: TransactionFormValues) {
     const transaction: Omit<Movimentacao, "id"> = {
       type: values.type,
@@ -189,9 +156,6 @@ export function Movimentacoes({
     setEditingTransaction(null);
   }
 
-  /*
-   * Exclusão.
-   */
   async function handleDelete(transaction: Movimentacao) {
     await onDeleteTransaction?.(transaction.id);
 

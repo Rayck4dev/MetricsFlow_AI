@@ -133,12 +133,20 @@ export function LoginForm() {
               Senha
             </label>
 
-            <button
-              type="button"
-              className="text-[11px] font-medium text-brand-400 transition-colors hover:text-brand-300"
-            >
-              Esqueci minha senha
-            </button>
+            <div className="mb-1 flex items-center justify-between">
+              <Link
+                href="/recuperar-senha"
+                className="
+                  text-[11px]
+                  font-medium
+                  text-brand-400
+                  transition-colors
+                  hover:text-brand-300
+                "
+              >
+                Esqueci minha senha
+              </Link>
+            </div>
           </div>
 
           <div className="relative">
@@ -261,8 +269,7 @@ export function LoginForm() {
           <Loader2 size={16} className="animate-spin" />
         ) : (
           <GoogleIcon />
-        )} 
-        
+        )}
 
         {googleLoading ? "Conectando..." : "Continuar com Google"}
       </button>

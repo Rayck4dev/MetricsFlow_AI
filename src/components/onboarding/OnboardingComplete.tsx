@@ -43,7 +43,6 @@ export default function OnboardingComplete({
         </div>
       </motion.div>
 
-      {/* TÍTULO */}
       <div className="mx-auto max-w-md space-y-2">
         <h2 className="font-heading text-2xl font-extrabold text-white">
           {isOwner
@@ -58,7 +57,6 @@ export default function OnboardingComplete({
         </p>
       </div>
 
-      {/* EMPRESA */}
       {companyName && (
         <div className="mx-auto flex max-w-md items-center gap-3 rounded-2xl border border-brand-500/20 bg-brand-500/5 p-4 text-left">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-brand-500/20 bg-brand-500/10">
@@ -81,7 +79,6 @@ export default function OnboardingComplete({
         </div>
       )}
 
-      {/* CHECKLIST */}
       <div className="mx-auto max-w-md space-y-2.5 rounded-2xl border border-surface-border bg-surface-panel/80 p-4 text-left">
         <div className="flex items-center gap-2 text-xs text-slate-300">
           <div className="rounded bg-emerald-500/10 p-1 text-emerald-400">
@@ -120,7 +117,6 @@ export default function OnboardingComplete({
         </div>
       </div>
 
-      {/* BOTÃO */}
       <button
         type="button"
         disabled={isSubmitting}

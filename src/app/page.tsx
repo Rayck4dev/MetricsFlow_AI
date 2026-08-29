@@ -59,7 +59,6 @@ export default function Home() {
             md:pt-44
           "
         >
-
           <div className="pointer-events-none absolute inset-0">
             <div className="absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-brand-500/[0.08] blur-[140px]" />
 
@@ -74,7 +73,6 @@ export default function Home() {
             animate="show"
             className="relative z-10 mx-auto max-w-6xl text-center"
           >
-
             <motion.div variants={heroItem}>
               <span
                 className="
@@ -94,7 +92,6 @@ export default function Home() {
                 Gestão financeira inteligente para MEIs
               </span>
             </motion.div>
-
 
             <motion.h1
               variants={heroItem}
@@ -120,7 +117,6 @@ export default function Home() {
               </span>
             </motion.h1>
 
-
             <motion.p
               variants={heroItem}
               className="
@@ -137,7 +133,6 @@ export default function Home() {
               WhatsApp sobre suas vendas e despesas. O MetricsFlow AI organiza,
               categoriza e transforma tudo em indicadores para o seu negócio.
             </motion.p>
-
 
             <motion.div
               variants={heroItem}
@@ -193,7 +188,6 @@ export default function Home() {
                 </span>
               </Link>
             </motion.div>
-
 
             <motion.div
               variants={heroItem}
@@ -261,7 +255,6 @@ export default function Home() {
                   backdrop-blur-xl
                 "
               >
-
                 <div
                   className="
                     flex h-9 items-center
@@ -280,9 +273,7 @@ export default function Home() {
                   </div>
                 </div>
 
-
                 <div className="grid grid-cols-1 gap-3 p-3 md:grid-cols-[1fr_1.15fr] md:p-5">
-
                   <div
                     className="
                       rounded-xl
@@ -314,7 +305,6 @@ export default function Home() {
                       </span>
                     </div>
 
-
                     <div className="ml-auto max-w-[88%] rounded-xl rounded-br-sm border border-emerald-500/10 bg-emerald-900/25 p-3">
                       <p className="text-[10px] leading-relaxed text-emerald-100">
                         Vendi R$ 250,00 em produtos no Pix agora!
@@ -324,7 +314,6 @@ export default function Home() {
                         14:32
                       </span>
                     </div>
-
 
                     <div className="mt-3 flex max-w-[92%] gap-2 rounded-xl rounded-bl-sm border border-surface-border bg-surface-panel p-3">
                       <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-brand-400">
@@ -344,7 +333,6 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-
 
                   <div
                     className="
@@ -377,7 +365,6 @@ export default function Home() {
                       </div>
                     </div>
 
-
                     <div className="grid grid-cols-3 gap-2">
                       <div className="rounded-lg border border-surface-border bg-surface-panel p-2.5">
                         <p className="text-[7px] text-slate-500">Receita</p>
@@ -403,7 +390,6 @@ export default function Home() {
                         </p>
                       </div>
                     </div>
-
 
                     <div className="mt-3 rounded-lg border border-surface-border bg-surface-panel p-3">
                       <div className="flex h-24 items-end gap-2">
@@ -447,7 +433,6 @@ export default function Home() {
                       </div>
                     </div>
 
-
                     <motion.div
                       initial={{
                         opacity: 0,
@@ -480,7 +465,6 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-
 
               <p className="mt-4 text-center text-[10px] text-slate-600">
                 Tudo o que você precisa para entender seu negócio em um só

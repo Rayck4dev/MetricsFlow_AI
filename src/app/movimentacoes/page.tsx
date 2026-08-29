@@ -32,12 +32,6 @@ export default function MovimentacoesPage() {
 
   const supabase = createClient();
 
-  /*
-   * =========================================================
-   * CONVERTER DATA DO BANCO
-   * =========================================================
-   */
-
   function formatTransactionDate(date: string) {
     const transactionDate = new Date(`${date}T12:00:00`);
 
@@ -79,9 +73,6 @@ export default function MovimentacoesPage() {
       throw new Error("Usuário não autenticado.");
     }
 
-    /*
-     * Perfil
-     */
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("name")
@@ -96,9 +87,6 @@ export default function MovimentacoesPage() {
       setUserName(profile.name);
     }
 
-    /*
-     * Empresa vinculada
-     */
     const { data: membership, error: membershipError } = await supabase
       .from("company_members")
       .select("company_id")
@@ -115,9 +103,6 @@ export default function MovimentacoesPage() {
 
     setCompanyId(membership.company_id);
 
-    /*
-     * Dados da empresa
-     */
     const { data: company, error: companyError } = await supabase
       .from("companies")
       .select("name")
@@ -138,12 +123,6 @@ export default function MovimentacoesPage() {
     };
   }, [supabase]);
 
-  /*
-   * =========================================================
-   * CARREGAR CATEGORIAS
-   * =========================================================
-   */
-
   const loadCategories = useCallback(
     async (currentCompanyId: string) => {
       const { data, error } = await supabase
@@ -160,12 +139,6 @@ export default function MovimentacoesPage() {
     },
     [supabase],
   );
-
-  /*
-   * =========================================================
-   * CARREGAR TRANSAÇÕES
-   * =========================================================
-   */
 
   const loadTransactions = useCallback(
     async (currentCompanyId: string) => {
@@ -220,12 +193,6 @@ export default function MovimentacoesPage() {
     [supabase],
   );
 
-  /*
-   * =========================================================
-   * CARREGAMENTO INICIAL
-   * =========================================================
-   */
-
   useEffect(() => {
     let mounted = true;
 
@@ -257,12 +224,6 @@ export default function MovimentacoesPage() {
     };
   }, [loadCompany, loadCategories, loadTransactions]);
 
-  /*
-   * =========================================================
-   * ADICIONAR TRANSAÇÃO
-   * =========================================================
-   */
-
   async function handleAddTransaction(transaction: Omit<Movimentacao, "id">) {
     if (!companyId) {
       throw new Error("Empresa não encontrada.");
@@ -276,9 +237,6 @@ export default function MovimentacoesPage() {
       throw new Error("Usuário não autenticado.");
     }
 
-    /*
-     * Descobre a categoria pelo nome.
-     */
     const category = categories.find(
       (item) =>
         item.name === transaction.category && item.type === transaction.type,
@@ -290,12 +248,6 @@ export default function MovimentacoesPage() {
       );
     }
 
-    /*
-     * A tabela usa DATE.
-     *
-     * Como o componente atual pode mandar "Hoje",
-     * "Ontem" ou uma data, normalizamos para YYYY-MM-DD.
-     */
     const transactionDate = getDatabaseDate(transaction.date);
 
     const { error } = await supabase.from("transactions").insert({
@@ -320,12 +272,6 @@ export default function MovimentacoesPage() {
      */
     await loadTransactions(companyId);
   }
-
-  /*
-   * =========================================================
-   * EDITAR TRANSAÇÃO
-   * =========================================================
-   */
 
   async function handleUpdateTransaction(
     id: string,
@@ -370,12 +316,6 @@ export default function MovimentacoesPage() {
     await loadTransactions(companyId);
   }
 
-  /*
-   * =========================================================
-   * EXCLUIR TRANSAÇÃO
-   * =========================================================
-   */
-
   async function handleDeleteTransaction(id: string) {
     if (!companyId) {
       throw new Error("Empresa não encontrada.");
@@ -394,12 +334,6 @@ export default function MovimentacoesPage() {
 
     await loadTransactions(companyId);
   }
-
-  /*
-   * =========================================================
-   * LOADING
-   * =========================================================
-   */
 
   if (loading || roleLoading) {
     return (
@@ -422,12 +356,6 @@ export default function MovimentacoesPage() {
       </div>
     );
   }
-
-  /*
-   * =========================================================
-   * PÁGINA
-   * =========================================================
-   */
 
   return (
     <div className="min-h-screen bg-surface-main text-slate-100">
@@ -456,32 +384,17 @@ export default function MovimentacoesPage() {
   );
 }
 
-/*
- * =========================================================
- * NORMALIZAÇÃO DE DATA
- * =========================================================
- */
-
 function getDatabaseDate(date: string): string {
   const today = new Date();
 
-  /*
-   * Se já estiver no formato YYYY-MM-DD.
-   */
   if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
     return date;
   }
 
-  /*
-   * Hoje
-   */
   if (date.toLowerCase().startsWith("hoje")) {
     return today.toISOString().split("T")[0];
   }
 
-  /*
-   * Ontem
-   */
   if (date.toLowerCase().startsWith("ontem")) {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
@@ -489,17 +402,11 @@ function getDatabaseDate(date: string): string {
     return yesterday.toISOString().split("T")[0];
   }
 
-  /*
-   * Tenta interpretar outras datas.
-   */
   const parsed = new Date(date);
 
   if (!Number.isNaN(parsed.getTime())) {
     return parsed.toISOString().split("T")[0];
   }
 
-  /*
-   * Fallback.
-   */
   return today.toISOString().split("T")[0];
 }

@@ -62,12 +62,6 @@ export default function EmpresaPage() {
 
       setCurrentUserId(user.id);
 
-      /*
-       * ============================================================
-       * PERFIL DO USUÁRIO
-       * ============================================================
-       */
-
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("id, name, email")
@@ -82,12 +76,6 @@ export default function EmpresaPage() {
         profile?.name?.trim() || user.email?.split("@")[0] || "";
 
       setUserName(currentUserName);
-
-      /*
-       * ============================================================
-       * EMPRESA DO USUÁRIO
-       * ============================================================
-       */
 
       const { data: membership, error: membershipError } = await supabase
         .from("company_members")
@@ -110,12 +98,6 @@ export default function EmpresaPage() {
       }
 
       const companyId = membership.company_id;
-
-      /*
-       * ============================================================
-       * DADOS DA EMPRESA
-       * ============================================================
-       */
 
       const { data: companyData, error: companyError } = await supabase
         .from("companies")
@@ -147,12 +129,6 @@ export default function EmpresaPage() {
 
       setCompany(formattedCompany);
 
-      /*
-       * ============================================================
-       * MEMBROS DA EMPRESA
-       * ============================================================
-       */
-
       const { data: memberRows, error: membersError } = await supabase
         .from("company_members")
         .select("id, user_id, role")
@@ -175,9 +151,6 @@ export default function EmpresaPage() {
 
       const userIds = memberRows.map((member) => member.user_id);
 
-      /*
-       * Os dados pessoais dos membros vêm de profiles.
-       */
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
         .select("id, name, email")
@@ -226,12 +199,6 @@ export default function EmpresaPage() {
     loadCompanyData();
   }, [loadCompanyData, role, roleLoading]);
 
-  /*
-   * ============================================================
-   * ATUALIZAR EMPRESA
-   * ============================================================
-   */
-
   async function handleUpdateCompany(values: {
     name: string;
     document: string;
@@ -273,12 +240,6 @@ export default function EmpresaPage() {
       inviteCode: data.invite_code,
     });
   }
-
-  /*
-   * ============================================================
-   * REGENERAR CÓDIGO
-   * ============================================================
-   */
 
   async function handleRegenerateInvite() {
     if (role !== "owner") {
@@ -325,12 +286,6 @@ export default function EmpresaPage() {
     );
   }
 
-  /*
-   * ============================================================
-   * REMOVER MEMBRO
-   * ============================================================
-   */
-
   async function handleRemoveMember(member: EmpresaMember) {
     if (role !== "owner") {
       throw new Error("Somente o proprietário pode remover colaboradores.");
@@ -363,12 +318,6 @@ export default function EmpresaPage() {
     setMembers((current) => current.filter((item) => item.id !== member.id));
   }
 
-  /*
-   * ============================================================
-   * LOADING
-   * ============================================================
-   */
-
   if (loading || roleLoading) {
     return (
       <div className="min-h-screen bg-surface-main text-slate-100">
@@ -388,12 +337,6 @@ export default function EmpresaPage() {
       </div>
     );
   }
-
-  /*
-   * ============================================================
-   * ERRO
-   * ============================================================
-   */
 
   if (role === "collaborator") {
     return null;
@@ -429,12 +372,6 @@ export default function EmpresaPage() {
     );
   }
 
-  /*
-   * ============================================================
-   * SEM EMPRESA
-   * ============================================================
-   */
-
   if (!company) {
     return (
       <div className="min-h-screen bg-surface-main text-slate-100">
@@ -458,12 +395,6 @@ export default function EmpresaPage() {
       </div>
     );
   }
-
-  /*
-   * ============================================================
-   * PÁGINA
-   * ============================================================
-   */
 
   return (
     <div className="min-h-screen bg-surface-main text-slate-100">

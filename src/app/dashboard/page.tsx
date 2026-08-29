@@ -22,19 +22,7 @@ export default function DashboardPage() {
 
   const supabase = createClient();
 
-  /*
-   * =========================================================
-   * CARREGAR DASHBOARD
-   * =========================================================
-   */
-
   const loadDashboard = useCallback(async () => {
-    /*
-     * ---------------------------------------------------------
-     * USUÁRIO AUTENTICADO
-     * ---------------------------------------------------------
-     */
-
     const {
       data: { user },
       error: userError,
@@ -47,12 +35,6 @@ export default function DashboardPage() {
     if (!user) {
       throw new Error("Usuário não autenticado.");
     }
-
-    /*
-     * ---------------------------------------------------------
-     * PERFIL
-     * ---------------------------------------------------------
-     */
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
@@ -67,12 +49,6 @@ export default function DashboardPage() {
     if (profile?.name) {
       setUserName(profile.name);
     }
-
-    /*
-     * ---------------------------------------------------------
-     * EMPRESA DO USUÁRIO
-     * ---------------------------------------------------------
-     */
 
     const { data: membership, error: membershipError } = await supabase
       .from("company_members")
@@ -90,12 +66,6 @@ export default function DashboardPage() {
 
     const companyId = membership.company_id;
 
-    /*
-     * ---------------------------------------------------------
-     * EMPRESA
-     * ---------------------------------------------------------
-     */
-
     const { data: company, error: companyError } = await supabase
       .from("companies")
       .select("name")
@@ -109,12 +79,6 @@ export default function DashboardPage() {
     if (company?.name) {
       setCompanyName(company.name);
     }
-
-    /*
-     * ---------------------------------------------------------
-     * TRANSAÇÕES
-     * ---------------------------------------------------------
-     */
 
     const { data: transactionData, error: transactionsError } = await supabase
       .from("transactions")
@@ -144,12 +108,6 @@ export default function DashboardPage() {
       throw transactionsError;
     }
 
-    /*
-     * ---------------------------------------------------------
-     * CONVERTER TRANSAÇÕES
-     * ---------------------------------------------------------
-     */
-
     const formattedTransactions: DashboardTransaction[] = (
       transactionData ?? []
     ).map((item: any) => {
@@ -170,12 +128,6 @@ export default function DashboardPage() {
 
     setTransactions(formattedTransactions);
   }, [supabase]);
-
-  /*
-   * =========================================================
-   * CARREGAMENTO INICIAL
-   * =========================================================
-   */
 
   useEffect(() => {
     let mounted = true;
@@ -201,12 +153,6 @@ export default function DashboardPage() {
     };
   }, [loadDashboard]);
 
-  /*
-   * =========================================================
-   * NAVEGAÇÃO
-   * =========================================================
-   */
-
   function handleAddIncome() {
     router.push("/movimentacoes");
   }
@@ -226,12 +172,6 @@ export default function DashboardPage() {
   function handleViewAllTransactions() {
     router.push("/movimentacoes");
   }
-
-  /*
-   * =========================================================
-   * LOADING
-   * =========================================================
-   */
 
   if (loading) {
     return (
@@ -254,12 +194,6 @@ export default function DashboardPage() {
       </div>
     );
   }
-
-  /*
-   * =========================================================
-   * PÁGINA
-   * =========================================================
-   */
 
   return (
     <div className="min-h-screen bg-surface-main text-slate-100">
@@ -285,12 +219,6 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-/*
- * =========================================================
- * FORMATAR DATA
- * =========================================================
- */
 
 function formatTransactionDate(date: string) {
   if (!date) {
@@ -326,12 +254,6 @@ function formatTransactionDate(date: string) {
     month: "short",
   });
 }
-
-/*
- * =========================================================
- * FORMA DE PAGAMENTO
- * =========================================================
- */
 
 function formatPaymentMethod(paymentMethod: string) {
   const methods: Record<string, string> = {

@@ -96,12 +96,6 @@ export function Perfil({
   );
 }
 
-/*
- * =========================================================
- * HEADER
- * =========================================================
- */
-
 interface PerfilHeaderProps {
   userName: string;
   email?: string;
@@ -197,12 +191,6 @@ function PerfilHeader({
     </motion.header>
   );
 }
-
-/*
- * =========================================================
- * INFORMAÇÕES DA CONTA
- * =========================================================
- */
 
 function AccountInfo({
   authProvider,

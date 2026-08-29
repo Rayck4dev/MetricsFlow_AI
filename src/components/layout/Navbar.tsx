@@ -371,7 +371,6 @@ export function Navbar() {
               md:hidden
             "
           >
-
             <div className="pointer-events-none absolute left-1/2 top-20 h-64 w-64 -translate-x-1/2 rounded-full bg-brand-500/[0.07] blur-[90px]" />
 
             <nav className="relative flex flex-col gap-2">
@@ -409,7 +408,6 @@ export function Navbar() {
                 </motion.a>
               ))}
             </nav>
-
 
             <motion.div
               initial={{

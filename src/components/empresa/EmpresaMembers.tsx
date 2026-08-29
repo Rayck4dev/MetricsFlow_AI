@@ -22,16 +22,6 @@ interface EmpresaMembersProps {
 
   currentUserId?: string;
 
-  /**
-   * Papel do usuário atualmente logado.
-   *
-   * Owner:
-   * - Pode remover colaboradores.
-   *
-   * Collaborator:
-   * - Apenas visualiza os membros.
-   * - Não pode remover ninguém.
-   */
   currentUserRole?: "owner" | "collaborator";
 
   onRemoveMember?: (member: EmpresaMember) => void | Promise<void>;
@@ -43,37 +33,19 @@ export function EmpresaMembers({
   currentUserRole = "collaborator",
   onRemoveMember,
 }: EmpresaMembersProps) {
-  /*
-   * =========================================================
-   * REMOVER COLABORADOR
-   * =========================================================
-   */
-
   async function handleRemove(member: EmpresaMember) {
-    /*
-     * Apenas o proprietário pode remover membros.
-     */
     if (currentUserRole !== "owner") {
       return;
     }
 
-    /*
-     * Não permite remover o próprio usuário.
-     */
     if (member.id === currentUserId) {
       return;
     }
 
-    /*
-     * Não permite remover o proprietário.
-     */
     if (member.role === "owner") {
       return;
     }
 
-    /*
-     * Callback não informado.
-     */
     if (!onRemoveMember) {
       return;
     }
@@ -112,10 +84,6 @@ export function EmpresaMembers({
         backdrop-blur-xl
       "
     >
-      {/* =====================================================
-          HEADER
-      ===================================================== */}
-
       <div className="flex items-center justify-between border-b border-surface-border px-5 py-4">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500/10">
@@ -146,10 +114,6 @@ export function EmpresaMembers({
         </span>
       </div>
 
-      {/* =====================================================
-          LISTA VAZIA
-      ===================================================== */}
-
       {members.length === 0 ? (
         <div className="flex min-h-[180px] flex-col items-center justify-center px-5 text-center">
           <div
@@ -175,10 +139,6 @@ export function EmpresaMembers({
           </p>
         </div>
       ) : (
-        /* =====================================================
-           LISTA DE MEMBROS
-        ===================================================== */
-
         <div className="divide-y divide-surface-border">
           {members.map((member, index) => {
             const isOwner = member.role === "owner";
@@ -225,10 +185,6 @@ export function EmpresaMembers({
                   px-5 py-4
                 "
               >
-                {/* =================================================
-                    AVATAR
-                ================================================= */}
-
                 <div
                   className="
                     flex h-9 w-9 shrink-0
@@ -243,10 +199,6 @@ export function EmpresaMembers({
                 >
                   {initials || <UserRound size={14} />}
                 </div>
-
-                {/* =================================================
-                    INFORMAÇÕES
-                ================================================= */}
 
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
@@ -275,10 +227,6 @@ export function EmpresaMembers({
                   </p>
                 </div>
 
-                {/* =================================================
-                    PAPEL
-                ================================================= */}
-
                 <div className="hidden items-center gap-1.5 sm:flex">
                   {isOwner ? (
                     <>
@@ -298,10 +246,6 @@ export function EmpresaMembers({
                     </>
                   )}
                 </div>
-
-                {/* =================================================
-                    REMOVER COLABORADOR
-                ================================================= */}
 
                 {canRemove && (
                   <button

@@ -15,8 +15,6 @@ export function useCompanyRole() {
     isOwner: role === "owner",
     isCollaborator: role === "collaborator",
 
-    // Importante para o Sidebar:
     roleLoaded: !loading && role !== null,
   };
 }
-

@@ -241,10 +241,6 @@ export function RegisterForm() {
 
   return (
     <div className="w-full">
-      {/* =====================================================
-          HEADER
-      ====================================================== */}
-
       <div className="mb-4">
         <div className="mb-2.5 flex h-9 w-9 items-center justify-center rounded-xl border border-brand-500/20 bg-brand-500/10">
           <Building2 size={17} className="text-brand-400" />
@@ -259,10 +255,6 @@ export function RegisterForm() {
         </p>
       </div>
 
-      {/* =====================================================
-          ERROR
-      ====================================================== */}
-
       {error && (
         <div className="mb-3 rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2">
           <p className="text-[11px] leading-4 text-red-300">{error}</p>
@@ -270,14 +262,7 @@ export function RegisterForm() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-3">
-        {/* ===================================================
-            LINHA 1
-            NOME + TIPO DE ACESSO
-        ==================================================== */}
-
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-          {/* NOME */}
-
           <div>
             <label
               htmlFor="name"
@@ -316,10 +301,6 @@ export function RegisterForm() {
               />
             </div>
           </div>
-
-          {/* =================================================
-              TIPO DE ACESSO — SELECT CUSTOMIZADO
-          ================================================== */}
 
           <div ref={selectRef}>
             <label className="mb-1 block text-xs font-semibold text-slate-300">
@@ -381,8 +362,6 @@ export function RegisterForm() {
                   `}
                 />
               </button>
-
-              {/* DROPDOWN */}
 
               <AnimatePresence>
                 {selectOpen && (
@@ -493,10 +472,6 @@ export function RegisterForm() {
           </div>
         </div>
 
-        {/* ===================================================
-            EMPRESA / CONVITE
-        ==================================================== */}
-
         {registrationType === "create_company" ? (
           <div>
             <label
@@ -586,10 +561,6 @@ export function RegisterForm() {
           </div>
         )}
 
-        {/* ===================================================
-            EMAIL + SENHA
-        ==================================================== */}
-
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {/* EMAIL */}
 
@@ -631,8 +602,6 @@ export function RegisterForm() {
               />
             </div>
           </div>
-
-          {/* SENHA */}
 
           <div>
             <label
@@ -690,10 +659,6 @@ export function RegisterForm() {
           </div>
         </div>
 
-        {/* ===================================================
-            BENEFÍCIOS
-        ==================================================== */}
-
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-0.5">
           {[
             "Dashboard financeiro",
@@ -709,10 +674,6 @@ export function RegisterForm() {
             </div>
           ))}
         </div>
-
-        {/* ===================================================
-            TERMOS
-        ==================================================== */}
 
         <label className="flex items-start gap-2 pt-0.5">
           <input
@@ -737,10 +698,6 @@ export function RegisterForm() {
             MetricsFlow AI.
           </span>
         </label>
-
-        {/* ===================================================
-            SUBMIT
-        ==================================================== */}
 
         <button
           type="submit"
@@ -775,10 +732,6 @@ export function RegisterForm() {
           )}
         </button>
       </form>
-
-      {/* =====================================================
-          GOOGLE
-      ====================================================== */}
 
       <div className="relative my-3.5">
         <div className="absolute inset-0 flex items-center">
@@ -818,10 +771,6 @@ export function RegisterForm() {
 
         {googleLoading ? "Conectando..." : "Continuar com Google"}
       </button>
-
-      {/* =====================================================
-          LOGIN
-      ====================================================== */}
 
       <div className="mt-3 border-t border-surface-border pt-3 text-center">
         <p className="text-[10px] text-slate-500">

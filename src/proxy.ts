@@ -1,25 +1,38 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_ROUTES = ["/", "/demo"];
-const AUTH_ROUTES = ["/login", "/cadastro"];
+const PUBLIC_ROUTES = ["/", "/demo", "/login", "/cadastro", "/recuperar-senha"];
+
+function isPublicRoute(pathname: string) {
+  return PUBLIC_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`),
+  );
+}
+
+function isAuthRoute(pathname: string) {
+  return (
+    pathname.startsWith("/auth") ||
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/_next")
+  );
+}
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  console.log("🔥 PROXY INTERCEPTOU:", pathname);
-
-  if (
-    pathname.startsWith("/api") ||
-    pathname.startsWith("/auth") ||
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/favicon")
-  ) {
-    console.log("📍 Sistema - passando");
+  if (isPublicRoute(pathname)) {
     return NextResponse.next();
   }
 
-  let response = NextResponse.next({ request });
+  if (isAuthRoute(pathname)) {
+    return NextResponse.next();
+  }
+
+  let response = NextResponse.next({
+    request,
+  });
+
+  const cookieStore = request.cookies;
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -27,13 +40,18 @@ export async function proxy(request: NextRequest) {
     {
       cookies: {
         getAll() {
-          return request.cookies.getAll();
+          return cookieStore.getAll();
         },
+
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => {
+          cookiesToSet.forEach(({ name, value, options }) => {
             request.cookies.set(name, value);
           });
-          response = NextResponse.next({ request });
+
+          response = NextResponse.next({
+            request,
+          });
+
           cookiesToSet.forEach(({ name, value, options }) => {
             response.cookies.set(name, value, options);
           });
@@ -44,34 +62,17 @@ export async function proxy(request: NextRequest) {
 
   const {
     data: { user },
+    error,
   } = await supabase.auth.getUser();
 
-  console.log("👤 Usuário autenticado?", !!user, user?.email || "");
+  if (error || !user) {
+    const loginUrl = new URL("/login", request.url);
 
-  if (user && AUTH_ROUTES.includes(pathname)) {
-    console.log(
-      "🔄 Usuário autenticado tentando acessar",
-      pathname,
-      "→ redirecionando para /dashboard",
-    );
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    loginUrl.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
+
+    return NextResponse.redirect(loginUrl);
   }
 
-  if (PUBLIC_ROUTES.includes(pathname) || AUTH_ROUTES.includes(pathname)) {
-    console.log("🟢 Rota pública/auth - permitindo:", pathname);
-    return response;
-  }
-
-  if (!user) {
-    console.log(
-      "🔒 NÃO AUTENTICADO em rota protegida:",
-      pathname,
-      "→ redirecionando para /login",
-    );
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  console.log("✅ Usuário autenticado - permitindo:", pathname);
   return response;
 }
 
