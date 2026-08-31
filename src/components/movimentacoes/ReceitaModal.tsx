@@ -3,7 +3,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, X } from "lucide-react";
 
-import { TransactionForm, type TransactionFormValues } from "./TransactionForm";
+import TransactionForm from "./transactions/TransactionForm";
+import type { TransactionFormValues } from "./transactions/TransactionForm";
 
 interface ReceitaModalProps {
   onClose: () => void;

@@ -12,72 +12,55 @@ interface EmpresaFormValues {
 
 interface EmpresaFormProps {
   initialValues: EmpresaFormValues;
-
   onSubmit?: (values: EmpresaFormValues) => void | Promise<void>;
 }
 
+type FormErrors = {
+  name?: string;
+  submit?: string;
+};
+
 export function EmpresaForm({ initialValues, onSubmit }: EmpresaFormProps) {
-  const [name, setName] = useState(initialValues.name);
-
-  const [document, setDocument] = useState(initialValues.document);
-
-  const [phoneNumber, setPhoneNumber] = useState(initialValues.phoneNumber);
+  const [form, setForm] = useState<EmpresaFormValues>(initialValues);
 
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<FormErrors>({});
 
   useEffect(() => {
-    setName(initialValues.name);
-    setDocument(initialValues.document);
-    setPhoneNumber(initialValues.phoneNumber);
+    setForm(initialValues);
   }, [initialValues]);
 
-  function formatDocument(value: string) {
-    const digits = value.replace(/\D/g, "").slice(0, 14);
+  function updateField(field: keyof EmpresaFormValues, value: string) {
+    setForm((current) => ({
+      ...current,
+      [field]: value,
+    }));
 
-    if (digits.length <= 11) {
-      if (digits.length <= 3) return digits;
-
-      if (digits.length <= 6) {
-        return `${digits.slice(0, 3)}.${digits.slice(3)}`;
-      }
-
-      if (digits.length <= 9) {
-        return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
-      }
-
-      return `${digits.slice(0, 3)}.${digits.slice(
-        3,
-        6,
-      )}.${digits.slice(6, 9)}-${digits.slice(9)}`;
+    if (errors[field as keyof FormErrors]) {
+      setErrors((current) => ({
+        ...current,
+        [field]: undefined,
+      }));
     }
-
-    return `${digits.slice(0, 2)}.${digits.slice(
-      2,
-      5,
-    )}.${digits.slice(5, 8)}/${digits.slice(8, 12)}-${digits.slice(12)}`;
   }
 
-  function formatPhone(value: string) {
-    const digits = value.replace(/\D/g, "").slice(0, 11);
+  function handleNameChange(value: string) {
+    updateField("name", value);
+  }
 
-    if (digits.length <= 2) {
-      return digits ? `(${digits}` : "";
-    }
+  function handleDocumentChange(value: string) {
+    updateField("document", formatDocument(value));
+  }
 
-    if (digits.length <= 7) {
-      return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
-    }
-
-    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  function handlePhoneChange(value: string) {
+    updateField("phoneNumber", formatPhone(value));
   }
 
   function validate() {
-    const nextErrors: Record<string, string> = {};
+    const nextErrors: FormErrors = {};
 
-    if (!name.trim()) {
+    if (!form.name.trim()) {
       nextErrors.name = "Informe o nome da empresa.";
     }
 
@@ -89,16 +72,18 @@ export function EmpresaForm({ initialValues, onSubmit }: EmpresaFormProps) {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!validate()) return;
+    if (!validate()) {
+      return;
+    }
 
     setSaving(true);
     setSaved(false);
 
     try {
       await onSubmit?.({
-        name: name.trim(),
-        document,
-        phoneNumber,
+        name: form.name.trim(),
+        document: form.document,
+        phoneNumber: form.phoneNumber,
       });
 
       setSaved(true);
@@ -133,63 +118,34 @@ export function EmpresaForm({ initialValues, onSubmit }: EmpresaFormProps) {
       }}
       className="overflow-hidden rounded-2xl border border-surface-border bg-surface-panel/90 shadow-xl shadow-black/10 backdrop-blur-xl"
     >
-      <div className="border-b border-surface-border px-5 py-4 sm:px-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500/10">
-            <Building2 size={16} className="text-brand-400" />
-          </div>
-
-          <div>
-            <h2 className="text-sm font-bold text-white">Dados da empresa</h2>
-
-            <p className="mt-0.5 text-[9px] text-slate-600">
-              Mantenha os dados da sua empresa atualizados.
-            </p>
-          </div>
-        </div>
-      </div>
+      <Header />
 
       <form onSubmit={handleSubmit} className="space-y-5 p-5 sm:p-6">
         <div className="grid gap-5 sm:grid-cols-2">
           <Field
             label="Nome da empresa"
-            value={name}
-            onChange={(value) => {
-              setName(value);
-
-              if (errors.name) {
-                setErrors((current) => ({
-                  ...current,
-                  name: "",
-                }));
-              }
-            }}
+            value={form.name}
+            onChange={handleNameChange}
             placeholder="Nome da empresa"
             error={errors.name}
           />
 
           <Field
             label="CPF / CNPJ"
-            value={document}
-            onChange={(value) => setDocument(formatDocument(value))}
+            value={form.document}
+            onChange={handleDocumentChange}
             placeholder="000.000.000-00"
           />
 
           <Field
             label="WhatsApp / Telefone"
-            value={phoneNumber}
-            onChange={(value) => setPhoneNumber(formatPhone(value))}
+            value={form.phoneNumber}
+            onChange={handlePhoneChange}
             placeholder="(00) 00000-0000"
           />
         </div>
 
-        {errors.submit && (
-          <div className="rounded-xl border border-red-500/15 bg-red-500/5 px-3.5 py-3">
-            <p className="text-[9px] font-medium text-red-400">
-              {errors.submit}
-            </p>
-          </div>
-        )}
+        {errors.submit && <SubmitError message={errors.submit} />}
 
         <div className="rounded-xl border border-brand-500/10 bg-brand-500/[0.035] p-3.5">
           <p className="text-[9px] font-semibold text-brand-300">
@@ -202,35 +158,29 @@ export function EmpresaForm({ initialValues, onSubmit }: EmpresaFormProps) {
           </p>
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-surface-border pt-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[8px] text-slate-600">
-            As alterações serão aplicadas à empresa.
-          </p>
-
-          <motion.button
-            type="submit"
-            disabled={saving}
-            whileHover={{ y: -1 }}
-            whileTap={{ scale: 0.98 }}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 text-[10px] font-bold text-white shadow-lg shadow-brand-600/10 transition-colors hover:bg-brand-500 disabled:pointer-events-none disabled:opacity-60"
-          >
-            {saving ? (
-              <Loader2 size={13} className="animate-spin" />
-            ) : saved ? (
-              <Check size={13} />
-            ) : (
-              <Save size={13} />
-            )}
-
-            {saving
-              ? "Salvando..."
-              : saved
-                ? "Alterações salvas"
-                : "Salvar alterações"}
-          </motion.button>
-        </div>
+        <FormActions saving={saving} saved={saved} />
       </form>
     </motion.section>
+  );
+}
+
+function Header() {
+  return (
+    <div className="border-b border-surface-border px-5 py-4 sm:px-6">
+      <div className="flex items-center gap-3">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500/10">
+          <Building2 size={16} className="text-brand-400" />
+        </div>
+
+        <div>
+          <h2 className="text-sm font-bold text-white">Dados da empresa</h2>
+
+          <p className="mt-0.5 text-[9px] text-slate-600">
+            Mantenha os dados da sua empresa atualizados.
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -268,4 +218,86 @@ function Field({
       {error && <p className="text-[9px] font-medium text-red-400">{error}</p>}
     </div>
   );
+}
+
+function SubmitError({ message }: { message: string }) {
+  return (
+    <div className="rounded-xl border border-red-500/15 bg-red-500/5 px-3.5 py-3">
+      <p className="text-[9px] font-medium text-red-400">{message}</p>
+    </div>
+  );
+}
+
+function FormActions({ saving, saved }: { saving: boolean; saved: boolean }) {
+  return (
+    <div className="flex flex-col gap-3 border-t border-surface-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+      <p className="text-[8px] text-slate-600">
+        As alterações serão aplicadas à empresa.
+      </p>
+
+      <motion.button
+        type="submit"
+        disabled={saving}
+        whileHover={{ y: -1 }}
+        whileTap={{ scale: 0.98 }}
+        className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 text-[10px] font-bold text-white shadow-lg shadow-brand-600/10 transition-colors hover:bg-brand-500 disabled:pointer-events-none disabled:opacity-60"
+      >
+        {saving ? (
+          <Loader2 size={13} className="animate-spin" />
+        ) : saved ? (
+          <Check size={13} />
+        ) : (
+          <Save size={13} />
+        )}
+
+        {saving
+          ? "Salvando..."
+          : saved
+            ? "Alterações salvas"
+            : "Salvar alterações"}
+      </motion.button>
+    </div>
+  );
+}
+
+function formatDocument(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 14);
+
+  if (digits.length <= 11) {
+    if (digits.length <= 3) {
+      return digits;
+    }
+
+    if (digits.length <= 6) {
+      return `${digits.slice(0, 3)}.${digits.slice(3)}`;
+    }
+
+    if (digits.length <= 9) {
+      return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
+    }
+
+    return `${digits.slice(0, 3)}.${digits.slice(
+      3,
+      6,
+    )}.${digits.slice(6, 9)}-${digits.slice(9)}`;
+  }
+
+  return `${digits.slice(0, 2)}.${digits.slice(
+    2,
+    5,
+  )}.${digits.slice(5, 8)}/${digits.slice(8, 12)}-${digits.slice(12)}`;
+}
+
+function formatPhone(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+
+  if (digits.length <= 2) {
+    return digits ? `(${digits}` : "";
+  }
+
+  if (digits.length <= 7) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  }
+
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
 }

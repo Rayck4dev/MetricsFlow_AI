@@ -1,0 +1,194 @@
+"use client";
+
+import Link from "next/link";
+import { motion } from "framer-motion";
+
+import type { NavigationItem, SidebarSection } from "@/data/sidebar.data";
+
+interface SidebarNavigationItemProps {
+  item: NavigationItem;
+  active: boolean;
+  hovered: boolean;
+  demo: boolean;
+  onHover: (id: SidebarSection) => void;
+  onDemoNavigation?: (section: SidebarSection) => void;
+  variant?: "main" | "account";
+}
+
+export function SidebarNavigationItem({
+  item,
+  active,
+  hovered,
+  demo,
+  onHover,
+  onDemoNavigation,
+  variant = "main",
+}: SidebarNavigationItemProps) {
+  const Icon = item.icon;
+
+  const isAccount = variant === "account";
+
+  const content = (
+    <>
+      {active && (
+        <motion.div
+          layoutId={isAccount ? "sidebar-account-active" : "sidebar-active-tab"}
+          className="
+            absolute
+            inset-0
+            rounded-xl
+            border
+            border-brand-500/20
+            bg-brand-500/10
+          "
+          transition={{
+            type: "spring",
+            stiffness: 380,
+            damping: 30,
+          }}
+        />
+      )}
+
+      {hovered && !active && !item.comingSoon && (
+        <motion.div
+          layoutId={isAccount ? "sidebar-account-hover" : "sidebar-hover-tab"}
+          className="
+            absolute
+            inset-0
+            rounded-xl
+            bg-surface-panel/60
+          "
+          transition={{
+            type: "spring",
+            stiffness: 400,
+            damping: 35,
+          }}
+        />
+      )}
+
+      <div className="relative z-10 flex w-full items-center gap-3">
+        <Icon
+          size={16}
+          className={`
+            shrink-0
+            transition-colors
+            duration-200
+            ${
+              item.comingSoon
+                ? "text-slate-700"
+                : active
+                  ? "text-brand-400"
+                  : "text-slate-500 group-hover:text-slate-300"
+            }
+          `}
+        />
+
+        <span
+          className={`
+            min-w-0
+            flex-1
+            truncate
+            text-[11px]
+            font-semibold
+            transition-colors
+            duration-200
+            ${
+              item.comingSoon
+                ? "text-slate-700"
+                : active
+                  ? "text-brand-300"
+                  : "text-slate-400 group-hover:text-slate-200"
+            }
+          `}
+        >
+          {item.label}
+        </span>
+
+        {item.comingSoon ? (
+          <span
+            className="
+              shrink-0
+              rounded-full
+              border border-slate-700/60
+              bg-slate-800/70
+              px-1.5 py-0.5
+              text-[7px]
+              font-bold
+              uppercase
+              tracking-wider
+              text-slate-600
+            "
+          >
+            Em breve
+          </span>
+        ) : (
+          active && (
+            <motion.span
+              layoutId={
+                isAccount ? "sidebar-account-dot" : "sidebar-active-dot"
+              }
+              className="
+                ml-auto
+                h-1.5 w-1.5
+                shrink-0
+                rounded-full
+                bg-brand-400
+                shadow-[0_0_8px_rgba(56,189,248,0.8)]
+              "
+            />
+          )
+        )}
+      </div>
+    </>
+  );
+
+  const baseClass = `
+    group
+    relative
+    flex
+    w-full
+    items-center
+    rounded-xl
+    px-2.5
+    py-2.5
+    text-left
+  `;
+
+  if (item.comingSoon) {
+    return (
+      <motion.div
+        key={item.id}
+        className={`${baseClass} cursor-not-allowed opacity-70`}
+      >
+        {content}
+      </motion.div>
+    );
+  }
+
+  if (demo) {
+    return (
+      <motion.button
+        key={item.id}
+        type="button"
+        whileTap={{ scale: 0.97 }}
+        onMouseEnter={() => onHover(item.id)}
+        onClick={() => onDemoNavigation?.(item.id)}
+        className={baseClass}
+      >
+        {content}
+      </motion.button>
+    );
+  }
+
+  return (
+    <motion.div key={item.id} whileTap={{ scale: 0.97 }}>
+      <Link
+        href={item.href}
+        onMouseEnter={() => onHover(item.id)}
+        className={baseClass}
+      >
+        {content}
+      </Link>
+    </motion.div>
+  );
+}

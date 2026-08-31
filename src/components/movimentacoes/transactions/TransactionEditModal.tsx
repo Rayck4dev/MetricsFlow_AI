@@ -3,17 +3,17 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowDownLeft, ArrowUpRight, Pencil, X } from "lucide-react";
 
-import { TransactionForm, type TransactionFormValues } from "./TransactionForm";
+import TransactionForm, { type TransactionFormValues } from "@/components/movimentacoes/transactions/TransactionForm";
 
-import type { Movimentacao } from "./types";
+import type { Movimentacao } from "@/types/index";
 
 interface TransactionEditModalProps {
   transaction: Movimentacao;
+
   onClose: () => void;
-  onSubmit: (
-    id: string,
-    transaction: TransactionFormValues,
-  ) => void | Promise<void>;
+
+  onSubmit: (values: TransactionFormValues) => void | Promise<void>;
+
   categories?: string[];
 }
 
@@ -21,12 +21,12 @@ export function TransactionEditModal({
   transaction,
   onClose,
   onSubmit,
-  categories,
+  categories = [],
 }: TransactionEditModalProps) {
   const isIncome = transaction.type === "income";
 
   async function handleSubmit(values: TransactionFormValues) {
-    await onSubmit(transaction.id, values);
+    await onSubmit(values);
   }
 
   return (
@@ -39,11 +39,29 @@ export function TransactionEditModal({
         className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md"
       >
         <motion.div
-          initial={{ opacity: 0, y: 24, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 16, scale: 0.97 }}
-          transition={{ type: "spring", stiffness: 320, damping: 28 }}
-          onMouseDown={(event) => event.stopPropagation()}
+          initial={{
+            opacity: 0,
+            y: 24,
+            scale: 0.96,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+            scale: 1,
+          }}
+          exit={{
+            opacity: 0,
+            y: 16,
+            scale: 0.97,
+          }}
+          transition={{
+            type: "spring",
+            stiffness: 320,
+            damping: 28,
+          }}
+          onMouseDown={(event) => {
+            event.stopPropagation();
+          }}
           className="relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-surface-border bg-surface-panel shadow-2xl shadow-black/40"
         >
           <div className="sticky top-0 z-20 flex items-center justify-between border-b border-surface-border bg-surface-panel/95 px-5 py-4 backdrop-blur-xl">

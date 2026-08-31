@@ -201,20 +201,20 @@ Os papéis atualmente utilizados são:
 
 ```text
 owner
-  │
-  ├── Acesso ao Dashboard
-  ├── Acesso às Movimentações
-  ├── Acesso à DRE
-  ├── Acesso ao Perfil
-  ├── Acesso à Empresa
-  └── Acesso às Preferências
+ │
+ ├── Acesso ao Dashboard
+ ├── Acesso às Movimentações
+ ├── Acesso à DRE
+ ├── Acesso ao Perfil
+ ├── Acesso à Empresa
+ └── Acesso às Preferências
 
 collaborator
-  │
-  ├── Acesso ao Dashboard
-  ├── Acesso às Movimentações
-  ├── Acesso ao Perfil
-  └── Acesso às Preferências
+ │
+ ├── Acesso ao Dashboard
+ ├── Acesso às Movimentações
+ ├── Acesso ao Perfil
+ └── Acesso às Preferências
 ```
 
 A estrutura permite que novas regras de permissão sejam adicionadas futuramente.
@@ -333,14 +333,9 @@ metricsflow-ai/
 │   │
 │   ├── lib/
 │   │
-│   ├── types/
-│   │
-│   └── tests/
-│
+│   ├── types/│
 ├── .env.local
 ├── .gitignore
-├── AGENTS.md
-├── CLAUDE.md
 ├── eslint.config.mjs
 ├── LICENSE
 ├── next-env.d.ts
@@ -364,6 +359,7 @@ Principais áreas:
 
 ```text
 app/
+├── (auth)/
 ├── dashboard/
 ├── demo/
 ├── dre/
@@ -466,10 +462,10 @@ companies
     │
     ├──────────────┐
     ▼              ▼
-categories     transactions
-                    │
-                    ▼
-             whatsapp_messages
+categories    transactions
+                  │
+                  ▼
+          whatsapp_messages
 ```
 
 ---
@@ -527,7 +523,8 @@ Cada categoria possui:
 - Tipo;
 - Cor;
 - Indicador de categoria padrão;
-- Data de criação.
+- Data de criação;
+- Ordem de exibição.
 
 O tipo da categoria diferencia:
 
@@ -553,7 +550,9 @@ Uma transação possui informações como:
 - Forma de pagamento;
 - Data;
 - Empresa;
-- Usuário responsável pelo registro.
+- Usuário responsável pelo registro;
+- Origem da movimentação;
+- Texto original do WhatsApp, quando aplicável.
 
 As transações são utilizadas pelo:
 
@@ -582,6 +581,95 @@ São utilizados conceitos como:
 
 A aplicação utiliza o usuário autenticado para identificar a empresa e as permissões correspondentes.
 
+As tabelas financeiras possuem políticas de acesso baseadas no vínculo do usuário com `company_members`.
+
+---
+
+# 🧠 Functions e regras de negócio do Supabase
+
+A camada de banco possui funções PostgreSQL utilizadas para centralizar regras relacionadas a autenticação, empresas, membros e categorias.
+
+Entre as principais funções estão:
+
+- Verificação de proprietário da empresa;
+- Verificação de membro da empresa;
+- Identificação da empresa do usuário autenticado;
+- Identificação do papel do usuário;
+- Criação de empresa durante o onboarding;
+- Associação do usuário como proprietário;
+- Entrada em uma empresa através de código de convite;
+- Verificação de informações do usuário;
+- Criação automática de categorias padrão;
+- Criação automática de perfil após cadastro;
+- Atualização automática de `updated_at`.
+
+---
+
+# 🏷️ Categorias padrão
+
+Ao criar uma nova empresa, uma trigger executa automaticamente a função responsável por criar categorias padrão.
+
+### Receitas
+
+- Vendas / Produtos;
+- Prestação de Serviços;
+- Outras Receitas.
+
+### Despesas
+
+- Fornecedores / Estoque;
+- Aluguel / Água / Luz;
+- Marketing / Anúncios;
+- DAS / Impostos MEI;
+- Ferramentas / Sistema;
+- Outras Despesas.
+
+Essas categorias são associadas automaticamente à empresa recém-criada.
+
+---
+
+# 👤 Criação automática de perfil
+
+Após a criação de um usuário no Supabase Auth, uma trigger pode executar a função responsável por criar ou atualizar o registro correspondente na tabela `profiles`.
+
+O processo utiliza informações disponíveis no usuário autenticado, como:
+
+- ID;
+- E-mail;
+- Nome informado no cadastro.
+
+A criação da empresa não é realizada nesse processo.
+
+A empresa é criada posteriormente através do fluxo de onboarding.
+
+---
+
+# 🔑 Row Level Security — RLS
+
+O banco utiliza **Row Level Security (RLS)** para impedir que usuários acessem dados de empresas às quais não pertencem.
+
+A autorização é baseada principalmente na relação:
+
+```text
+auth.uid()
+     ↓
+company_members
+     ↓
+company_id
+     ↓
+dados da empresa
+```
+
+Dessa forma, um usuário somente pode acessar os dados correspondentes às empresas das quais é membro.
+
+As políticas são aplicadas principalmente sobre:
+
+- `companies`;
+- `company_members`;
+- `categories`;
+- `transactions`;
+- `profiles`.
+
 ---
 
 # 📐 UML
@@ -599,7 +687,6 @@ flowchart LR
 
     Owner["👤 Proprietário"]
     Collaborator["👤 Colaborador"]
-
     System(("MetricsFlow AI"))
 
     Owner -->|Autenticar-se| System
@@ -660,6 +747,7 @@ classDiagram
         +string color
         +boolean isDefault
         +Date createdAt
+        +integer sortOrder
     }
 
     class Transaction {
@@ -670,8 +758,12 @@ classDiagram
         +TransactionType type
         +decimal amount
         +string description
-        +string paymentMethod
-        +Date date
+        +PaymentMethod paymentMethod
+        +Date transactionDate
+        +string origin
+        +string rawWhatsappText
+        +Date createdAt
+        +Date updatedAt
     }
 
     class WhatsAppMessage {
@@ -766,6 +858,7 @@ flowchart TD
     H -->|Sim| J
     J --> K
     J --> L
+
     K --> M
     L --> M
 ```
@@ -806,7 +899,7 @@ C4Context
 
 ---
 
-## Diagrama de Containers — C4
+# 📦 Diagrama de Containers — C4
 
 O diagrama de containers apresenta os principais componentes tecnológicos da plataforma.
 
@@ -841,12 +934,13 @@ C4Container
 
     Rel(web, auth, "Autentica usuário")
     Rel(web, api, "Envia requisições")
-    Rel(api, database, "Consulta e altera dados")
 
+    Rel(api, database, "Consulta e altera dados")
     Rel(auth, database, "Gerencia dados de autenticação")
 
     Rel(wa, whatsapp, "Envia mensagens")
     Rel(whatsapp, ai, "Envia conteúdo para interpretação")
+
     Rel(ai, api, "Retorna dados estruturados")
     Rel(api, database, "Registra movimentação")
 
@@ -873,6 +967,8 @@ C4Container
 - **PostgreSQL**
 - **Supabase Auth**
 - **Row Level Security (RLS)**
+- **PostgreSQL Functions**
+- **PostgreSQL Triggers**
 
 ## Desenvolvimento
 
@@ -931,71 +1027,6 @@ http://localhost:3000
 
 ---
 
-# 🧪 Testes
-
-A pasta de testes está localizada em:
-
-```text
-src/tests/
-```
-
-Os testes têm como objetivo validar os principais fluxos da aplicação e reduzir regressões durante a evolução do projeto.
-
-As áreas prioritárias de testes são:
-
-### Autenticação
-
-- Login;
-- Cadastro;
-- Login com Google;
-- Logout;
-- Recuperação de senha;
-- Redefinição de senha;
-- Persistência da sessão.
-
-### Usuários
-
-- Carregamento do perfil;
-- Identificação da empresa;
-- Identificação do papel do usuário;
-- Proprietário;
-- Colaborador.
-
-### Empresas
-
-- Criação;
-- Associação de membros;
-- Código de convite;
-- Permissões administrativas.
-
-### Movimentações
-
-- Criar receita;
-- Criar despesa;
-- Editar transação;
-- Excluir transação;
-- Filtrar transações;
-- Validar valores;
-- Validar categorias.
-
-### Dashboard
-
-- Cálculo de receitas;
-- Cálculo de despesas;
-- Cálculo de lucro;
-- Cálculo de margem;
-- Atualização dos indicadores.
-
-### DRE
-
-- Receita;
-- Custos;
-- Despesas;
-- Resultado;
-- Seleção de período.
-
----
-
 # 📌 Status da V1
 
 ## Frontend
@@ -1034,7 +1065,7 @@ As áreas prioritárias de testes são:
 
 - [x] Supabase configurado
 - [x] PostgreSQL
-- [x] Autenticação
+- [x] Supabase Auth
 - [x] Perfis
 - [x] Empresas
 - [x] Membros
@@ -1042,7 +1073,11 @@ As áreas prioritárias de testes são:
 - [x] Categorias
 - [x] Transações
 - [x] Relacionamentos
+- [x] PostgreSQL Functions
+- [x] PostgreSQL Triggers
+- [x] Row Level Security
 - [x] Políticas de segurança
+- [x] Isolamento de dados por empresa
 - [x] Integração frontend + banco
 
 ---
@@ -1085,7 +1120,7 @@ Entrega
 
 A segunda fase do projeto tem como objetivo transformar o MetricsFlow AI em um assistente financeiro mais automatizado.
 
-### WhatsApp
+## WhatsApp
 
 - [ ] Configurar API/WhatsApp
 - [ ] Configurar webhook
@@ -1095,7 +1130,7 @@ A segunda fase do projeto tem como objetivo transformar o MetricsFlow AI em um a
 - [ ] Identificar empresa
 - [ ] Registrar histórico das mensagens
 
-### Inteligência Artificial
+## Inteligência Artificial
 
 - [ ] Integrar API de IA
 - [ ] Criar prompt estruturado
@@ -1107,7 +1142,7 @@ A segunda fase do projeto tem como objetivo transformar o MetricsFlow AI em um a
 - [ ] Identificar data
 - [ ] Validar informações recebidas
 
-### Backend
+## Backend
 
 - [ ] Criar rota para processamento
 - [ ] Validar resposta da IA
@@ -1116,7 +1151,7 @@ A segunda fase do projeto tem como objetivo transformar o MetricsFlow AI em um a
 - [ ] Criar tratamento de erros
 - [ ] Criar logs
 
-### Dashboard
+## Dashboard
 
 - [ ] Atualização após lançamento via WhatsApp
 - [ ] Histórico de lançamentos automatizados
@@ -1153,13 +1188,13 @@ O MetricsFlow AI é desenvolvido individualmente. Dessa forma, todas as áreas n
 | **Gestão / Produto** | Levantamento de requisitos, definição de funcionalidades, organização das tarefas e priorização do projeto |
 | **UI/UX**            | Arquitetura visual, experiência de navegação, identidade visual, responsividade e componentes              |
 | **Frontend**         | Desenvolvimento das páginas, componentização, estados, interações, validações e integração com dados       |
-| **Backend**          | Desenvolvimento futuro das APIs, regras de negócio, autenticação e integrações                             |
+| **Backend**          | Desenvolvimento das APIs, regras de negócio, autenticação e integrações                                    |
 | **Banco de Dados**   | Modelagem, relacionamentos, políticas de acesso, integridade e manutenção do banco                         |
 | **QA / Testes**      | Testes funcionais, validação dos fluxos, identificação e correção de bugs                                  |
 | **Documentação**     | README, documentação técnica, organização do projeto e registro das decisões                               |
 | **DevOps / Deploy**  | Configuração do ambiente, versionamento, build, deploy e infraestrutura                                    |
 
-### Desenvolvimento individual
+## Desenvolvimento individual
 
 Por se tratar de um projeto desenvolvido individualmente, as diferentes responsabilidades são acumuladas ao longo das etapas do projeto.
 
@@ -1208,6 +1243,8 @@ Essa abordagem permite que todas as decisões de **produto, design, desenvolvime
 - Relacionamentos;
 - Índices;
 - Políticas de acesso;
+- Functions;
+- Triggers;
 - Integridade dos dados.
 
 ## QA / Testes
@@ -1226,6 +1263,15 @@ Essa abordagem permite que todas as decisões de **produto, design, desenvolvime
 - Organização do projeto;
 - Registro das decisões.
 
+## DevOps / Deploy
+
+- Configuração do ambiente;
+- Versionamento;
+- Build;
+- Deploy;
+- Configuração de variáveis de ambiente;
+- Infraestrutura.
+
 ---
 
 # 🗺️ Roadmap geral
@@ -1239,15 +1285,61 @@ Essa abordagem permite que todas as decisões de **produto, design, desenvolvime
               │                                 │
       Gestão financeira                 Automação + IA
               │                                 │
-      ├── Autenticação                   ├── WhatsApp
-      ├── Empresas                       ├── Webhook
-      ├── Membros                        ├── IA
-      ├── Categorias                     ├── Structured Output
-      ├── Transações                     ├── Processamento
-      ├── Dashboard                      ├── Automação
-      ├── DRE                            └── Insights
+      ├── Autenticação                    ├── WhatsApp
+      ├── Empresas                        ├── Webhook
+      ├── Membros                         ├── IA
+      ├── Categorias                      ├── Structured Output
+      ├── Transações                      ├── Processamento
+      ├── Dashboard                       ├── Automação
+      ├── DRE                             └── Insights
       └── Segurança
 ```
+
+---
+
+# 📂 Estrutura da documentação do Supabase
+
+Os scripts relacionados ao banco de dados podem ser organizados da seguinte forma:
+
+```text
+supabase/
+│
+└── database/
+    │
+    ├── tables/
+    │   ├── profiles.sql
+    │   ├── companies.sql
+    │   ├── company_members.sql
+    │   ├── categories.sql
+    │   └── transactions.sql
+    │
+    ├── functions/
+    │   ├── is_company_owner.sql
+    │   ├── create_company.sql
+    │   ├── get_user_company.sql
+    │   ├── get_user_role.sql
+    │   ├── get_company_members.sql
+    │   ├── create_company_categories.sql
+    │   ├── handle_new_user.sql
+    │   ├── is_company_member.sql
+    │   ├── is_company_owner_by_id.sql
+    │   ├── join_company_by_invite.sql
+    │   └── update_updated_at.sql
+    │
+    ├── triggers/
+    │   ├── trigger_seed_company_categories.sql
+    │   ├── trigger_handle_new_user.sql
+    │   └── trigger_update_updated_at.sql
+    │
+    └── rls/
+        ├── profiles.sql
+        ├── companies.sql
+        ├── company_members.sql
+        ├── categories.sql
+        └── transactions.sql
+```
+
+Essa organização separa a estrutura do banco, regras de negócio, triggers e políticas de segurança, facilitando a manutenção e a reprodução do ambiente.
 
 ---
 

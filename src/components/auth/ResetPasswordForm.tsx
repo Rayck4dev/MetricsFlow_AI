@@ -1,115 +1,35 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent } from "react";
 import Link from "next/link";
-import {
-  ArrowRight,
-  CheckCircle2,
-  Eye,
-  EyeOff,
-  Loader2,
-  Lock,
-} from "lucide-react";
+import { ArrowRight, CheckCircle2, Loader2, Lock } from "lucide-react";
 
-import { createClient } from "@/lib/supabase/client";
+import { PasswordInput } from "./PasswordInput";
+import { useResetPassword } from "@/hooks/useResetPassword";
 
 export function ResetPasswordForm() {
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const {
+    password,
+    setPassword,
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    confirmPassword,
+    setConfirmPassword,
 
-  const [loading, setLoading] = useState(false);
-  const [checkingSession, setCheckingSession] = useState(true);
+    loading,
+    checkingSession,
 
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
+    success,
+    error,
 
-  const [hasRecoverySession, setHasRecoverySession] = useState(false);
+    hasRecoverySession,
 
-  useEffect(() => {
-    const supabase = createClient();
+    resetPassword,
+  } = useResetPassword();
 
-    async function checkSession() {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (session) {
-          setHasRecoverySession(true);
-        } else {
-          setError(
-            "O link de recuperação é inválido ou expirou. Solicite um novo link.",
-          );
-        }
-      } catch (error) {
-        console.error("Erro ao verificar sessão de recuperação:", error);
-
-        setError("Não foi possível validar o link de recuperação.");
-      } finally {
-        setCheckingSession(false);
-      }
-    }
-
-    checkSession();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY" && session) {
-        setHasRecoverySession(true);
-        setError("");
-        setCheckingSession(false);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    setError("");
-
-    if (password.length < 8) {
-      setError("A senha deve ter pelo menos 8 caracteres.");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError("As senhas não coincidem.");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const supabase = createClient();
-
-      const { error } = await supabase.auth.updateUser({
-        password,
-      });
-
-      if (error) {
-        console.error("Erro ao atualizar senha:", error);
-
-        setError(error.message || "Não foi possível atualizar sua senha.");
-
-        return;
-      }
-
-      setSuccess(true);
-    } catch (error) {
-      console.error("Erro inesperado ao atualizar senha:", error);
-
-      setError("Ocorreu um erro inesperado. Tente novamente.");
-    } finally {
-      setLoading(false);
-    }
+    resetPassword();
   }
 
   if (checkingSession) {
@@ -176,7 +96,7 @@ export function ResetPasswordForm() {
   }
 
   return (
-    <>
+    <div className="w-full">
       <div className="mb-6">
         <div
           className="
@@ -221,143 +141,27 @@ export function ResetPasswordForm() {
 
       {hasRecoverySession ? (
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* NOVA SENHA */}
-          <div>
-            <label
-              htmlFor="password"
-              className="
-                mb-1.5 block
-                text-xs font-semibold
-                text-slate-300
-              "
-            >
-              Nova senha
-            </label>
+          <PasswordInput
+            id="password"
+            name="password"
+            label="Nova senha"
+            value={password}
+            onChange={setPassword}
+            disabled={loading}
+          />
 
-            <div className="relative">
-              <Lock
-                size={16}
-                className="
-                  pointer-events-none
-                  absolute left-3 top-1/2
-                  -translate-y-1/2
-                  text-slate-500
-                "
-              />
+          <p className="-mt-2 text-[10px] text-slate-600">
+            A senha deve possuir pelo menos 8 caracteres.
+          </p>
 
-              <input
-                id="password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                required
-                minLength={8}
-                autoComplete="new-password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                placeholder="••••••••"
-                className="
-                  h-11 w-full rounded-xl
-                  border border-surface-border
-                  bg-surface-main
-                  pl-9 pr-10
-                  text-xs text-white
-                  outline-none
-                  placeholder:text-slate-600
-                  transition-all
-                  focus:border-brand-500/60
-                  focus:ring-2
-                  focus:ring-brand-500/10
-                "
-              />
-
-              <button
-                type="button"
-                onClick={() => setShowPassword((current) => !current)}
-                aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
-                className="
-                  absolute right-3 top-1/2
-                  -translate-y-1/2
-                  text-slate-500
-                  transition-colors
-                  hover:text-slate-300
-                "
-              >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-
-            <p className="mt-1.5 text-[10px] text-slate-600">
-              A senha deve possuir pelo menos 8 caracteres.
-            </p>
-          </div>
-
-          {/* CONFIRMAR SENHA */}
-          <div>
-            <label
-              htmlFor="confirmPassword"
-              className="
-                mb-1.5 block
-                text-xs font-semibold
-                text-slate-300
-              "
-            >
-              Confirmar nova senha
-            </label>
-
-            <div className="relative">
-              <Lock
-                size={16}
-                className="
-                  pointer-events-none
-                  absolute left-3 top-1/2
-                  -translate-y-1/2
-                  text-slate-500
-                "
-              />
-
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type={showConfirmPassword ? "text" : "password"}
-                required
-                minLength={8}
-                autoComplete="new-password"
-                value={confirmPassword}
-                onChange={(event) => setConfirmPassword(event.target.value)}
-                placeholder="••••••••"
-                className="
-                  h-11 w-full rounded-xl
-                  border border-surface-border
-                  bg-surface-main
-                  pl-9 pr-10
-                  text-xs text-white
-                  outline-none
-                  placeholder:text-slate-600
-                  transition-all
-                  focus:border-brand-500/60
-                  focus:ring-2
-                  focus:ring-brand-500/10
-                "
-              />
-
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword((current) => !current)}
-                aria-label={
-                  showConfirmPassword ? "Ocultar senha" : "Mostrar senha"
-                }
-                className="
-                  absolute right-3 top-1/2
-                  -translate-y-1/2
-                  text-slate-500
-                  transition-colors
-                  hover:text-slate-300
-                "
-              >
-                {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-          </div>
+          <PasswordInput
+            id="confirmPassword"
+            name="confirmPassword"
+            label="Confirmar nova senha"
+            value={confirmPassword}
+            onChange={setConfirmPassword}
+            disabled={loading}
+          />
 
           {confirmPassword.length > 0 && (
             <div>
@@ -425,6 +229,6 @@ export function ResetPasswordForm() {
           Solicitar novo link
         </Link>
       )}
-    </>
+    </div>
   );
 }

@@ -1,0 +1,4 @@
+-- MetricsFlow AI
+-- RLS da tabela public.company_members
+-- A versão consolidada está em ../05_rls_policies.sql.
+-- Este arquivo é mantido para organização por tabela.

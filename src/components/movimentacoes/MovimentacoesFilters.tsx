@@ -12,15 +12,17 @@ import {
   WalletCards,
 } from "lucide-react";
 
+import type { PeriodFilter, TransactionType } from "@/types/index";
+
 interface MovimentacoesFiltersProps {
-  type: "all" | "income" | "expense";
+  type: TransactionType;
   category: string;
-  period: string;
+  period: PeriodFilter;
   categories: string[];
 
-  onTypeChange: (value: "all" | "income" | "expense") => void;
+  onTypeChange: (value: TransactionType) => void;
   onCategoryChange: (value: string) => void;
-  onPeriodChange: (value: string) => void;
+  onPeriodChange: (value: PeriodFilter) => void;
   onClear: () => void;
 }
 
@@ -70,7 +72,6 @@ function FilterDropdown({
 
   return (
     <div ref={ref} className="relative z-[80] min-w-[185px]">
-
       <motion.button
         type="button"
         onClick={() => setOpen((current) => !current)}
@@ -81,7 +82,6 @@ function FilterDropdown({
             : "border-surface-border bg-surface-sidebar hover:border-slate-600 hover:bg-surface-panel"
         }`}
       >
-
         <span
           className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border transition-all ${
             open
@@ -120,7 +120,6 @@ function FilterDropdown({
         </motion.span>
       </motion.button>
 
-
       <AnimatePresence>
         {open && (
           <motion.div
@@ -145,7 +144,6 @@ function FilterDropdown({
             }}
             className="absolute left-0 top-[calc(100%+8px)] z-[9999] w-full min-w-[210px] origin-top overflow-hidden rounded-xl border border-surface-border bg-[#0b1329]/[98%] p-1.5 shadow-[0_20px_50px_rgba(0,0,0,0.45)] backdrop-blur-xl"
           >
-
             <div className="pointer-events-none absolute -right-8 -top-8 h-20 w-20 rounded-full bg-brand-500/10 blur-2xl" />
 
             <div className="relative max-h-64 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-slate-700">
@@ -283,7 +281,6 @@ export function MovimentacoesFilters({
 
   return (
     <section className="relative z-[70] overflow-visible border-t border-surface-border bg-[#0d2038]/60">
-
       <button
         type="button"
         onClick={() => setExpanded((current) => !current)}
@@ -330,7 +327,6 @@ export function MovimentacoesFilters({
         </motion.span>
       </button>
 
-
       <AnimatePresence initial={false}>
         {expanded && (
           <motion.div
@@ -358,9 +354,7 @@ export function MovimentacoesFilters({
                 value={type}
                 options={typeOptions}
                 icon={WalletCards}
-                onChange={(value) =>
-                  onTypeChange(value as "all" | "income" | "expense")
-                }
+                onChange={(value) => onTypeChange(value as TransactionType)}
               />
 
               <FilterDropdown
@@ -376,9 +370,8 @@ export function MovimentacoesFilters({
                 value={period}
                 options={periodOptions}
                 icon={CalendarDays}
-                onChange={onPeriodChange}
+                onChange={(value) => onPeriodChange(value as PeriodFilter)}
               />
-
 
               <motion.button
                 type="button"

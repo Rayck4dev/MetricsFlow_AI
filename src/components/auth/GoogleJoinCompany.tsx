@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, Link2, Loader2 } from "lucide-react";
 
-import { createClient } from "@/lib/supabase/client";
+import { joinCompanyByCode } from "@/services/company/joinCompany";
 
 interface GoogleJoinCompanyProps {
   onBack: () => void;
@@ -21,11 +21,11 @@ export default function GoogleJoinCompany({
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const normalizedCode = inviteCode.trim().toUpperCase();
+    const code = inviteCode.trim().toUpperCase();
 
     setError("");
 
-    if (!normalizedCode) {
+    if (!code) {
       setError("Informe o código de convite da empresa.");
       return;
     }
@@ -33,58 +33,29 @@ export default function GoogleJoinCompany({
     setLoading(true);
 
     try {
-      const supabase = createClient();
+      const result = await joinCompanyByCode(code);
 
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-
-      if (userError) {
-        throw userError;
-      }
-
-      if (!user) {
-        throw new Error("Sua sessão não foi encontrada. Faça login novamente.");
-      }
-
-      const { data, error: rpcError } = await supabase.rpc(
-        "join_company_by_code",
-        {
-          code_input: normalizedCode,
-        },
-      );
-
-      if (rpcError) {
-        console.error("❌ Erro ao entrar na empresa:", rpcError);
-
-        throw rpcError;
-      }
-
-      if (!data?.success) {
+      if (!result.success) {
         throw new Error(
-          data?.message ||
-            "Não foi possível entrar na empresa com este código.",
+          result.message || "Não foi possível entrar na empresa.",
         );
       }
 
       sessionStorage.removeItem("metricsflow_registration");
 
-      if (data.company_id) {
-        localStorage.setItem("metricsflow_company_id", data.company_id);
+      if (result.company_id) {
+        localStorage.setItem("metricsflow_company_id", result.company_id);
       }
 
-      if (data.company_name) {
-        localStorage.setItem("metricsflow_company", data.company_name);
+      if (result.company_name) {
+        localStorage.setItem("metricsflow_company", result.company_name);
       }
 
-      localStorage.setItem("metricsflow_role", data.role || "collaborator");
+      localStorage.setItem("metricsflow_role", result.role || "collaborator");
 
-      console.log("✅ Google entrou na empresa:", data);
-
-      onSuccess(data.company_id, data.company_name ?? null);
+      onSuccess(result.company_id, result.company_name ?? null);
     } catch (err) {
-      console.error("💥 Erro ao processar entrada por convite:", err);
+      console.error("Erro ao entrar na empresa:", err);
 
       setError(
         err instanceof Error
@@ -182,9 +153,7 @@ export default function GoogleJoinCompany({
           </p>
 
           <p className="mt-1 text-[9px] leading-4 text-slate-600">
-            O acesso será vinculado à empresa do convite. Recursos
-            administrativos, como DRE e gerenciamento da empresa, permanecem
-            disponíveis apenas para o proprietário.
+            O acesso será vinculado à empresa do convite.
           </p>
         </div>
 

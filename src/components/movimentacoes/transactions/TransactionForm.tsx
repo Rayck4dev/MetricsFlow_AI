@@ -1,17 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowDownLeft, ArrowUpRight, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 
-import { TransactionSelect } from "@/components/movimentacoes/TransactionSelect";
-import { TransactionDatePicker } from "@/components/movimentacoes/TransactionDatePicker";
-import { formatBRLInput, parseBRL } from "@/types/formatters";
+import { TransactionSelect } from "@/components/movimentacoes/transactions/TransactionSelect";
+import { TransactionDatePicker } from "@/components/movimentacoes/transactions/TransactionDatePicker";
 
-import type { Movimentacao, MovimentacaoTipo } from "./types";
+import type { TransactionType } from "@/constants/transaction.constants";
 
 export interface TransactionFormValues {
-  type: MovimentacaoTipo;
+  type: "income" | "expense";
   amount: number;
   category: string;
   paymentMethod: string;
@@ -20,69 +19,109 @@ export interface TransactionFormValues {
 }
 
 interface TransactionFormProps {
-  type: MovimentacaoTipo;
-  initialData?: Partial<Movimentacao>;
+  type: "income" | "expense";
+
+  initialData?: Partial<TransactionFormValues>;
+
   categories?: string[];
-  onSubmit: (values: TransactionFormValues) => void | Promise<void>;
+
+  onSubmit: (transaction: TransactionFormValues) => void | Promise<void>;
+
   onCancel?: () => void;
+
+  isSubmitting?: boolean;
+
   submitLabel?: string;
 }
 
 const paymentMethods = [
-  { value: "pix", label: "Pix" },
-  { value: "credit_card", label: "Cartão de crédito" },
-  { value: "debit_card", label: "Cartão de débito" },
-  { value: "bank_slip", label: "Boleto" },
-  { value: "cash", label: "Dinheiro" },
-  { value: "transfer", label: "Transferência" },
-  { value: "other", label: "Outro" },
-];
-
-const defaultCategories = [
-  "Vendas / Produtos",
-  "Prestação de Serviços",
-  "Outras Receitas",
-  "Fornecedores / Estoque",
-  "Aluguel / Água / Luz",
-  "Marketing / Anúncios",
-  "DAS / Impostos MEI",
-  "Ferramentas / Sistema",
-  "Outras Despesas",
+  {
+    value: "Pix",
+    label: "Pix",
+  },
+  {
+    value: "Cartão de crédito",
+    label: "Cartão de crédito",
+  },
+  {
+    value: "Cartão de débito",
+    label: "Cartão de débito",
+  },
+  {
+    value: "Boleto",
+    label: "Boleto",
+  },
+  {
+    value: "Dinheiro",
+    label: "Dinheiro",
+  },
+  {
+    value: "Transferência",
+    label: "Transferência",
+  },
+  {
+    value: "Outro",
+    label: "Outro",
+  },
 ];
 
 function getToday() {
   return new Date().toISOString().split("T")[0];
 }
 
-export function TransactionForm({
+function formatAmount(value: number) {
+  if (!value) return "";
+
+  return value.toFixed(2).replace(".", ",");
+}
+
+function parseAmount(value: string) {
+  const normalized = value
+    .replace(/\s/g, "")
+    .replace(/R\$/gi, "")
+    .replace(/\./g, "")
+    .replace(",", ".")
+    .replace(/[^\d.-]/g, "");
+
+  const amount = Number(normalized);
+
+  return Number.isFinite(amount) ? amount : 0;
+}
+
+export default function TransactionForm({
   type,
   initialData,
-  categories = defaultCategories,
+  categories = [],
   onSubmit,
   onCancel,
+  isSubmitting = false,
   submitLabel,
 }: TransactionFormProps) {
-  const [description, setDescription] = useState(
-    initialData?.description ?? "",
+  const isIncome = type === "income";
+
+  const [amountRaw, setAmountRaw] = useState(
+    formatAmount(initialData?.amount ?? 0),
   );
 
-  const [amountInput, setAmountInput] = useState(
-    initialData?.amount ? formatBRLInput(String(initialData.amount)) : "",
+  const [description, setDescription] = useState(
+    initialData?.description ?? "",
   );
 
   const [category, setCategory] = useState(initialData?.category ?? "");
 
   const [paymentMethod, setPaymentMethod] = useState(
-    initialData?.paymentMethod ?? "pix",
+    initialData?.paymentMethod ?? "",
   );
 
   const [date, setDate] = useState(initialData?.date ?? getToday());
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const isIncome = type === "income";
+  useEffect(() => {
+    setAmountRaw(formatAmount(initialData?.amount ?? 0));
+    setDescription(initialData?.description ?? "");
+    setCategory(initialData?.category ?? "");
+    setPaymentMethod(initialData?.paymentMethod ?? "");
+    setDate(initialData?.date ?? getToday());
+  }, [initialData]);
 
   const categoryOptions = useMemo(() => {
     return categories
@@ -93,84 +132,25 @@ export function TransactionForm({
       }));
   }, [categories]);
 
-  function validate() {
-    const nextErrors: Record<string, string> = {};
-
-    if (!description.trim()) {
-      nextErrors.description = "Informe uma descrição.";
-    }
-
-    const amount = parseBRL(amountInput);
-
-    if (!amount || amount <= 0) {
-      nextErrors.amount = "Informe um valor válido.";
-    }
-
-    if (!category) {
-      nextErrors.category = "Selecione uma categoria.";
-    }
-
-    if (!paymentMethod) {
-      nextErrors.paymentMethod = "Selecione a forma de pagamento.";
-    }
-
-    if (!date) {
-      nextErrors.date = "Informe a data.";
-    }
-
-    setErrors(nextErrors);
-
-    return {
-      valid: Object.keys(nextErrors).length === 0,
-      amount,
-    };
-  }
-
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const { valid, amount } = validate();
+    const amount = parseAmount(amountRaw);
 
-    if (!valid) {
-      return;
-    }
+    const transaction: TransactionFormValues = {
+      type,
+      amount,
+      category,
+      paymentMethod,
+      description,
+      date,
+    };
 
-    setIsSubmitting(true);
-
-    try {
-      await onSubmit({
-        type,
-        amount,
-        category,
-        paymentMethod,
-        description: description.trim(),
-        date,
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
-
-  function handleAmountChange(value: string) {
-    const numericValue = value.replace(/\D/g, "");
-
-    if (!numericValue) {
-      setAmountInput("");
-      return;
-    }
-
-    setAmountInput(formatBRLInput(numericValue));
-
-    if (errors.amount) {
-      setErrors((current) => ({
-        ...current,
-        amount: "",
-      }));
-    }
+    void onSubmit(transaction);
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="mt-5 space-y-5">
       <div>
         <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">
           Tipo de movimentação
@@ -221,31 +201,21 @@ export function TransactionForm({
           Valor
         </label>
 
-        <div
-          className={`relative rounded-xl border bg-surface-sidebar transition-all ${
-            errors.amount
-              ? "border-rose-500/50"
-              : "border-surface-border focus-within:border-brand-500/60 focus-within:ring-2 focus-within:ring-brand-500/10"
-          }`}
-        >
+        <div className="relative rounded-xl border border-surface-border bg-surface-sidebar transition-all focus-within:border-brand-500/60 focus-within:ring-2 focus-within:ring-brand-500/10">
           <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-600">
             R$
           </span>
 
           <input
-            value={amountInput}
-            inputMode="numeric"
+            type="text"
+            value={amountRaw}
+            inputMode="decimal"
             placeholder="0,00"
-            onChange={(event) => handleAmountChange(event.target.value)}
-            className="h-12 w-full bg-transparent pl-10 pr-4 text-lg font-bold text-white outline-none placeholder:text-slate-700"
+            onChange={(event) => setAmountRaw(event.target.value)}
+            disabled={isSubmitting}
+            className="h-12 w-full bg-transparent pl-10 pr-4 text-lg font-bold text-white outline-none placeholder:text-slate-700 disabled:opacity-60"
           />
         </div>
-
-        {errors.amount && (
-          <p className="text-[10px] font-medium text-rose-400">
-            {errors.amount}
-          </p>
-        )}
       </div>
 
       <div className="space-y-2">
@@ -258,24 +228,16 @@ export function TransactionForm({
 
         <input
           id="transaction-description"
+          type="text"
           value={description}
           maxLength={255}
           onChange={(event) => setDescription(event.target.value)}
+          disabled={isSubmitting}
           placeholder={
             isIncome ? "Ex.: Venda de produtos" : "Ex.: Compra de materiais"
           }
-          className={`h-11 w-full rounded-xl border bg-surface-sidebar px-3.5 text-xs font-medium text-slate-200 outline-none transition-all placeholder:text-slate-700 ${
-            errors.description
-              ? "border-rose-500/50"
-              : "border-surface-border focus:border-brand-500/60 focus:bg-surface-main focus:ring-2 focus:ring-brand-500/10"
-          }`}
+          className="h-11 w-full rounded-xl border border-surface-border bg-surface-sidebar px-3.5 text-xs font-medium text-slate-200 outline-none transition-all placeholder:text-slate-700 focus:border-brand-500/60 focus:bg-surface-main focus:ring-2 focus:ring-brand-500/10 disabled:opacity-60"
         />
-
-        {errors.description && (
-          <p className="text-[10px] font-medium text-rose-400">
-            {errors.description}
-          </p>
-        )}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -285,7 +247,7 @@ export function TransactionForm({
           onChange={setCategory}
           options={categoryOptions}
           placeholder="Selecione"
-          error={errors.category}
+          disabled={isSubmitting}
         />
 
         <TransactionSelect
@@ -294,16 +256,11 @@ export function TransactionForm({
           onChange={setPaymentMethod}
           options={paymentMethods}
           placeholder="Selecione"
-          error={errors.paymentMethod}
+          disabled={isSubmitting}
         />
       </div>
 
-      <TransactionDatePicker
-        value={date}
-        onChange={setDate}
-        error={errors.date}
-        max={getToday()}
-      />
+      <TransactionDatePicker value={date} onChange={setDate} max={getToday()} />
 
       <div className="flex items-center justify-end gap-2 border-t border-surface-border pt-4">
         {onCancel && (
@@ -311,7 +268,7 @@ export function TransactionForm({
             type="button"
             onClick={onCancel}
             disabled={isSubmitting}
-            className="h-10 rounded-xl px-4 text-[10px] font-bold text-slate-500 transition-colors hover:bg-surface-sidebar hover:text-slate-300 disabled:opacity-50"
+            className="h-10 rounded-xl px-4 text-[10px] font-bold text-slate-500 transition-colors hover:bg-surface-sidebar hover:text-slate-300 disabled:pointer-events-none disabled:opacity-50"
           >
             Cancelar
           </button>

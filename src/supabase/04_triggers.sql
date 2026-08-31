@@ -1,0 +1,43 @@
+-- MetricsFlow AI
+-- Triggers do schema fornecido e das funções enviadas.
+
+-- ================================================================
+-- NOVA EMPRESA -> CATEGORIAS PADRÃO
+-- ================================================================
+DROP TRIGGER IF EXISTS trigger_seed_company_categories ON public.companies;
+
+CREATE TRIGGER trigger_seed_company_categories
+AFTER INSERT ON public.companies
+FOR EACH ROW
+EXECUTE FUNCTION public.handle_new_company_created();
+
+
+-- ================================================================
+-- UPDATED_AT
+-- ================================================================
+-- Os triggers abaixo assumem que as tabelas possuem updated_at,
+-- conforme o schema enviado/documentado.
+
+DROP TRIGGER IF EXISTS trigger_companies_updated_at ON public.companies;
+CREATE TRIGGER trigger_companies_updated_at
+BEFORE UPDATE ON public.companies
+FOR EACH ROW
+EXECUTE FUNCTION public.update_updated_at();
+
+DROP TRIGGER IF EXISTS trigger_transactions_updated_at ON public.transactions;
+CREATE TRIGGER trigger_transactions_updated_at
+BEFORE UPDATE ON public.transactions
+FOR EACH ROW
+EXECUTE FUNCTION public.update_updated_at();
+
+-- ================================================================
+-- AUTH.USERS -> PROFILE
+-- ================================================================
+-- Este trigger precisa ser criado no schema auth.
+-- Execute apenas se o projeto estiver usando a função handle_new_user.
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+after INSERT OR UPDATE OF email, raw_user_meta_data ON auth.users
+FOR EACH ROW
+EXECUTE FUNCTION public.handle_new_user();

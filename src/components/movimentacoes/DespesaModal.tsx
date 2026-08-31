@@ -3,7 +3,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowDownLeft, X } from "lucide-react";
 
-import { TransactionForm, type TransactionFormValues } from "./TransactionForm";
+import TransactionForm from "./transactions/TransactionForm";
+import type { TransactionFormValues } from "./transactions/TransactionForm";
 
 interface DespesaModalProps {
   onClose: () => void;

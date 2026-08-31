@@ -27,7 +27,6 @@ export default function OnboardingComplete({
 
   return (
     <div className="space-y-6 py-6 text-center">
-      {/* ÍCONE */}
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
@@ -137,16 +136,12 @@ export default function OnboardingComplete({
         {isSubmitting ? (
           <>
             <Loader2 size={16} className="animate-spin" />
-            {isOwner
-              ? "Criando sua empresa..."
-              : "Entrando na empresa..."}
+            {isOwner ? "Criando sua empresa..." : "Entrando na empresa..."}
           </>
         ) : (
           <>
             <span>
-              {isOwner
-                ? "Acessar meu MetricsFlow"
-                : "Entrar no MetricsFlow"}
+              {isOwner ? "Acessar meu MetricsFlow" : "Entrar no MetricsFlow"}
             </span>
 
             <ArrowRight

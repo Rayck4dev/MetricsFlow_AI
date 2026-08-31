@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { Dre } from "@/components/dre/Dre";
-import type { DreTransaction } from "@/components/dre/Dre";
+import Dre from "@/components/dre/Dre";
+import type { DreTransaction } from "@/hooks/useDre";
 
 import { Sidebar } from "@/components/layout/Sidebar";
 import { createClient } from "@/lib/supabase/client";

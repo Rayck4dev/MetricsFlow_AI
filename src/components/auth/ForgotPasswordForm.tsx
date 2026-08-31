@@ -1,61 +1,13 @@
 "use client";
 
-import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, Loader2, Lock, Mail } from "lucide-react";
 
-import { createClient } from "@/lib/supabase/client";
+import { useForgotPassword } from "@/hooks/useForgotPassword";
 
 export function ForgotPasswordForm() {
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    setError("");
-    setSuccess(false);
-
-    if (!email.trim()) {
-      setError("Informe seu e-mail.");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const supabase = createClient();
-
-      const redirectTo = `${window.location.origin}/auth/callback?next=/redefinir-senha`;
-
-      const { error } = await supabase.auth.resetPasswordForEmail(
-        email.trim(),
-        {
-          redirectTo,
-        },
-      );
-
-      if (error) {
-        console.error("Erro ao solicitar recuperação:", error);
-
-        setError(
-          error.message || "Não foi possível enviar o link de recuperação.",
-        );
-
-        return;
-      }
-
-      setSuccess(true);
-    } catch (error) {
-      console.error("Erro inesperado na recuperação:", error);
-
-      setError("Ocorreu um erro inesperado. Tente novamente.");
-    } finally {
-      setLoading(false);
-    }
-  }
+  const { email, setEmail, loading, success, error, handleSubmit } =
+    useForgotPassword();
 
   return (
     <div className="w-full">

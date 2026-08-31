@@ -61,8 +61,6 @@ export function Preferencias() {
   }
 
   function handleDeleteAccount() {
-
-    console.log("Excluir conta");
   }
 
   return (

@@ -14,55 +14,79 @@ interface DreResultProps {
   expenses: number;
 }
 
+type ResultMiniCardColor = "emerald" | "orange" | "red";
+
+type ResultLineColor =
+  | "text-emerald-400"
+  | "text-orange-400"
+  | "text-red-400"
+  | "text-brand-300";
+
+const currencyFormatter = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+});
+
 function formatCurrency(value: number) {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(value);
+  return currencyFormatter.format(value);
 }
 
 export function DreResult({ revenue, costs, expenses }: DreResultProps) {
   const grossResult = revenue - costs;
   const netResult = grossResult - expenses;
 
-  const margin = revenue > 0 ? (netResult / revenue) * 100 : 0;
+  const marginPercentage = revenue > 0 ? (netResult / revenue) * 100 : 0;
 
-  const positive = netResult >= 0;
+  const isPositive = netResult >= 0;
+
+  const formattedMargin = Math.abs(marginPercentage).toFixed(1);
 
   return (
     <motion.section
-      initial={{ opacity: 0, y: 18 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{
+        opacity: 0,
+        y: 18,
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+      }}
       transition={{
         delay: 0.18,
         duration: 0.45,
       }}
+      aria-labelledby="dre-result-title"
       className="relative overflow-hidden rounded-2xl border border-surface-border bg-surface-panel shadow-xl shadow-black/10"
     >
       <div
+        aria-hidden="true"
         className={`pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full blur-3xl ${
-          positive ? "bg-emerald-500/[0.08]" : "bg-red-500/[0.08]"
+          isPositive ? "bg-emerald-500/[0.08]" : "bg-red-500/[0.08]"
         }`}
       />
 
       <div className="relative p-5 sm:p-6">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div>
+          <div className="min-w-0">
             <div className="mb-3 flex items-center gap-2">
               <div
-                className={`flex h-9 w-9 items-center justify-center rounded-xl ${
-                  positive ? "bg-emerald-500/10" : "bg-red-500/10"
+                aria-hidden="true"
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+                  isPositive ? "bg-emerald-500/10" : "bg-red-500/10"
                 }`}
               >
-                {positive ? (
+                {isPositive ? (
                   <TrendingUp size={17} className="text-emerald-400" />
                 ) : (
                   <ArrowDownRight size={17} className="text-red-400" />
                 )}
               </div>
 
-              <div>
-                <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-slate-500">
+              <div className="min-w-0">
+                <p
+                  id="dre-result-title"
+                  className="text-[9px] font-bold uppercase tracking-[0.16em] text-slate-500"
+                >
                   Resultado líquido
                 </p>
 
@@ -73,34 +97,38 @@ export function DreResult({ revenue, costs, expenses }: DreResultProps) {
             </div>
 
             <motion.h2
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
+              initial={{
+                scale: 0.95,
+              }}
+              animate={{
+                scale: 1,
+              }}
               transition={{
                 delay: 0.3,
                 type: "spring",
                 stiffness: 180,
               }}
               className={`font-heading text-3xl font-bold sm:text-4xl ${
-                positive ? "text-emerald-400" : "text-red-400"
+                isPositive ? "text-emerald-400" : "text-red-400"
               }`}
             >
               {formatCurrency(netResult)}
             </motion.h2>
 
-            <div className="mt-2 flex items-center gap-2">
+            <div className="mt-2 flex flex-wrap items-center gap-2">
               <span
                 className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[8px] font-semibold ${
-                  positive
+                  isPositive
                     ? "bg-emerald-500/10 text-emerald-400"
                     : "bg-red-500/10 text-red-400"
                 }`}
               >
-                {positive ? (
+                {isPositive ? (
                   <ArrowUpRight size={10} />
                 ) : (
                   <ArrowDownRight size={10} />
                 )}
-                {Math.abs(margin).toFixed(1)}% de margem
+                {formattedMargin}% de margem
               </span>
 
               <span className="text-[8px] text-slate-600">sobre a receita</span>
@@ -139,7 +167,7 @@ export function DreResult({ revenue, costs, expenses }: DreResultProps) {
               negative
             />
 
-            <div className="h-px bg-surface-border" />
+            <ResultDivider />
 
             <ResultLine
               label="Resultado bruto"
@@ -155,12 +183,12 @@ export function DreResult({ revenue, costs, expenses }: DreResultProps) {
               negative
             />
 
-            <div className="h-px bg-surface-border" />
+            <ResultDivider />
 
             <ResultLine
               label="Resultado líquido"
               value={netResult}
-              color={positive ? "text-emerald-400" : "text-red-400"}
+              color={isPositive ? "text-emerald-400" : "text-red-400"}
               strong
               large
             />
@@ -174,13 +202,15 @@ export function DreResult({ revenue, costs, expenses }: DreResultProps) {
 interface ResultMiniCardProps {
   label: string;
   value: number;
-  color: "emerald" | "orange" | "red";
+  color: ResultMiniCardColor;
 }
 
 function ResultMiniCard({ label, value, color }: ResultMiniCardProps) {
-  const styles = {
+  const styles: Record<ResultMiniCardColor, string> = {
     emerald: "border-emerald-500/15 bg-emerald-500/[0.05] text-emerald-400",
+
     orange: "border-orange-500/15 bg-orange-500/[0.05] text-orange-400",
+
     red: "border-red-500/15 bg-red-500/[0.05] text-red-400",
   };
 
@@ -195,13 +225,13 @@ function ResultMiniCard({ label, value, color }: ResultMiniCardProps) {
         stiffness: 300,
         damping: 18,
       }}
-      className={`rounded-xl border p-3 ${styles[color]}`}
+      className={`min-w-0 rounded-xl border p-3 ${styles[color]}`}
     >
-      <p className="text-[8px] font-semibold uppercase tracking-wider opacity-70">
+      <p className="truncate text-[8px] font-semibold uppercase tracking-wider opacity-70">
         {label}
       </p>
 
-      <p className="mt-1 text-sm font-bold">{formatCurrency(value)}</p>
+      <p className="mt-1 truncate text-sm font-bold">{formatCurrency(value)}</p>
     </motion.div>
   );
 }
@@ -209,7 +239,7 @@ function ResultMiniCard({ label, value, color }: ResultMiniCardProps) {
 interface ResultLineProps {
   label: string;
   value: number;
-  color: string;
+  color: ResultLineColor;
   negative?: boolean;
   strong?: boolean;
   large?: boolean;
@@ -234,7 +264,7 @@ function ResultLine({
       </span>
 
       <span
-        className={`${color} ${
+        className={`shrink-0 ${color} ${
           strong ? "font-bold" : "font-semibold"
         } ${large ? "text-base" : "text-xs"}`}
       >
@@ -243,4 +273,8 @@ function ResultLine({
       </span>
     </div>
   );
+}
+
+function ResultDivider() {
+  return <div className="h-px bg-surface-border" />;
 }

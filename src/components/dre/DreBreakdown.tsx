@@ -1,7 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowDownRight, ArrowUpRight } from "lucide-react";
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
 
 interface DreBreakdownProps {
   revenue: number;
@@ -29,22 +34,22 @@ export function DreBreakdown({
     {
       label: "Receita bruta",
       value: revenue,
-      type: "income",
+      type: "income" as const,
     },
     {
       label: "(-) Custos",
       value: costs,
-      type: "expense",
+      type: "expense" as const,
     },
     {
       label: "(-) Despesas operacionais",
       value: expenses,
-      type: "expense",
+      type: "expense" as const,
     },
     {
       label: "Resultado líquido",
       value: result,
-      type: "result",
+      type: "result" as const,
     },
   ];
 
@@ -52,50 +57,89 @@ export function DreBreakdown({
     <motion.section
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.22 }}
+      transition={{
+        duration: 0.5,
+        delay: 0.22,
+      }}
       className="rounded-2xl border border-surface-border bg-surface-panel p-5 shadow-xl shadow-black/10"
     >
       <div className="mb-5">
         <h2 className="text-xs font-bold text-white">
-          Composição do resultado
+          Visão financeira
         </h2>
 
         <p className="mt-1 text-[8px] text-slate-600">
-          Visão resumida da formação do resultado líquido.
+          Resumo visual das principais movimentações da DRE.
         </p>
       </div>
 
       <div className="space-y-1">
         {rows.map((row, index) => {
+          const isResult = row.type === "result";
+          const isPositive = isResult
+            ? row.value >= 0
+            : row.type === "income";
+
           const percentage =
             revenue > 0
-              ? Math.min((Math.abs(row.value) / revenue) * 100, 100)
+              ? Math.min(
+                  (Math.abs(row.value) / revenue) * 100,
+                  100,
+                )
               : 0;
-
-          const positive = row.type === "income" || row.type === "result";
 
           return (
             <motion.div
               key={row.label}
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.25 + index * 0.06 }}
+              initial={{
+                opacity: 0,
+                x: -8,
+              }}
+              animate={{
+                opacity: 1,
+                x: 0,
+              }}
+              transition={{
+                delay: 0.25 + index * 0.06,
+              }}
               className={`rounded-xl p-3 ${
-                row.type === "result"
-                  ? "mt-2 border border-brand-500/20 bg-brand-500/5"
+                isResult
+                  ? isPositive
+                    ? "mt-2 border border-emerald-500/20 bg-emerald-500/[0.05]"
+                    : "mt-2 border border-rose-500/20 bg-rose-500/[0.05]"
                   : "bg-surface-sidebar/40"
               }`}
             >
               <div className="flex items-center gap-3">
                 <div
                   className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
-                    positive ? "bg-cpm-income/10" : "bg-cpm-expense/10"
+                    isPositive
+                      ? "bg-emerald-500/10"
+                      : "bg-rose-500/10"
                   }`}
                 >
-                  {positive ? (
-                    <ArrowUpRight size={13} className="text-cpm-income" />
+                  {isResult ? (
+                    isPositive ? (
+                      <TrendingUp
+                        size={13}
+                        className="text-emerald-400"
+                      />
+                    ) : (
+                      <TrendingDown
+                        size={13}
+                        className="text-rose-400"
+                      />
+                    )
+                  ) : isPositive ? (
+                    <ArrowUpRight
+                      size={13}
+                      className="text-emerald-400"
+                    />
                   ) : (
-                    <ArrowDownRight size={13} className="text-cpm-expense" />
+                    <ArrowDownRight
+                      size={13}
+                      className="text-rose-400"
+                    />
                   )}
                 </div>
 
@@ -103,7 +147,9 @@ export function DreBreakdown({
                   <div className="flex items-center justify-between gap-3">
                     <span
                       className={`text-[9px] font-semibold ${
-                        row.type === "result" ? "text-white" : "text-slate-500"
+                        isResult
+                          ? "text-white"
+                          : "text-slate-500"
                       }`}
                     >
                       {row.label}
@@ -111,20 +157,37 @@ export function DreBreakdown({
 
                     <span
                       className={`text-[9px] font-bold ${
-                        positive ? "text-cpm-income" : "text-cpm-expense"
+                        isPositive
+                          ? "text-emerald-400"
+                          : "text-rose-400"
                       }`}
                     >
-                      {formatCurrency(row.value)}
+                      {isResult && row.value < 0
+                        ? "-"
+                        : !isResult && row.type === "expense"
+                          ? "-"
+                          : "+"}
+
+                      {formatCurrency(
+                        Math.abs(row.value),
+                      )}
                     </span>
                   </div>
 
                   <div className="mt-2 h-1 overflow-hidden rounded-full bg-surface-panel">
                     <motion.div
                       initial={{ width: 0 }}
-                      animate={{ width: `${percentage}%` }}
-                      transition={{ duration: 0.7 }}
+                      animate={{
+                        width: `${percentage}%`,
+                      }}
+                      transition={{
+                        duration: 0.7,
+                        delay: 0.1 + index * 0.05,
+                      }}
                       className={`h-full rounded-full ${
-                        positive ? "bg-cpm-income" : "bg-cpm-expense"
+                        isPositive
+                          ? "bg-emerald-400"
+                          : "bg-rose-400"
                       }`}
                     />
                   </div>

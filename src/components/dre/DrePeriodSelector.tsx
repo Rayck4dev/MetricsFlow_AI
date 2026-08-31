@@ -18,11 +18,13 @@ interface DrePeriodSelectorProps {
   onChange: (value: DrePeriod) => void;
 }
 
-const periods: {
+interface PeriodOption {
   value: DrePeriod;
   label: string;
   description: string;
-}[] = [
+}
+
+const PERIODS: PeriodOption[] = [
   {
     value: "today",
     label: "Hoje",
@@ -31,7 +33,7 @@ const periods: {
   {
     value: "week",
     label: "Esta semana",
-    description: "Últimos 7 dias",
+    description: "Da segunda-feira até hoje",
   },
   {
     value: "month",
@@ -60,46 +62,60 @@ const periods: {
   },
 ];
 
+const DEFAULT_PERIOD: DrePeriod = "month";
+
 export function DrePeriodSelector({ value, onChange }: DrePeriodSelectorProps) {
   const [open, setOpen] = useState(false);
 
-  const ref = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const current = periods.find((item) => item.value === value) ?? periods[2];
+  const currentPeriod =
+    PERIODS.find((period) => period.value === value) ??
+    PERIODS.find((period) => period.value === DEFAULT_PERIOD)!;
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
+    function handlePointerDown(event: MouseEvent) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         setOpen(false);
       }
     }
 
-    function handleEscape(event: KeyboardEvent) {
+    function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setOpen(false);
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleEscape);
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscape);
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
 
-  function handleSelect(selectedPeriod: DrePeriod) {
-    onChange(selectedPeriod);
+  function handleToggle() {
+    setOpen((previous) => !previous);
+  }
+
+  function handleSelect(period: DrePeriod) {
+    onChange(period);
     setOpen(false);
   }
 
   return (
-    <div ref={ref} className="relative z-[100] min-w-0">
+    <div ref={containerRef} className="relative z-[100] min-w-0">
       <motion.button
         type="button"
         whileTap={{ scale: 0.98 }}
-        onClick={() => setOpen((previous) => !previous)}
+        onClick={handleToggle}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label={`Selecionar período. Atual: ${currentPeriod.label}`}
         className={`flex h-11 w-full min-w-0 items-center justify-between gap-3 rounded-xl border px-3 py-2.5 transition-all sm:w-[210px] ${
           open
             ? "border-brand-500/40 bg-brand-500/[0.06] shadow-lg shadow-brand-500/5"
@@ -121,14 +137,18 @@ export function DrePeriodSelector({ value, onChange }: DrePeriodSelectorProps) {
             </p>
 
             <p className="truncate text-[10px] font-bold text-slate-300">
-              {current.label}
+              {currentPeriod.label}
             </p>
           </div>
         </div>
 
         <motion.div
-          animate={{ rotate: open ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
+          animate={{
+            rotate: open ? 180 : 0,
+          }}
+          transition={{
+            duration: 0.2,
+          }}
           className="shrink-0"
         >
           <ChevronDown size={14} className="text-slate-500" />
@@ -157,6 +177,8 @@ export function DrePeriodSelector({ value, onChange }: DrePeriodSelectorProps) {
               duration: 0.16,
               ease: "easeOut",
             }}
+            role="listbox"
+            aria-label="Períodos disponíveis"
             className="absolute right-0 top-full z-[200] w-[min(280px,calc(100vw-2rem))] rounded-2xl border border-surface-border bg-[#122033] p-2 shadow-2xl shadow-black/50 backdrop-blur-xl"
           >
             <div className="mb-1 flex items-center gap-2 px-2 py-2">
@@ -168,35 +190,41 @@ export function DrePeriodSelector({ value, onChange }: DrePeriodSelectorProps) {
             </div>
 
             <div className="space-y-1">
-              {periods.map((item) => {
-                const active = value === item.value;
+              {PERIODS.map((period) => {
+                const isActive = period.value === value;
 
                 return (
                   <motion.button
-                    key={item.value}
+                    key={period.value}
                     type="button"
-                    whileHover={{ x: 3 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => handleSelect(item.value)}
+                    role="option"
+                    aria-selected={isActive}
+                    whileHover={{
+                      x: 3,
+                    }}
+                    whileTap={{
+                      scale: 0.98,
+                    }}
+                    onClick={() => handleSelect(period.value)}
                     className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition-colors ${
-                      active ? "bg-brand-500/10" : "hover:bg-white/[0.04]"
+                      isActive ? "bg-brand-500/10" : "hover:bg-white/[0.04]"
                     }`}
                   >
                     <div className="min-w-0">
                       <p
                         className={`text-[10px] font-semibold ${
-                          active ? "text-brand-300" : "text-slate-300"
+                          isActive ? "text-brand-300" : "text-slate-300"
                         }`}
                       >
-                        {item.label}
+                        {period.label}
                       </p>
 
                       <p className="mt-0.5 truncate text-[8px] text-slate-600">
-                        {item.description}
+                        {period.description}
                       </p>
                     </div>
 
-                    {active && (
+                    {isActive && (
                       <motion.div
                         initial={{
                           scale: 0,

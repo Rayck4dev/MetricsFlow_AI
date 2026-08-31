@@ -8,7 +8,6 @@ export default function RedefinirSenhaPage() {
     <main className="min-h-screen bg-surface-main text-white">
       <div className="flex min-h-screen items-center justify-center px-4 py-10">
         <div className="w-full max-w-md">
-          {/* LOGO */}
           <div className="mb-8 text-center">
             <Link
               href="/"
@@ -57,7 +56,6 @@ export default function RedefinirSenhaPage() {
             </Link>
           </div>
 
-          {/* CARD */}
           <div
             className="
               rounded-2xl

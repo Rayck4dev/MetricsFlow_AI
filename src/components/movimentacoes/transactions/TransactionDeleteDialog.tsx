@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle, Trash2, X } from "lucide-react";
 
-import type { Movimentacao } from "./types";
+import type { Movimentacao } from "@/types/index";
 
 interface TransactionDeleteDialogProps {
   transaction: Movimentacao | null;

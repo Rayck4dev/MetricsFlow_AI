@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import { MovimentacoesHeader } from "./MovimentacoesHeader";
@@ -12,12 +11,12 @@ import { MovimentacoesActions } from "./MovimentacoesActions";
 
 import { ReceitaModal } from "./ReceitaModal";
 import { DespesaModal } from "./DespesaModal";
-import { TransactionEditModal } from "./TransactionEditModal";
-import { TransactionDeleteDialog } from "./TransactionDeleteDialog";
+import { TransactionEditModal } from "./transactions/TransactionEditModal";
+import { TransactionDeleteDialog } from "./transactions/TransactionDeleteDialog";
 
-import type { TransactionFormValues } from "./TransactionForm";
+import { useMovimentacoes } from "@/hooks/useMovimentacoes";
 
-import type { Movimentacao } from "./types";
+import type { Movimentacao } from "@/types";
 
 export interface MovimentacoesProps {
   transactions: Movimentacao[];
@@ -30,7 +29,6 @@ export interface MovimentacoesProps {
   onAddExpense?: (
     transaction: Omit<Movimentacao, "id">,
   ) => void | Promise<void>;
-
 
   onUpdateTransaction?: (
     id: string,
@@ -49,125 +47,52 @@ export function Movimentacoes({
   onUpdateTransaction,
   onDeleteTransaction,
 }: MovimentacoesProps) {
-  const [search, setSearch] = useState("");
+  const {
+    search,
+    setSearch,
 
-  const [editingTransaction, setEditingTransaction] =
-    useState<Movimentacao | null>(null);
+    typeFilter,
+    setTypeFilter,
 
-  const [deletingTransaction, setDeletingTransaction] =
-    useState<Movimentacao | null>(null);
+    categoryFilter,
+    setCategoryFilter,
 
-  const [typeFilter, setTypeFilter] = useState<"all" | "income" | "expense">(
-    "all",
-  );
+    periodFilter,
+    setPeriodFilter,
 
-  const [categoryFilter, setCategoryFilter] = useState("all");
+    clearFilters,
 
-  const [periodFilter, setPeriodFilter] = useState("all");
+    categories,
+    filteredTransactions,
+    totals,
 
-  const [isIncomeModalOpen, setIsIncomeModalOpen] = useState(false);
+    editingTransaction,
+    openEdit,
+    closeEdit,
 
-  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+    deletingTransaction,
+    openDelete,
+    closeDelete,
 
-  const categories = useMemo(() => {
-    return Array.from(
-      new Set(transactions.map((transaction) => transaction.category)),
-    ).sort();
-  }, [transactions]);
+    isIncomeModalOpen,
+    openIncomeModal,
+    closeIncomeModal,
 
-  const filteredTransactions = useMemo(() => {
-    const normalizedSearch = search.toLowerCase().trim();
+    isExpenseModalOpen,
+    openExpenseModal,
+    closeExpenseModal,
 
-    return transactions.filter((transaction) => {
-      const normalizedDate = transaction.date.toLowerCase();
-
-      const matchesSearch =
-        !normalizedSearch ||
-        transaction.description.toLowerCase().includes(normalizedSearch) ||
-        transaction.category.toLowerCase().includes(normalizedSearch) ||
-        transaction.paymentMethod.toLowerCase().includes(normalizedSearch);
-
-      const matchesType =
-        typeFilter === "all" || transaction.type === typeFilter;
-
-      const matchesCategory =
-        categoryFilter === "all" || transaction.category === categoryFilter;
-
-      let matchesPeriod = true;
-
-      if (periodFilter === "today") {
-        matchesPeriod = normalizedDate.includes("hoje");
-      }
-
-      if (periodFilter === "week") {
-        matchesPeriod =
-          normalizedDate.includes("hoje") || normalizedDate.includes("ontem");
-      }
-
-      if (periodFilter === "month") {
-        matchesPeriod = true;
-      }
-
-      return matchesSearch && matchesType && matchesCategory && matchesPeriod;
-    });
-  }, [transactions, search, typeFilter, categoryFilter, periodFilter]);
-
-  const totals = useMemo(() => {
-    const income = filteredTransactions
-      .filter((item) => item.type === "income")
-      .reduce((sum, item) => sum + item.amount, 0);
-
-    const expenses = filteredTransactions
-      .filter((item) => item.type === "expense")
-      .reduce((sum, item) => sum + item.amount, 0);
-
-    return {
-      income,
-      expenses,
-      balance: income - expenses,
-      count: filteredTransactions.length,
-    };
-  }, [filteredTransactions]);
-
-  async function handleIncome(transaction: Omit<Movimentacao, "id">) {
-    await onAddIncome?.(transaction);
-
-    setIsIncomeModalOpen(false);
-  }
-
-  async function handleExpense(transaction: Omit<Movimentacao, "id">) {
-    await onAddExpense?.(transaction);
-
-    setIsExpenseModalOpen(false);
-  }
-
-  async function handleEdit(id: string, values: TransactionFormValues) {
-    const transaction: Omit<Movimentacao, "id"> = {
-      type: values.type,
-      amount: values.amount,
-      category: values.category,
-      paymentMethod: values.paymentMethod,
-      description: values.description,
-      date: values.date,
-    };
-
-    await onUpdateTransaction?.(id, transaction);
-
-    setEditingTransaction(null);
-  }
-
-  async function handleDelete(transaction: Movimentacao) {
-    await onDeleteTransaction?.(transaction.id);
-
-    setDeletingTransaction(null);
-  }
-
-  function handleClearFilters() {
-    setSearch("");
-    setTypeFilter("all");
-    setCategoryFilter("all");
-    setPeriodFilter("all");
-  }
+    handleIncome,
+    handleExpense,
+    handleEdit,
+    handleDelete,
+  } = useMovimentacoes({
+    transactions,
+    onAddIncome,
+    onAddExpense,
+    onUpdateTransaction,
+    onDeleteTransaction,
+  });
 
   return (
     <>
@@ -175,8 +100,8 @@ export function Movimentacoes({
         <MovimentacoesHeader
           userName={userName}
           companyName={companyName}
-          onAddIncome={() => setIsIncomeModalOpen(true)}
-          onAddExpense={() => setIsExpenseModalOpen(true)}
+          onAddIncome={openIncomeModal}
+          onAddExpense={openExpenseModal}
         />
 
         <MovimentacoesCards
@@ -234,8 +159,8 @@ export function Movimentacoes({
               <MovimentacoesSearch value={search} onChange={setSearch} />
 
               <MovimentacoesActions
-                onAddIncome={() => setIsIncomeModalOpen(true)}
-                onAddExpense={() => setIsExpenseModalOpen(true)}
+                onAddIncome={openIncomeModal}
+                onAddExpense={openExpenseModal}
               />
             </div>
 
@@ -247,7 +172,7 @@ export function Movimentacoes({
               onTypeChange={setTypeFilter}
               onCategoryChange={setCategoryFilter}
               onPeriodChange={setPeriodFilter}
-              onClear={handleClearFilters}
+              onClear={clearFilters}
             />
           </div>
         </motion.section>
@@ -255,38 +180,41 @@ export function Movimentacoes({
         <MovimentacoesTable
           transactions={filteredTransactions}
           totalTransactions={transactions.length}
-          onEdit={(transaction) => setEditingTransaction(transaction)}
-          onDelete={(transaction) => setDeletingTransaction(transaction)}
+          onEdit={openEdit}
+          onDelete={openDelete}
         />
       </div>
 
       <AnimatePresence mode="wait">
         {isIncomeModalOpen && (
           <ReceitaModal
-            onClose={() => setIsIncomeModalOpen(false)}
+            onClose={closeIncomeModal}
             onSubmit={handleIncome}
+            categories={categories}
           />
         )}
 
         {isExpenseModalOpen && (
           <DespesaModal
-            onClose={() => setIsExpenseModalOpen(false)}
+            onClose={closeExpenseModal}
             onSubmit={handleExpense}
+            categories={categories}
           />
         )}
 
         {editingTransaction && (
           <TransactionEditModal
             transaction={editingTransaction}
-            onClose={() => setEditingTransaction(null)}
+            onClose={closeEdit}
             onSubmit={handleEdit}
+            categories={categories}
           />
         )}
 
         {deletingTransaction && (
           <TransactionDeleteDialog
             transaction={deletingTransaction}
-            onClose={() => setDeletingTransaction(null)}
+            onClose={closeDelete}
             onConfirm={handleDelete}
           />
         )}
