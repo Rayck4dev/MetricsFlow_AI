@@ -333,7 +333,8 @@ metricsflow-ai/
 │   │
 │   ├── lib/
 │   │
-│   ├── types/│
+│   ├── types/
+│   │
 ├── .env.local
 ├── .gitignore
 ├── eslint.config.mjs
