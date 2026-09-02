@@ -7,10 +7,12 @@ import { motion } from "framer-motion";
 import { TransactionSelect } from "@/components/movimentacoes/transactions/TransactionSelect";
 import { TransactionDatePicker } from "@/components/movimentacoes/transactions/TransactionDatePicker";
 
+import { formatBRLInput, parseBRL } from "@/types/formatters";
+
 import type { TransactionType } from "@/constants/transaction.constants";
 
 export interface TransactionFormValues {
-  type: "income" | "expense";
+  type: TransactionType;
   amount: number;
   category: string;
   paymentMethod: string;
@@ -19,73 +21,60 @@ export interface TransactionFormValues {
 }
 
 interface TransactionFormProps {
-  type: "income" | "expense";
-
+  type: TransactionType;
   initialData?: Partial<TransactionFormValues>;
-
   categories?: string[];
 
   onSubmit: (transaction: TransactionFormValues) => void | Promise<void>;
 
   onCancel?: () => void;
-
   isSubmitting?: boolean;
-
   submitLabel?: string;
 }
 
 const paymentMethods = [
   {
-    value: "Pix",
+    value: "pix",
     label: "Pix",
   },
   {
-    value: "Cartão de crédito",
+    value: "credit_card",
     label: "Cartão de crédito",
   },
   {
-    value: "Cartão de débito",
+    value: "debit_card",
     label: "Cartão de débito",
   },
   {
-    value: "Boleto",
+    value: "bank_slip",
     label: "Boleto",
   },
   {
-    value: "Dinheiro",
+    value: "cash",
     label: "Dinheiro",
   },
   {
-    value: "Transferência",
+    value: "transfer",
     label: "Transferência",
   },
   {
-    value: "Outro",
+    value: "other",
     label: "Outro",
   },
 ];
 
-function getToday() {
+function getToday(): string {
   return new Date().toISOString().split("T")[0];
 }
 
-function formatAmount(value: number) {
-  if (!value) return "";
+function formatInitialAmount(value?: number): string {
+  if (typeof value !== "number" || value <= 0) {
+    return "";
+  }
 
-  return value.toFixed(2).replace(".", ",");
-}
+  const cents = Math.round(value * 100);
 
-function parseAmount(value: string) {
-  const normalized = value
-    .replace(/\s/g, "")
-    .replace(/R\$/gi, "")
-    .replace(/\./g, "")
-    .replace(",", ".")
-    .replace(/[^\d.-]/g, "");
-
-  const amount = Number(normalized);
-
-  return Number.isFinite(amount) ? amount : 0;
+  return formatBRLInput(String(cents));
 }
 
 export default function TransactionForm({
@@ -99,8 +88,8 @@ export default function TransactionForm({
 }: TransactionFormProps) {
   const isIncome = type === "income";
 
-  const [amountRaw, setAmountRaw] = useState(
-    formatAmount(initialData?.amount ?? 0),
+  const [amountInput, setAmountInput] = useState(() =>
+    formatInitialAmount(initialData?.amount),
   );
 
   const [description, setDescription] = useState(
@@ -110,43 +99,128 @@ export default function TransactionForm({
   const [category, setCategory] = useState(initialData?.category ?? "");
 
   const [paymentMethod, setPaymentMethod] = useState(
-    initialData?.paymentMethod ?? "",
+    initialData?.paymentMethod ?? "pix",
   );
 
   const [date, setDate] = useState(initialData?.date ?? getToday());
 
+  const [error, setError] = useState("");
+
   useEffect(() => {
-    setAmountRaw(formatAmount(initialData?.amount ?? 0));
+    setAmountInput(formatInitialAmount(initialData?.amount));
+
     setDescription(initialData?.description ?? "");
+
     setCategory(initialData?.category ?? "");
-    setPaymentMethod(initialData?.paymentMethod ?? "");
+
+    setPaymentMethod(initialData?.paymentMethod ?? "pix");
+
     setDate(initialData?.date ?? getToday());
-  }, [initialData]);
+
+    setError("");
+  }, [
+    initialData?.amount,
+    initialData?.description,
+    initialData?.category,
+    initialData?.paymentMethod,
+    initialData?.date,
+  ]);
 
   const categoryOptions = useMemo(() => {
     return categories
-      .filter((item) => item.trim())
+      .filter((item) => item.trim() !== "")
       .map((item) => ({
         value: item,
         label: item,
       }));
   }, [categories]);
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function handleAmountChange(value: string) {
+    const onlyNumbers = value.replace(/\D/g, "");
+
+    const formatted = formatBRLInput(onlyNumbers);
+
+    setAmountInput(formatted);
+
+    if (error) {
+      setError("");
+    }
+  }
+
+  function handleDescriptionChange(value: string) {
+    setDescription(value);
+
+    if (error) {
+      setError("");
+    }
+  }
+
+  function handleCategoryChange(value: string) {
+    setCategory(value);
+
+    if (error) {
+      setError("");
+    }
+  }
+
+  function handlePaymentMethodChange(value: string) {
+    setPaymentMethod(value);
+
+    if (error) {
+      setError("");
+    }
+  }
+
+  function handleDateChange(value: string) {
+    setDate(value);
+
+    if (error) {
+      setError("");
+    }
+  }
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const amount = parseAmount(amountRaw);
+    const amount = parseBRL(amountInput);
+
+    if (amount <= 0) {
+      setError("Informe um valor válido.");
+      return;
+    }
+
+    if (!description.trim()) {
+      setError("Informe uma descrição.");
+      return;
+    }
+
+    if (!category) {
+      setError("Selecione uma categoria.");
+      return;
+    }
+
+    if (!paymentMethod) {
+      setError("Selecione a forma de pagamento.");
+      return;
+    }
+
+    if (!date) {
+      setError("Informe a data.");
+      return;
+    }
+
+    setError("");
 
     const transaction: TransactionFormValues = {
       type,
       amount,
       category,
       paymentMethod,
-      description,
+      description: description.trim(),
       date,
     };
 
-    void onSubmit(transaction);
+    await onSubmit(transaction);
   }
 
   return (
@@ -164,8 +238,7 @@ export default function TransactionForm({
           }`}
         >
           <motion.div
-            layoutId="transaction-type-icon"
-            className={`flex h-9 w-9 items-center justify-center rounded-lg ${
+            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
               isIncome
                 ? "bg-emerald-500/10 text-emerald-400"
                 : "bg-rose-500/10 text-rose-400"
@@ -201,19 +274,22 @@ export default function TransactionForm({
           Valor
         </label>
 
-        <div className="relative rounded-xl border border-surface-border bg-surface-sidebar transition-all focus-within:border-brand-500/60 focus-within:ring-2 focus-within:ring-brand-500/10">
-          <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-600">
-            R$
-          </span>
-
+        <div
+          className={`rounded-xl border bg-surface-sidebar transition-all ${
+            error && parseBRL(amountInput) <= 0
+              ? "border-rose-500/50 focus-within:border-rose-400"
+              : "border-surface-border focus-within:border-brand-500/60 focus-within:ring-2 focus-within:ring-brand-500/10"
+          }`}
+        >
           <input
             type="text"
-            value={amountRaw}
-            inputMode="decimal"
-            placeholder="0,00"
-            onChange={(event) => setAmountRaw(event.target.value)}
+            inputMode="numeric"
+            autoComplete="off"
+            value={amountInput}
+            onChange={(event) => handleAmountChange(event.target.value)}
             disabled={isSubmitting}
-            className="h-12 w-full bg-transparent pl-10 pr-4 text-lg font-bold text-white outline-none placeholder:text-slate-700 disabled:opacity-60"
+            placeholder="R$ 0,00"
+            className="h-12 w-full bg-transparent px-4 text-lg font-bold text-white outline-none placeholder:text-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
           />
         </div>
       </div>
@@ -231,12 +307,12 @@ export default function TransactionForm({
           type="text"
           value={description}
           maxLength={255}
-          onChange={(event) => setDescription(event.target.value)}
+          onChange={(event) => handleDescriptionChange(event.target.value)}
           disabled={isSubmitting}
           placeholder={
             isIncome ? "Ex.: Venda de produtos" : "Ex.: Compra de materiais"
           }
-          className="h-11 w-full rounded-xl border border-surface-border bg-surface-sidebar px-3.5 text-xs font-medium text-slate-200 outline-none transition-all placeholder:text-slate-700 focus:border-brand-500/60 focus:bg-surface-main focus:ring-2 focus:ring-brand-500/10 disabled:opacity-60"
+          className="h-11 w-full rounded-xl border border-surface-border bg-surface-sidebar px-3.5 text-xs font-medium text-slate-200 outline-none transition-all placeholder:text-slate-700 focus:border-brand-500/60 focus:bg-surface-main focus:ring-2 focus:ring-brand-500/10 disabled:cursor-not-allowed disabled:opacity-60"
         />
       </div>
 
@@ -244,7 +320,7 @@ export default function TransactionForm({
         <TransactionSelect
           label="Categoria"
           value={category}
-          onChange={setCategory}
+          onChange={handleCategoryChange}
           options={categoryOptions}
           placeholder="Selecione"
           disabled={isSubmitting}
@@ -253,14 +329,25 @@ export default function TransactionForm({
         <TransactionSelect
           label="Pagamento"
           value={paymentMethod}
-          onChange={setPaymentMethod}
+          onChange={handlePaymentMethodChange}
           options={paymentMethods}
           placeholder="Selecione"
           disabled={isSubmitting}
         />
       </div>
 
-      <TransactionDatePicker value={date} onChange={setDate} max={getToday()} />
+      <TransactionDatePicker
+        value={date}
+        onChange={handleDateChange}
+      />
+
+      {error && (
+        <div className="rounded-xl border border-rose-500/15 bg-rose-500/[0.05] px-3.5 py-3">
+          <p className="text-[9px] font-medium leading-4 text-rose-400">
+            {error}
+          </p>
+        </div>
+      )}
 
       <div className="flex items-center justify-end gap-2 border-t border-surface-border pt-4">
         {onCancel && (
@@ -285,8 +372,7 @@ export default function TransactionForm({
         >
           {isSubmitting && <Loader2 size={13} className="animate-spin" />}
 
-          {submitLabel ??
-            (isIncome ? "Adicionar receita" : "Adicionar despesa")}
+          {submitLabel ?? (isIncome ? "Salvar receita" : "Salvar despesa")}
         </button>
       </div>
     </form>

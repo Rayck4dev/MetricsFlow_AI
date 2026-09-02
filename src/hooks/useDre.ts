@@ -35,6 +35,11 @@ export interface DreChartItem {
   result: number;
 }
 
+export interface DreCustomPeriod {
+  startDate: string;
+  endDate: string;
+}
+
 const COST_CATEGORIES = ["Fornecedores", "Fornecedores / Estoque"];
 
 function isCostCategory(category: string) {
@@ -98,8 +103,33 @@ function parseTransactionDate(date: string) {
   return new Date(year, month - 1, day);
 }
 
-function getPeriodRange(period: DrePeriod) {
+function parseInputDate(date: string) {
+  const [year, month, day] = date.split("-").map(Number);
+
+  return new Date(year, month - 1, day);
+}
+
+function getPeriodRange(period: DrePeriod, customPeriod?: DreCustomPeriod) {
   const now = new Date();
+
+  if (period === "year") {
+    return {
+      start: startOfYear(now),
+      end: endOfYear(now),
+    };
+  }
+
+
+  if (period.startsWith("year-")) {
+    const year = Number(period.replace("year-", ""));
+
+    if (!Number.isNaN(year)) {
+      return {
+        start: new Date(year, 0, 1),
+        end: new Date(year, 11, 31, 23, 59, 59, 999),
+      };
+    }
+  }
 
   switch (period) {
     case "today":
@@ -135,17 +165,24 @@ function getPeriodRange(period: DrePeriod) {
         end: endOfDay(now),
       };
 
-    case "year":
-      return {
-        start: startOfYear(now),
-        end: endOfYear(now),
-      };
+    case "custom": {
+      if (customPeriod?.startDate && customPeriod?.endDate) {
+        const start = startOfDay(parseInputDate(customPeriod.startDate));
 
-    case "custom":
+        const end = endOfDay(parseInputDate(customPeriod.endDate));
+
+        return {
+          start,
+          end,
+        };
+      }
+
+
       return {
         start: startOfMonth(now),
         end: endOfMonth(now),
       };
+    }
 
     default:
       return {
@@ -239,15 +276,20 @@ function buildChartData(transactions: DreTransaction[]): DreChartItem[] {
 export function useDre(transactions: DreTransaction[]) {
   const [period, setPeriod] = useState<DrePeriod>("month");
 
+  const [customPeriod, setCustomPeriod] = useState<DreCustomPeriod>({
+    startDate: "",
+    endDate: "",
+  });
+
   const periodTransactions = useMemo(() => {
-    const { start, end } = getPeriodRange(period);
+    const { start, end } = getPeriodRange(period, customPeriod);
 
     return transactions.filter((transaction) => {
       const transactionDate = parseTransactionDate(transaction.date);
 
       return transactionDate >= start && transactionDate <= end;
     });
-  }, [transactions, period]);
+  }, [transactions, period, customPeriod]);
 
   const financialData = useMemo<DreFinancialData>(() => {
     const revenue = periodTransactions
@@ -311,9 +353,26 @@ export function useDre(transactions: DreTransaction[]) {
     [periodTransactions],
   );
 
+  function changePeriod(nextPeriod: DrePeriod) {
+    setPeriod(nextPeriod);
+  }
+
+  function changeCustomPeriod(startDate: string, endDate: string) {
+    setCustomPeriod({
+      startDate,
+      endDate,
+    });
+
+    setPeriod("custom");
+  }
+
   return {
     period,
-    setPeriod,
+    setPeriod: changePeriod,
+
+    customPeriod,
+    setCustomPeriod,
+    changeCustomPeriod,
 
     periodTransactions,
 

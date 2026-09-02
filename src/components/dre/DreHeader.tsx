@@ -7,8 +7,17 @@ import { DrePeriodSelector, type DrePeriod } from "./DrePeriodSelector";
 
 interface DreHeaderProps {
   companyName?: string;
+
   period: DrePeriod;
+
   onPeriodChange: (period: DrePeriod) => void;
+
+  customStartDate?: string;
+
+  customEndDate?: string;
+
+  onCustomChange?: (startDate: string, endDate: string) => void;
+
   onExport?: () => void;
 }
 
@@ -16,13 +25,24 @@ export function DreHeader({
   companyName,
   period,
   onPeriodChange,
+  customStartDate = "",
+  customEndDate = "",
+  onCustomChange,
   onExport,
 }: DreHeaderProps) {
   return (
     <motion.header
-      initial={{ opacity: 0, y: -14 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45 }}
+      initial={{
+        opacity: 0,
+        y: -14,
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+      }}
+      transition={{
+        duration: 0.45,
+      }}
       className="relative z-[70] overflow-visible rounded-2xl border border-surface-border bg-surface-panel/90 p-5 shadow-2xl shadow-black/10 backdrop-blur-xl sm:p-6"
     >
       <div className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-brand-500/10 blur-3xl" />
@@ -59,7 +79,13 @@ export function DreHeader({
         </div>
 
         <div className="relative z-[100] flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
-          <DrePeriodSelector value={period} onChange={onPeriodChange} />
+          <DrePeriodSelector
+            value={period}
+            onChange={onPeriodChange}
+            customStartDate={customStartDate}
+            customEndDate={customEndDate}
+            onCustomChange={onCustomChange}
+          />
 
           <button
             type="button"

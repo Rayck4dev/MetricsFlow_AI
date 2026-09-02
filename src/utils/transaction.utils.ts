@@ -20,3 +20,17 @@ export function getPaymentIcon(paymentMethod: string) {
 
   return CreditCard;
 }
+
+export function getPaymentLabel(paymentMethod: string) {
+  const labels: Record<string, string> = {
+    pix: "Pix",
+    credit_card: "Cartão de crédito",
+    debit_card: "Cartão de débito",
+    bank_slip: "Boleto",
+    cash: "Dinheiro",
+    transfer: "Transferência",
+    other: "Outro",
+  };
+
+  return labels[paymentMethod] ?? paymentMethod;
+}

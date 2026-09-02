@@ -28,6 +28,9 @@ export default function Dre({
     period,
     setPeriod,
 
+    customPeriod,
+    changeCustomPeriod,
+
     financialData,
 
     revenueItems,
@@ -35,7 +38,6 @@ export default function Dre({
     expenseItems,
 
     chartData,
-  
   } = useDre(transactions);
 
   return (
@@ -44,6 +46,9 @@ export default function Dre({
         companyName={companyName}
         period={period}
         onPeriodChange={setPeriod}
+        customStartDate={customPeriod.startDate}
+        customEndDate={customPeriod.endDate}
+        onCustomChange={changeCustomPeriod}
         onExport={onExport}
       />
 

@@ -5,7 +5,11 @@ import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
 
 import type { Movimentacao } from "@/types/index";
 
-import { formatCurrency, getPaymentIcon } from "@/utils/transaction.utils";
+import {
+  formatCurrency,
+  getPaymentIcon,
+  getPaymentLabel,
+} from "@/utils/transaction.utils";
 
 import { TransactionActions } from "./TransactionActions";
 import { TransactionMobileActions } from "./TransactionMobileActions";
@@ -13,7 +17,6 @@ import { TransactionMobileActions } from "./TransactionMobileActions";
 interface TransactionRowProps {
   transaction: Movimentacao;
   index: number;
-
   onEdit?: (transaction: Movimentacao) => void;
   onDelete?: (transaction: Movimentacao) => void;
 }
@@ -27,6 +30,8 @@ export function TransactionRow({
   const income = transaction.type === "income";
 
   const PaymentIcon = getPaymentIcon(transaction.paymentMethod);
+
+  const paymentLabel = getPaymentLabel(transaction.paymentMethod);
 
   return (
     <motion.div
@@ -42,7 +47,7 @@ export function TransactionRow({
         delay: 0.04 * index,
         duration: 0.3,
       }}
-      className="group relative grid min-w-0 gap-3 px-5 py-4 transition-colors hover:bg-white/[0.015] md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto_auto] md:items-center md:gap-4"
+      className="group relative grid min-w-0 gap-4 px-5 py-4 pr-24 transition-colors hover:bg-white/[0.015] md:grid-cols-[minmax(0,2fr)_180px_180px_120px_140px] md:items-center md:gap-5 md:pr-24"
     >
       <div className="flex min-w-0 items-center gap-3">
         <motion.div
@@ -75,24 +80,24 @@ export function TransactionRow({
         </div>
       </div>
 
-      <div className="min-w-0">
-        <span className="inline-flex max-w-full truncate rounded-full border border-surface-border bg-surface-sidebar px-2 py-1 text-[8px] font-semibold text-slate-500">
+      <div className="flex min-w-0 justify-center">
+        <span className="inline-flex max-w-full truncate rounded-full border border-surface-border bg-surface-sidebar px-2 py-1 text-center text-[8px] font-semibold text-slate-500">
           {transaction.category}
         </span>
       </div>
 
-      <div className="flex min-w-0 items-center gap-1.5 text-[9px] text-slate-500">
-        <PaymentIcon size={12} className="shrink-0" />
+      <div className="flex min-w-0 items-center justify-center gap-1.5 text-center text-[10px] text-slate-500">
+        <PaymentIcon size={13} className="shrink-0" />
 
-        <span className="truncate">{transaction.paymentMethod}</span>
+        <span className="truncate">{paymentLabel}</span>
       </div>
 
-      <div className="min-w-0 truncate text-[9px] text-slate-600">
+      <div className="min-w-0 truncate text-center text-[10px] text-slate-600">
         {transaction.date}
       </div>
 
       <div
-        className={`shrink-0 text-left text-[10px] font-bold md:text-right ${
+        className={`min-w-0 truncate text-right text-[10px] font-bold ${
           income ? "text-emerald-400" : "text-red-400"
         }`}
       >

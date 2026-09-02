@@ -90,28 +90,26 @@ export function MovimentacoesTable({
         </div>
       ) : (
         <>
-          <div className="hidden min-w-0 grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto_auto] gap-4 border-b border-surface-border bg-surface-sidebar/50 px-5 py-3 md:grid">
-            <span className="min-w-0 text-[8px] font-bold uppercase tracking-wider text-slate-600">
+          <div className="hidden min-w-0 grid-cols-[minmax(0,2fr)_180px_180px_120px_140px] gap-5 border-b border-surface-border bg-surface-sidebar/50 px-5 py-3 pr-24 md:grid">
+            <span className="min-w-0 text-left text-[8px] font-bold uppercase tracking-wider text-slate-600">
               Movimentação
             </span>
 
-            <span className="min-w-0 text-[8px] font-bold uppercase tracking-wider text-slate-600">
+            <span className="min-w-0 text-center text-[8px] font-bold uppercase tracking-wider text-slate-600">
               Categoria
             </span>
 
-            <span className="min-w-0 text-[8px] font-bold uppercase tracking-wider text-slate-600">
+            <span className="min-w-0 text-center text-[8px] font-bold uppercase tracking-wider text-slate-600">
               Pagamento
             </span>
 
-            <span className="min-w-0 text-[8px] font-bold uppercase tracking-wider text-slate-600">
+            <span className="min-w-0 text-center text-[8px] font-bold uppercase tracking-wider text-slate-600">
               Data
             </span>
 
-            <span className="text-right text-[8px] font-bold uppercase tracking-wider text-slate-600">
+            <span className="min-w-0 text-right text-[8px] font-bold uppercase tracking-wider text-slate-600">
               Valor
             </span>
-
-            <span className="w-8" />
           </div>
 
           <div className="min-w-0 divide-y divide-surface-border">
