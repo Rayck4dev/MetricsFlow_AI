@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CreditCard, DollarSign, WalletCards } from "lucide-react";
+import { CalendarRange, WalletCards } from "lucide-react";
 
 import type { FinancePreferences } from "./Preferencias";
 
@@ -10,29 +10,27 @@ interface PreferenciasFinanceProps {
   onChange: (key: keyof FinancePreferences, value: string) => void;
 }
 
-const paymentMethods = [
-  { value: "pix", label: "Pix" },
-  { value: "credit_card", label: "Cartão de crédito" },
-  { value: "debit_card", label: "Cartão de débito" },
-  { value: "bank_slip", label: "Boleto" },
-  { value: "cash", label: "Dinheiro" },
-  { value: "transfer", label: "Transferência" },
-  { value: "other", label: "Outro" },
-];
-
-const incomeCategories = [
-  "Vendas / Produtos",
-  "Prestação de Serviços",
-  "Outras Receitas",
-];
-
-const expenseCategories = [
-  "Fornecedores / Estoque",
-  "Aluguel / Água / Luz",
-  "Marketing / Anúncios",
-  "DAS / Impostos MEI",
-  "Ferramentas / Sistema",
-  "Outras Despesas",
+const periodOptions = [
+  {
+    value: "day",
+    label: "Hoje",
+  },
+  {
+    value: "week",
+    label: "Esta semana",
+  },
+  {
+    value: "month",
+    label: "Este mês",
+  },
+  {
+    value: "quarter",
+    label: "Este trimestre",
+  },
+  {
+    value: "year",
+    label: "Este ano",
+  },
 ];
 
 export function PreferenciasFinance({
@@ -41,9 +39,18 @@ export function PreferenciasFinance({
 }: PreferenciasFinanceProps) {
   return (
     <motion.section
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.1 }}
+      initial={{
+        opacity: 0,
+        y: 16,
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+      }}
+      transition={{
+        duration: 0.4,
+        delay: 0.1,
+      }}
       className="overflow-hidden rounded-2xl border border-surface-border bg-surface-panel/90 shadow-xl shadow-black/10 backdrop-blur-xl"
     >
       <div className="border-b border-surface-border px-5 py-4 sm:px-6">
@@ -58,7 +65,7 @@ export function PreferenciasFinance({
             </h2>
 
             <p className="mt-0.5 text-[9px] text-slate-600">
-              Defina valores padrão para novos lançamentos.
+              Defina como os dados financeiros devem ser apresentados.
             </p>
           </div>
         </div>
@@ -66,33 +73,11 @@ export function PreferenciasFinance({
 
       <div className="space-y-4 p-5 sm:p-6">
         <SelectField
-          label="Forma de pagamento padrão"
-          value={values.defaultPaymentMethod}
-          options={paymentMethods}
-          icon={<CreditCard size={13} />}
-          onChange={(value) => onChange("defaultPaymentMethod", value)}
-        />
-
-        <SelectField
-          label="Categoria padrão para receitas"
-          value={values.defaultIncomeCategory}
-          options={incomeCategories.map((item) => ({
-            value: item,
-            label: item,
-          }))}
-          icon={<DollarSign size={13} />}
-          onChange={(value) => onChange("defaultIncomeCategory", value)}
-        />
-
-        <SelectField
-          label="Categoria padrão para despesas"
-          value={values.defaultExpenseCategory}
-          options={expenseCategories.map((item) => ({
-            value: item,
-            label: item,
-          }))}
-          icon={<DollarSign size={13} />}
-          onChange={(value) => onChange("defaultExpenseCategory", value)}
+          label="Período financeiro padrão"
+          value={values.defaultPeriod}
+          options={periodOptions}
+          icon={<CalendarRange size={13} />}
+          onChange={(value) => onChange("defaultPeriod", value)}
         />
 
         <div className="flex items-center justify-between rounded-xl border border-surface-border bg-surface-sidebar px-3.5 py-3">

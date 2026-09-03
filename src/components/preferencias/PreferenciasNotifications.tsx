@@ -1,14 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  Bell,
-  CheckCircle2,
-  MessageCircle,
-  Receipt,
-  Trash2,
-  RefreshCw,
-} from "lucide-react";
+import { Bell, Mail, Receipt, MessageCircle } from "lucide-react";
 
 import type { NotificationPreferences } from "./Preferencias";
 
@@ -24,33 +17,21 @@ const options: {
   icon: typeof Bell;
 }[] = [
   {
-    key: "transactionCreated",
-    label: "Novas movimentações",
-    description: "Avisar quando uma receita ou despesa for registrada.",
+    key: "emailNotifications",
+    label: "Notificações por e-mail",
+    description: "Receber atualizações importantes por e-mail.",
+    icon: Mail,
+  },
+  {
+    key: "transactionNotifications",
+    label: "Notificações de movimentações",
+    description: "Receber avisos relacionados às movimentações financeiras.",
     icon: Receipt,
   },
   {
-    key: "transactionUpdated",
-    label: "Movimentações editadas",
-    description: "Avisar quando uma movimentação for alterada.",
-    icon: RefreshCw,
-  },
-  {
-    key: "transactionDeleted",
-    label: "Movimentações excluídas",
-    description: "Avisar quando um lançamento for removido.",
-    icon: Trash2,
-  },
-  {
-    key: "financialSummary",
-    label: "Resumo financeiro",
-    description: "Receber atualizações sobre o desempenho financeiro.",
-    icon: CheckCircle2,
-  },
-  {
-    key: "whatsappUpdates",
-    label: "Atualizações do WhatsApp",
-    description: "Receber novidades sobre a integração com WhatsApp.",
+    key: "whatsappNotifications",
+    label: "Notificações do WhatsApp",
+    description: "Receber atualizações relacionadas à integração com WhatsApp.",
     icon: MessageCircle,
   },
 ];
@@ -61,9 +42,18 @@ export function PreferenciasNotifications({
 }: PreferenciasNotificationsProps) {
   return (
     <motion.section
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.05 }}
+      initial={{
+        opacity: 0,
+        y: 16,
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+      }}
+      transition={{
+        duration: 0.4,
+        delay: 0.05,
+      }}
       className="overflow-hidden rounded-2xl border border-surface-border bg-surface-panel/90 shadow-xl shadow-black/10 backdrop-blur-xl"
     >
       <div className="border-b border-surface-border px-5 py-4 sm:px-6">
@@ -112,6 +102,7 @@ export function PreferenciasNotifications({
                 type="button"
                 role="switch"
                 aria-checked={enabled}
+                aria-label={option.label}
                 onClick={() => onChange(option.key, !enabled)}
                 className={`relative h-6 w-10 shrink-0 rounded-full border transition-all ${
                   enabled
@@ -120,7 +111,9 @@ export function PreferenciasNotifications({
                 }`}
               >
                 <motion.span
-                  animate={{ x: enabled ? 20 : 5 }}
+                  animate={{
+                    x: enabled ? 20 : 5,
+                  }}
                   transition={{
                     type: "spring",
                     stiffness: 400,

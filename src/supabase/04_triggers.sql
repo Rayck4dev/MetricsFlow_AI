@@ -1,5 +1,4 @@
 -- MetricsFlow AI
--- Triggers do schema fornecido e das funções enviadas.
 
 -- ================================================================
 -- NOVA EMPRESA -> CATEGORIAS PADRÃO
@@ -15,8 +14,6 @@ EXECUTE FUNCTION public.handle_new_company_created();
 -- ================================================================
 -- UPDATED_AT
 -- ================================================================
--- Os triggers abaixo assumem que as tabelas possuem updated_at,
--- conforme o schema enviado/documentado.
 
 DROP TRIGGER IF EXISTS trigger_companies_updated_at ON public.companies;
 CREATE TRIGGER trigger_companies_updated_at

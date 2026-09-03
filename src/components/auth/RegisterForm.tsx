@@ -69,6 +69,7 @@ export function RegisterForm() {
           Comece a organizar as finanças da sua empresa de forma simples.
         </p>
       </div>
+
       {error && (
         <div className="mb-3 rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2">
           <p className="text-[11px] leading-4 text-red-300">{error}</p>
@@ -174,7 +175,7 @@ export function RegisterForm() {
                 autoComplete="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                placeholder="voce@empresa.com"
+                placeholder="exemplo@gmail.com"
                 disabled={isDisabled}
                 className="
                   h-10 w-full rounded-xl
@@ -265,9 +266,7 @@ export function RegisterForm() {
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-0.5">
           <FeatureItem>Dashboard financeiro</FeatureItem>
-
           <FeatureItem>Receitas e despesas</FeatureItem>
-
           <FeatureItem>DRE automatizado</FeatureItem>
         </div>
 
@@ -279,7 +278,7 @@ export function RegisterForm() {
             onChange={(event) => setAcceptedTerms(event.target.checked)}
             disabled={isDisabled}
             className="
-              mt-0.5
+              mt-0.2
               h-3.5
               w-3.5
               shrink-0
@@ -291,9 +290,26 @@ export function RegisterForm() {
             "
           />
 
-          <span className="text-[9px] leading-tight text-slate-500">
-            Concordo com os termos de uso e com a política de privacidade do
-            MetricsFlow AI.
+          <span className="text-[9px] leading-[1.45] text-slate-500">
+            Li e concordo com os{" "}
+            <Link
+              href="/termos-de-uso"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-brand-400 transition-colors hover:text-brand-300 hover:underline"
+            >
+              Termos de Uso
+            </Link>{" "}
+            e estou ciente da{" "}
+            <Link
+              href="/politica-de-privacidade"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-brand-400 transition-colors hover:text-brand-300 hover:underline"
+            >
+              Política de Privacidade
+            </Link>
+            .
           </span>
         </label>
 

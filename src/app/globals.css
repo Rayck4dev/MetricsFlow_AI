@@ -5,3 +5,25 @@
 html {
   scroll-behavior: smooth;
 }
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #081522;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #24364a;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #31506a;
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #24364a #081522;
+}

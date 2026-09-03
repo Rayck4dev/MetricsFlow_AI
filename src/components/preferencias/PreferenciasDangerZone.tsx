@@ -12,6 +12,7 @@ export function PreferenciasDangerZone({
   onDeleteAccount,
 }: PreferenciasDangerZoneProps) {
   const [confirming, setConfirming] = useState(false);
+
   const [deleting, setDeleting] = useState(false);
 
   async function handleDelete() {
@@ -32,9 +33,18 @@ export function PreferenciasDangerZone({
 
   return (
     <motion.section
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.15 }}
+      initial={{
+        opacity: 0,
+        y: 16,
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+      }}
+      transition={{
+        duration: 0.4,
+        delay: 0.15,
+      }}
       className="overflow-hidden rounded-2xl border border-red-500/15 bg-surface-panel/90 shadow-xl shadow-black/10 backdrop-blur-xl"
     >
       <div className="border-b border-red-500/10 px-5 py-4 sm:px-6">
@@ -60,15 +70,22 @@ export function PreferenciasDangerZone({
           </p>
 
           <p className="mt-1.5 text-[8px] leading-4 text-slate-600">
-            A exclusão da conta removerá seus dados e o acesso ao sistema. Essa
-            ação deverá ser confirmada antes de ser executada.
+            A exclusão da conta será implementada com validação e processamento
+            seguro. Nenhuma exclusão permanente será realizada enquanto esse
+            recurso não estiver disponível.
           </p>
         </div>
 
         {confirming && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
+            initial={{
+              opacity: 0,
+              height: 0,
+            }}
+            animate={{
+              opacity: 1,
+              height: "auto",
+            }}
             className="rounded-xl border border-red-500/20 bg-red-500/[0.06] p-3"
           >
             <p className="text-[9px] font-semibold text-red-300">
@@ -76,8 +93,8 @@ export function PreferenciasDangerZone({
             </p>
 
             <p className="mt-1 text-[8px] leading-4 text-slate-500">
-              Esta confirmação será substituída pela validação do backend quando
-              a exclusão estiver disponível.
+              A exclusão real da conta depende da implementação da operação de
+              backend.
             </p>
           </motion.div>
         )}
@@ -95,7 +112,9 @@ export function PreferenciasDangerZone({
 
           <motion.button
             type="button"
-            whileTap={{ scale: 0.98 }}
+            whileTap={{
+              scale: 0.98,
+            }}
             disabled={deleting}
             onClick={handleDelete}
             className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-4 text-[9px] font-bold text-red-400 transition-all hover:border-red-500/30 hover:bg-red-500/15 disabled:opacity-50"
@@ -103,9 +122,9 @@ export function PreferenciasDangerZone({
             <Trash2 size={13} />
 
             {deleting
-              ? "Excluindo..."
+              ? "Processando..."
               : confirming
-                ? "Confirmar exclusão"
+                ? "Confirmar solicitação"
                 : "Excluir minha conta"}
           </motion.button>
         </div>

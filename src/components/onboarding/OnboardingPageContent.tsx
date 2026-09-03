@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -59,13 +60,31 @@ export default function OnboardingPageContent() {
     isGoogleOnboarding,
   });
 
+  const previousStep = useRef(currentStep);
+  const direction = currentStep >= previousStep.current ? 1 : -1;
+  previousStep.current = currentStep;
+
+  const slideVariants = {
+    enter: (dir: number) => ({
+      opacity: 0,
+      x: dir > 0 ? 28 : -28,
+    }),
+    center: {
+      opacity: 1,
+      x: 0,
+    },
+    exit: (dir: number) => ({
+      opacity: 0,
+      x: dir > 0 ? -28 : 28,
+    }),
+  };
+
   if (isLoadingRegistration) {
     return (
       <OnboardingLayout>
         <div className="flex min-h-[300px] items-center justify-center">
-          <div className="text-center">
-            <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-surface-border border-t-brand-500" />
-
+          <div className="text-center space-y-4">
+            <div className="mx-auto h-10 w-10 rounded-full border-2 border-surface-border border-t-brand-500 animate-spin" />
             <p className="text-xs text-slate-400">
               Preparando sua configuração...
             </p>
@@ -79,7 +98,6 @@ export default function OnboardingPageContent() {
     return (
       <OnboardingLayout>
         <OnboardingError message={error} />
-
         <GoogleOnboardingStep onSelect={handleGoogleRegistrationType} />
       </OnboardingLayout>
     );
@@ -89,7 +107,6 @@ export default function OnboardingPageContent() {
     return (
       <OnboardingLayout>
         <OnboardingError message={error} />
-
         <GoogleJoinCompany
           onBack={() => {
             setError("");
@@ -109,24 +126,17 @@ export default function OnboardingPageContent() {
 
       <OnboardingError message={error} />
 
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" custom={direction}>
         <motion.div
           key={currentStep}
-          initial={{
-            opacity: 0,
-            x: 20,
-          }}
-          animate={{
-            opacity: 1,
-            x: 0,
-          }}
-          exit={{
-            opacity: 0,
-            x: -20,
-          }}
+          custom={direction}
+          variants={slideVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
           transition={{
-            duration: 0.25,
-            ease: "easeInOut",
+            duration: 0.28,
+            ease: [0.4, 0, 0.2, 1],
           }}
         >
           {currentStep === 1 && (

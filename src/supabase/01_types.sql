@@ -1,6 +1,5 @@
 -- MetricsFlow AI
 -- Supabase / PostgreSQL
--- Tipos enumerados identificados no schema fornecido.
 
 DO $$
 BEGIN

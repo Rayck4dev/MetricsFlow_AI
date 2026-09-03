@@ -1,16 +1,5 @@
 -- MetricsFlow AI
 -- Supabase / PostgreSQL
--- RLS reconstruída a partir das regras visíveis no painel enviado.
---
--- IMPORTANTE:
--- As capturas mostram nome, comando e role das policies, mas não mostram
--- os campos USING / WITH CHECK. Portanto, as expressões abaixo são uma
--- reconstrução funcional baseada nas funções e no modelo de dados enviados.
--- Elas NÃO devem ser tratadas como uma exportação literal do projeto atual.
---
--- As capturas também possuem policies redundantes/duplicadas. PostgreSQL
--- não permite duas policies com o mesmo nome na mesma tabela, então este
--- arquivo consolida as regras em policies únicas.
 
 -- ================================================================
 -- CATEGORIES
@@ -122,9 +111,6 @@ USING (
 -- ================================================================
 -- PROFILES
 -- ================================================================
--- O schema de profiles não foi enviado nas mensagens, mas os SQLs das
--- funções confirmam que a tabela possui pelo menos id, name, email e
--- updated_at. As regras abaixo usam apenas id.
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "users_select_own_profile" ON public.profiles;
@@ -197,9 +183,6 @@ USING (public.is_company_member(company_id));
 -- ================================================================
 -- USER PREFERENCES
 -- ================================================================
--- Esta tabela não teve seu CREATE TABLE enviado. O README/documentação
--- indica que as preferências pertencem ao usuário. O bloco abaixo só
--- cria as policies se a tabela existir e possuir a coluna user_id.
 DO $$
 BEGIN
   IF to_regclass('public.user_preferences') IS NOT NULL
@@ -240,9 +223,6 @@ $$;
 -- ================================================================
 -- WHATSAPP MESSAGES
 -- ================================================================
--- O CREATE TABLE de whatsapp_messages não foi enviado. O modelo UML
--- informa transaction_id. As policies são criadas somente quando a
--- tabela e essa coluna existirem.
 DO $$
 BEGIN
   IF to_regclass('public.whatsapp_messages') IS NOT NULL

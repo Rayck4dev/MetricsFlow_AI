@@ -5,6 +5,8 @@ import { BarChart3, Download, Sparkles } from "lucide-react";
 
 import { DrePeriodSelector, type DrePeriod } from "./DrePeriodSelector";
 
+import { NotificationBell } from "@/components/notifications/Notification";
+
 interface DreHeaderProps {
   companyName?: string;
   period: DrePeriod;
@@ -59,6 +61,8 @@ export function DreHeader({
         </div>
 
         <div className="relative z-[100] flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
+          <NotificationBell />
+
           <DrePeriodSelector value={period} onChange={onPeriodChange} />
 
           <button

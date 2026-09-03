@@ -1,6 +1,5 @@
 -- MetricsFlow AI
 -- Supabase / PostgreSQL
--- Funções enviadas pelo projeto, organizadas na mesma ordem apresentada.
 
 CREATE OR REPLACE FUNCTION public.check_is_company_owner(co_id uuid)
 RETURNS boolean

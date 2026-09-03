@@ -1,14 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  ArrowUpRight,
-  Building2,
-  CalendarDays,
-  Sparkles,
-} from "lucide-react";
+import { ArrowUpRight, Building2, CalendarDays, Sparkles } from "lucide-react";
 
 import { useUser } from "@/contexts/UserContext";
+import { NotificationBell } from "@/components/notifications/Notification";
 
 interface DashboardHeaderProps {
   userName?: string;
@@ -36,7 +32,7 @@ export function DashboardHeader({
       initial={{ opacity: 0, y: -18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="group relative overflow-hidden rounded-3xl border border-surface-border bg-surface-panel p-5 shadow-2xl shadow-black/10 sm:p-6"
+      className="group relative overflow-visible rounded-3xl border border-surface-border bg-surface-panel p-5 shadow-2xl shadow-black/10 sm:p-6"
     >
       <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-brand-500/[0.09] blur-3xl transition-all duration-700 group-hover:bg-brand-500/[0.14]" />
 
@@ -104,6 +100,8 @@ export function DashboardHeader({
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
+          <NotificationBell />
+
           <div className="flex items-center gap-3 rounded-2xl border border-surface-border bg-surface-sidebar/70 px-4 py-3 shadow-lg shadow-black/10 backdrop-blur-xl">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-brand-500/10 bg-brand-500/10">
               <Building2 size={18} className="text-brand-400" />

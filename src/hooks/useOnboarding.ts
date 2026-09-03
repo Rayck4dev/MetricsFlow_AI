@@ -7,6 +7,7 @@ import { getCurrentUser } from "@/services/onboarding/getCurrentUser";
 import { getUserCompany } from "@/services/onboarding/getUserCompany";
 import { joinCompanyByCode } from "@/services/company/joinCompany";
 import { createCompanyForCurrentUser } from "@/services/onboarding/createCompany";
+import { saveOnboarding } from "@/services/onboarding/saveOnboarding";
 
 export type RegistrationType = "create_company" | "join_company";
 
@@ -76,10 +77,6 @@ export function useOnboarding({ isGoogleOnboarding }: UseOnboardingOptions) {
       }
 
       localStorage.setItem("metricsflow_role", result.role || "collaborator");
-
-      sessionStorage.removeItem("metricsflow_registration");
-
-      router.replace("/dashboard");
     },
     [router],
   );
@@ -148,7 +145,6 @@ export function useOnboarding({ isGoogleOnboarding }: UseOnboardingOptions) {
             setRegistrationType(null);
           }
 
-
           return;
         }
 
@@ -198,8 +194,6 @@ export function useOnboarding({ isGoogleOnboarding }: UseOnboardingOptions) {
 
           console.warn("Colaborador sem código de convite.");
         }
-
-
       } catch (err) {
         console.error("💥 Erro ao carregar contexto do cadastro:", err);
 
@@ -298,7 +292,6 @@ export function useOnboarding({ isGoogleOnboarding }: UseOnboardingOptions) {
 
     setCurrentStep(TOTAL_STEPS + 1);
   }, [canProceed, currentStep]);
-
   const handleBack = useCallback(() => {
     if (currentStep > 1 && currentStep <= TOTAL_STEPS) {
       setCurrentStep((previous) => previous - 1);
@@ -330,8 +323,6 @@ export function useOnboarding({ isGoogleOnboarding }: UseOnboardingOptions) {
     try {
       const user = await getCurrentUser();
 
-
-
       if (registrationType === "create_company") {
         const finalCompanyName = companyName.trim();
 
@@ -339,9 +330,7 @@ export function useOnboarding({ isGoogleOnboarding }: UseOnboardingOptions) {
           throw new Error("O nome da empresa não foi informado.");
         }
 
-
         const result = await createCompanyForCurrentUser(finalCompanyName);
-
 
         localStorage.setItem("metricsflow_company_id", result.company_id);
 
@@ -360,14 +349,11 @@ export function useOnboarding({ isGoogleOnboarding }: UseOnboardingOptions) {
         }
 
         await finishJoinFlow(finalInviteCode);
-
-        return;
       }
 
-      localStorage.setItem("metricsflow_onboarding", JSON.stringify(formData));
+      await saveOnboarding(user.id, formData);
 
       sessionStorage.removeItem("metricsflow_registration");
-
 
       router.replace("/dashboard");
     } catch (err) {
