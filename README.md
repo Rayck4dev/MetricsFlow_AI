@@ -1380,6 +1380,65 @@ Essa organização separa a estrutura do banco, funções, triggers e políticas
 
 ---
 
+## 👥 Planejamento de Recursos Humanos & Escala Organizacional
+
+### Organograma de Expansão Nacional (Pós-MVP)
+
+```text
+                        ┌─────────────────────────┐
+                        │      CEO / Founder      │
+                        └────────────┬────────────┘
+                                     │
+         ┌───────────────────────────┼───────────────────────────┐
+         │                           │                           │
+┌────────┴────────┐         ┌────────┴────────┐         ┌────────┴────────┐
+│ Diretoria de    │         │ Diretoria de    │         │ Diretoria de    │
+│ Engenharia (CTO)│         │ Produto & UX    │         │ Operações/Vendas│
+└────────┬────────┘         └────────┬────────┘         └────────┬────────┘
+         │                           │                           │
+ ┌───────┴───────┐           ┌───────┴───────┐           ┌───────┴───────┐
+ │ Dev Fullstack │           │ Product Manager│           │ Analista de   │
+ │ Senior        │           │ (PM / UX)     │           │ Growth/Mídia  │
+ └───────┬───────┘           └───────────────┘           └───────┴───────┘
+         │                                                       │
+ ┌───────┴───────┐                                       ┌───────┴───────┐
+ │ Dev Fullstack │                                       │ Suporte / CS  │
+ │ Pleno / Jr    │                                       │ (Atendimento) │
+ └───────────────┘                                       └───────────────┘
+
+```
+
+---
+
+### Plano de Carreira em Y (Y-Career Path)
+
+```text
+                [ Desenvolvedor(a) Full Stack Júnior ]
+                                  │
+                [ Desenvolvedor(a) Full Stack Pleno ]
+                                  │
+            ┌─────────────────────┴─────────────────────┐
+            │                                           │
+   CAMINHO TÉCNICO (Especialista)             CAMINHO DE LIDERANÇA (Gestão)
+            │                                           │
+  [ Especialista de Software / AI ]            [ Líder Técnico / Tech Lead ]
+            │                                           │
+  [ Arquiteto(a) de Soluções Cloud ]          [ Engineering Manager / CTO ]
+
+```
+
+#### Descrição de Cargos, Faixas Salariais e Métricas de Progressão
+
+| Cargo | Nível | Faixa Salarial (Mensal) | Indicadores de Performance / Progressão |
+| --- | --- | --- | --- |
+| **Dev Fullstack** | Júnior | R$ 3.500,00 — R$ 5.000,00 | Absorção da stack (Next.js/Supabase) e resolução de bugs/tasks no Kanban |
+| **Dev Fullstack** | Pleno | R$ 6.000,00 — R$ 8.500,00 | Autonomia na criação de rotas/APIs, otimização de SQL e baixo índice de regressão |
+| **Dev Fullstack / Tech Lead** | Sênior / Esp. | R$ 10.000,00 — R$ 14.000,00 | Definição de arquitetura, otimização DORA (*Lead Time*, *Failure Rate*) e mentoria técnica |
+| **Product Manager (PM)** | Pleno / Sênior | R$ 7.500,00 — R$ 11.000,00 | Taxa de retenção do usuário, clareza do backlog de produto e CSAT |
+| **Analista de CS / Suporte** | Júnior / Pleno | R$ 2.500,00 — R$ 4.000,00 | Tempo de resposta no WhatsApp (< 15 min) e nível de satisfação do cliente |
+
+---
+
 # 📄 Licença
 
 Este projeto está licenciado sob a **MIT License**.
