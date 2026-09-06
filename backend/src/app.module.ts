@@ -1,0 +1,30 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { SupabaseTestController } from './modules/supabase-test.controller';
+
+import { HealthModule } from './modules/health/health.module';
+import { SupabaseModule } from './modules/supabase.module';
+import { CompaniesModule } from './modules/companies/companies.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { TransactionsModule } from './modules/transactions/transactions.module';
+import { CategoriesModule } from './modules/categories/categories.module';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    HealthModule,
+    SupabaseModule,
+    CompaniesModule,
+    AuthModule,
+    TransactionsModule,
+    CategoriesModule,
+  ],
+  controllers: [AppController, SupabaseTestController],
+  providers: [AppService],
+})
+export class AppModule {}
