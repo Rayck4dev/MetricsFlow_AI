@@ -32,3 +32,23 @@ export interface TransactionFormData {
   paymentMethod: string;
   date: string;
 }
+
+export function getPaymentMethodLabel(
+  paymentMethod: string | null | undefined,
+): string {
+  if (!paymentMethod) {
+    return "Não informado";
+  }
+
+  const labels: Record<string, string> = {
+    pix: "Pix",
+    credit_card: "Cartão de Crédito",
+    debit_card: "Cartão de Débito",
+    bank_slip: "Boleto",
+    cash: "Dinheiro",
+    transfer: "Transferência",
+    other: "Outro",
+  };
+
+  return labels[paymentMethod] ?? paymentMethod;
+}

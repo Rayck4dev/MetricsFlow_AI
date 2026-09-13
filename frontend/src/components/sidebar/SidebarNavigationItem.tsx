@@ -25,7 +25,6 @@ export function SidebarNavigationItem({
   variant = "main",
 }: SidebarNavigationItemProps) {
   const Icon = item.icon;
-
   const isAccount = variant === "account";
 
   const content = (
@@ -49,7 +48,7 @@ export function SidebarNavigationItem({
         />
       )}
 
-      {hovered && !active && !item.comingSoon && (
+      {hovered && !active && (
         <motion.div
           layoutId={isAccount ? "sidebar-account-hover" : "sidebar-hover-tab"}
           className="
@@ -74,11 +73,9 @@ export function SidebarNavigationItem({
             transition-colors
             duration-200
             ${
-              item.comingSoon
-                ? "text-slate-700"
-                : active
-                  ? "text-brand-400"
-                  : "text-slate-500 group-hover:text-slate-300"
+              active
+                ? "text-brand-400"
+                : "text-slate-500 group-hover:text-slate-300"
             }
           `}
         />
@@ -93,50 +90,27 @@ export function SidebarNavigationItem({
             transition-colors
             duration-200
             ${
-              item.comingSoon
-                ? "text-slate-700"
-                : active
-                  ? "text-brand-300"
-                  : "text-slate-400 group-hover:text-slate-200"
+              active
+                ? "text-brand-300"
+                : "text-slate-400 group-hover:text-slate-200"
             }
           `}
         >
           {item.label}
         </span>
 
-        {item.comingSoon ? (
-          <span
+        {active && (
+          <motion.span
+            layoutId={isAccount ? "sidebar-account-dot" : "sidebar-active-dot"}
             className="
+              ml-auto
+              h-1.5 w-1.5
               shrink-0
               rounded-full
-              border border-slate-700/60
-              bg-slate-800/70
-              px-1.5 py-0.5
-              text-[7px]
-              font-bold
-              uppercase
-              tracking-wider
-              text-slate-600
+              bg-brand-400
+              shadow-[0_0_8px_rgba(56,189,248,0.8)]
             "
-          >
-            Em breve
-          </span>
-        ) : (
-          active && (
-            <motion.span
-              layoutId={
-                isAccount ? "sidebar-account-dot" : "sidebar-active-dot"
-              }
-              className="
-                ml-auto
-                h-1.5 w-1.5
-                shrink-0
-                rounded-full
-                bg-brand-400
-                shadow-[0_0_8px_rgba(56,189,248,0.8)]
-              "
-            />
-          )
+          />
         )}
       </div>
     </>
@@ -153,17 +127,6 @@ export function SidebarNavigationItem({
     py-2.5
     text-left
   `;
-
-  if (item.comingSoon) {
-    return (
-      <motion.div
-        key={item.id}
-        className={`${baseClass} cursor-not-allowed opacity-70`}
-      >
-        {content}
-      </motion.div>
-    );
-  }
 
   if (demo) {
     return (

@@ -11,6 +11,8 @@ import { CompaniesModule } from './modules/companies/companies.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
 import { CategoriesModule } from './modules/categories/categories.module';
+import { WhatsappModule } from './modules/whatsapp/whatsapp.module';
+import { AiModule } from './modules/ai/ai.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { CategoriesModule } from './modules/categories/categories.module';
     AuthModule,
     TransactionsModule,
     CategoriesModule,
+    WhatsappModule,
+    AiModule,
   ],
   controllers: [AppController, SupabaseTestController],
   providers: [AppService],

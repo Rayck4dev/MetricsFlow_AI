@@ -1,4 +1,8 @@
-import { ConflictException, ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { SupabaseService } from '../supabase.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 
@@ -25,17 +29,17 @@ export class CompaniesService {
       .from('company_members')
       .select(
         `
-        role,
-        companies (
-          id,
-          name,
-          document,
-          phone_number,
-          invite_code,
-          created_at,
-          updated_at
-        )
-      `,
+      role,
+      companies (
+        id,
+        name,
+        document,
+        phone_number,
+        invite_code,
+        created_at,
+        updated_at
+      )
+    `,
       )
       .eq('user_id', userId);
 
@@ -43,12 +47,20 @@ export class CompaniesService {
       throw new Error(error.message);
     }
 
-    return data.map((item) => ({
-      ...item.companies,
-      role: item.role,
-    }));
-  }
+    return data
+      .filter((item) => item.companies)
+      .map((item) => {
+        const company = Array.isArray(item.companies)
+          ? item.companies[0]
+          : item.companies;
 
+        return {
+          ...company,
+          role: item.role,
+        };
+      });
+  }
+  
   async create(dto: CreateCompanyDto, userId: string) {
     const { data: existingOwner, error: ownerError } =
       await this.supabaseService
