@@ -21,6 +21,8 @@ export function MovimentacoesTable({
   onEdit,
   onDelete,
 }: MovimentacoesTableProps) {
+  const hasActions = Boolean(onEdit || onDelete);
+
   return (
     <motion.section
       initial={{
@@ -90,28 +92,45 @@ export function MovimentacoesTable({
         </div>
       ) : (
         <>
-          <div className="hidden min-w-0 grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto_auto] gap-4 border-b border-surface-border bg-surface-sidebar/50 px-5 py-3 md:grid">
+          <div
+            className={`
+              hidden min-w-0
+              border-b border-surface-border
+              bg-surface-sidebar/50
+              px-7 py-3
+              md:grid md:items-center md:gap-4
+              ${
+                hasActions
+                  ? "md:grid-cols-[minmax(0,2fr)_minmax(150px,1fr)_minmax(150px,1fr)_minmax(90px,1fr)_minmax(120px,auto)_72px]"
+                  : "md:grid-cols-[minmax(0,2fr)_minmax(150px,1fr)_minmax(150px,1fr)_minmax(90px,1fr)_minmax(120px,auto)]"
+              }
+            `}
+          >
             <span className="min-w-0 text-[8px] font-bold uppercase tracking-wider text-slate-600">
               Movimentação
             </span>
 
-            <span className="min-w-0 text-[8px] font-bold uppercase tracking-wider text-slate-600">
+            <span className="min-w-0 text-center text-[8px] font-bold uppercase tracking-wider text-slate-600">
               Categoria
             </span>
 
-            <span className="min-w-0 text-[8px] font-bold uppercase tracking-wider text-slate-600">
+            <span className="min-w-0 text-center text-[8px] font-bold uppercase tracking-wider text-slate-600">
               Pagamento
             </span>
 
-            <span className="min-w-0 text-[8px] font-bold uppercase tracking-wider text-slate-600">
+            <span className="min-w-0 text-center text-[8px] font-bold uppercase tracking-wider text-slate-600">
               Data
             </span>
 
-            <span className="text-right text-[8px] font-bold uppercase tracking-wider text-slate-600">
+            <span className="min-w-0 text-right text-[8px] font-bold uppercase tracking-wider text-slate-600">
               Valor
             </span>
 
-            <span className="w-8" />
+            {hasActions && (
+              <span className="text-right text-[8px] font-bold uppercase tracking-wider text-slate-600">
+                Ações
+              </span>
+            )}
           </div>
 
           <div className="min-w-0 divide-y divide-surface-border">

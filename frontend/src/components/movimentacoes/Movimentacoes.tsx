@@ -36,6 +36,8 @@ export interface MovimentacoesProps {
   ) => void | Promise<void>;
 
   onDeleteTransaction?: (id: string) => void | Promise<void>;
+
+  onExport?: (transactions: Movimentacao[]) => void;
 }
 
 export function Movimentacoes({
@@ -46,6 +48,7 @@ export function Movimentacoes({
   onAddExpense,
   onUpdateTransaction,
   onDeleteTransaction,
+  onExport,
 }: MovimentacoesProps) {
   const {
     search,
@@ -93,6 +96,10 @@ export function Movimentacoes({
     onUpdateTransaction,
     onDeleteTransaction,
   });
+
+  function handleExport() {
+    onExport?.(filteredTransactions);
+  }
 
   return (
     <>
@@ -161,6 +168,7 @@ export function Movimentacoes({
               <MovimentacoesActions
                 onAddIncome={openIncomeModal}
                 onAddExpense={openExpenseModal}
+                onExport={handleExport}
               />
             </div>
 
@@ -180,8 +188,8 @@ export function Movimentacoes({
         <MovimentacoesTable
           transactions={filteredTransactions}
           totalTransactions={transactions.length}
-          onEdit={openEdit}
-          onDelete={openDelete}
+          onEdit={onUpdateTransaction ? openEdit : undefined}
+          onDelete={onDeleteTransaction ? openDelete : undefined}
         />
       </div>
 

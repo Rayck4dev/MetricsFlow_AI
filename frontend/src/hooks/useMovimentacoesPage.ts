@@ -6,6 +6,7 @@ import type { Movimentacao } from "@/components/movimentacoes/types";
 
 import { createClient } from "@/lib/supabase/client";
 import { useCompanyRole } from "@/hooks/useCompanyRole";
+import { getPaymentMethodLabel } from "@/constants/transaction.constants";
 
 interface Category {
   id: string;
@@ -15,6 +16,10 @@ interface Category {
 
 export function useMovimentacoesPage() {
   const [transactions, setTransactions] = useState<Movimentacao[]>([]);
+
+  const [transactionDatabaseDates, setTransactionDatabaseDates] = useState<
+    Record<string, string>
+  >({});
 
   const [userName, setUserName] = useState("Usuário");
   const [companyName, setCompanyName] = useState("Empresa");
@@ -198,11 +203,15 @@ export function useMovimentacoesPage() {
         throw error;
       }
 
+      const databaseDates: Record<string, string> = {};
+
       const formattedTransactions: Movimentacao[] = (data ?? []).map(
         (item: any) => {
           const category = Array.isArray(item.categories)
             ? item.categories[0]
             : item.categories;
+
+          databaseDates[item.id] = item.transaction_date;
 
           return {
             id: item.id,
@@ -216,9 +225,111 @@ export function useMovimentacoesPage() {
         },
       );
 
+      setTransactionDatabaseDates(databaseDates);
       setTransactions(formattedTransactions);
     },
     [supabase, formatTransactionDate],
+  );
+
+  const exportTransactionsCsv = useCallback(
+    (transactionsToExport: Movimentacao[]) => {
+      if (!transactionsToExport.length) {
+        return;
+      }
+
+      const escapeCsvValue = (value: string | number | null | undefined) => {
+        const normalized = String(value ?? "");
+
+        return `"${normalized.replace(/"/g, '""')}"`;
+      };
+
+      const formatType = (type: Movimentacao["type"]) => {
+        return type === "income" ? "Receita" : "Despesa";
+      };
+
+      const formatPaymentMethod = (
+        paymentMethod: Movimentacao["paymentMethod"],
+      ) => {
+        if (!paymentMethod) {
+          return "Não informado";
+        }
+
+        return getPaymentMethodLabel(paymentMethod);
+      };
+
+      const formatAmount = (amount: number) => {
+        return amount.toLocaleString("pt-BR", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      };
+
+      const formatExportDate = (date: string | undefined) => {
+        if (!date) {
+          return "";
+        }
+
+        const parsedDate = new Date(`${date}T12:00:00`);
+
+        if (Number.isNaN(parsedDate.getTime())) {
+          return date;
+        }
+
+        return parsedDate.toLocaleDateString("pt-BR");
+      };
+
+      const headers = [
+        "Data",
+        "Tipo",
+        "Descrição",
+        "Categoria",
+        "Forma de pagamento",
+        "Valor",
+      ];
+
+      const rows = transactionsToExport.map((transaction) => {
+        const databaseDate = transactionDatabaseDates[transaction.id];
+
+        return [
+          escapeCsvValue(formatExportDate(databaseDate)),
+          escapeCsvValue(formatType(transaction.type)),
+          escapeCsvValue(transaction.description),
+          escapeCsvValue(transaction.category),
+          escapeCsvValue(formatPaymentMethod(transaction.paymentMethod)),
+          escapeCsvValue(formatAmount(transaction.amount)),
+        ];
+      });
+
+      const csv = [
+        headers.map(escapeCsvValue).join(";"),
+        ...rows.map((row) => row.join(";")),
+      ].join("\r\n");
+
+      const csvWithBom = `\uFEFF${csv}`;
+
+      const blob = new Blob([csvWithBom], {
+        type: "text/csv;charset=utf-8;",
+      });
+
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+
+      const now = new Date();
+
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+
+      link.href = url;
+      link.download = `metricsflow-movimentacoes-${year}-${month}.csv`;
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      URL.revokeObjectURL(url);
+    },
+    [transactionDatabaseDates],
   );
 
   useEffect(() => {
@@ -376,6 +487,8 @@ export function useMovimentacoesPage() {
     loadCompany,
     loadCategories,
     loadTransactions,
+
+    exportTransactionsCsv,
 
     handleAddTransaction,
     handleUpdateTransaction,

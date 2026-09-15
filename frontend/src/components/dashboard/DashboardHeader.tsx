@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowUpRight, Building2, CalendarDays, Sparkles } from "lucide-react";
+import { ArrowUpRight, Building2, Sparkles } from "lucide-react";
 
 import { useUser } from "@/contexts/UserContext";
 import { NotificationBell } from "@/components/notifications/Notification";
@@ -34,7 +34,7 @@ export function DashboardHeader({
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="group relative overflow-visible rounded-3xl border border-surface-border bg-surface-panel p-5 shadow-2xl shadow-black/10 sm:p-6"
     >
-      <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-brand-500/[0.09] blur-3xl transition-all duration-700 group-hover:bg-brand-500/[0.14]" />
+      <div className="pointer-events-none absolute -right-23 -top-24 h-64 w-64 rounded-full bg-brand-500/[0.09] blur-3xl transition-all duration-700 group-hover:bg-brand-500/[0.14]" />
 
       <div className="pointer-events-none absolute bottom-0 left-1/3 h-24 w-64 rounded-full bg-cpm-accent/[0.035] blur-3xl" />
 
@@ -100,8 +100,8 @@ export function DashboardHeader({
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <NotificationBell />
-
+          <NotificationBell demo={demo} />
+          
           <div className="flex items-center gap-3 rounded-2xl border border-surface-border bg-surface-sidebar/70 px-4 py-3 shadow-lg shadow-black/10 backdrop-blur-xl">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-brand-500/10 bg-brand-500/10">
               <Building2 size={18} className="text-brand-400" />
@@ -114,20 +114,6 @@ export function DashboardHeader({
 
               <p className="mt-0.5 max-w-[180px] truncate text-xs font-bold text-slate-300">
                 {displayCompanyName}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 rounded-2xl border border-surface-border bg-surface-sidebar/70 px-4 py-3 shadow-lg shadow-black/10 backdrop-blur-xl">
-            <CalendarDays size={15} className="text-slate-500" />
-
-            <div>
-              <p className="text-[8px] font-semibold uppercase tracking-wider text-slate-600">
-                Período
-              </p>
-
-              <p className="mt-0.5 text-[10px] font-semibold text-slate-400">
-                Agosto 2026
               </p>
             </div>
           </div>

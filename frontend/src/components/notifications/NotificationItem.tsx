@@ -7,7 +7,7 @@ import {
   Pencil,
   PlusCircle,
   Trash2,
-  WalletCards,
+  X,
 } from "lucide-react";
 
 import type { Notification } from "@/types/notifications";
@@ -15,6 +15,7 @@ import type { Notification } from "@/types/notifications";
 interface NotificationItemProps {
   notification: Notification;
   onRead?: (notificationId: string) => void;
+  onDismiss?: (notificationId: string) => void;
 }
 
 function getNotificationIcon(type: Notification["type"]) {
@@ -95,56 +96,92 @@ function formatRelativeTime(dateString: string) {
 export function NotificationItem({
   notification,
   onRead,
+  onDismiss,
 }: NotificationItemProps) {
   const Icon = getNotificationIcon(notification.type);
 
   const iconStyle = getNotificationIconStyle(notification.type);
 
-  const handleClick = () => {
+  function handleClick() {
     if (!notification.read) {
       onRead?.(notification.id);
     }
-  };
+  }
+
+  function handleDismiss(event: React.MouseEvent<HTMLButtonElement>) {
+    event.stopPropagation();
+
+    onDismiss?.(notification.id);
+  }
 
   return (
-    <button
-      type="button"
-      onClick={handleClick}
-      className={`group flex w-full items-start gap-3 px-4 py-3 text-left transition-colors ${
+    <div
+      className={`group flex w-full items-start gap-3 px-4 py-3 transition-colors ${
         notification.read
           ? "bg-transparent hover:bg-white/[0.02]"
           : "bg-brand-500/[0.035] hover:bg-brand-500/[0.06]"
       }`}
     >
-      <div
-        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${iconStyle}`}
+      <button
+        type="button"
+        onClick={handleClick}
+        className="flex min-w-0 flex-1 items-start gap-3 text-left outline-none"
+        aria-label={
+          notification.read
+            ? notification.title
+            : `Marcar como lida: ${notification.title}`
+        }
       >
-        <Icon size={15} />
-      </div>
-
-      <div className="min-w-0 flex-1">
-        <div className="flex items-start justify-between gap-2">
-          <p
-            className={`text-[11px] font-semibold leading-4 ${
-              notification.read ? "text-slate-300" : "text-white"
-            }`}
-          >
-            {notification.title}
-          </p>
-
-          {!notification.read && (
-            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-400" />
-          )}
+        <div
+          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${iconStyle}`}
+        >
+          <Icon size={15} />
         </div>
 
-        <p className="mt-0.5 line-clamp-2 text-[10px] leading-4 text-slate-500">
-          {notification.message}
-        </p>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start gap-2">
+            <p
+              className={`min-w-0 flex-1 text-[11px] font-semibold leading-4 ${
+                notification.read ? "text-slate-300" : "text-white"
+              }`}
+            >
+              {notification.title}
+            </p>
 
-        <p className="mt-1 text-[9px] text-slate-600">
-          {formatRelativeTime(notification.created_at)}
-        </p>
-      </div>
-    </button>
+            {!notification.read && (
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-400" />
+            )}
+          </div>
+
+          <p className="mt-0.5 line-clamp-2 text-[10px] leading-4 text-slate-500">
+            {notification.message}
+          </p>
+
+          <p className="mt-1 text-[9px] text-slate-600">
+            {formatRelativeTime(notification.created_at)}
+          </p>
+        </div>
+      </button>
+
+      <button
+        type="button"
+        onClick={handleDismiss}
+        aria-label="Dispensar notificação"
+        className="
+          mt-0.5 flex h-7 w-7 shrink-0
+          items-center justify-center
+          rounded-lg
+          text-slate-700
+          opacity-0
+          transition-all
+          hover:bg-white/[0.04]
+          hover:text-slate-400
+          group-hover:opacity-100
+          focus:opacity-100
+        "
+      >
+        <X size={13} />
+      </button>
+    </div>
   );
 }

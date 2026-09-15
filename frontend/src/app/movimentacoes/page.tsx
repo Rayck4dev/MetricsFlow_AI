@@ -16,6 +16,7 @@ export default function MovimentacoesPage() {
     handleAddTransaction,
     handleUpdateTransaction,
     handleDeleteTransaction,
+    exportTransactionsCsv,
   } = useMovimentacoesPage();
 
   if (loading || roleLoading) {
@@ -59,6 +60,7 @@ export default function MovimentacoesPage() {
               onDeleteTransaction={
                 isOwner ? handleDeleteTransaction : undefined
               }
+              onExport={exportTransactionsCsv}
             />
           </div>
         </main>

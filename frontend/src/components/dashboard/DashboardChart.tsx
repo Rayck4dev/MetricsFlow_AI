@@ -50,7 +50,7 @@ export function DashboardChart({ transactions }: DashboardChartProps) {
         <div className="hidden items-center gap-2 rounded-lg border border-surface-border bg-surface-sidebar px-2.5 py-1.5 sm:flex">
           <TrendingUp size={11} className="text-cpm-income" />
           <span className="text-[8px] font-semibold text-slate-500">
-            Período atual
+            Visão geral
           </span>
         </div>
       </div>
@@ -62,7 +62,7 @@ export function DashboardChart({ transactions }: DashboardChartProps) {
           ))}
         </div>
 
-        <div className="relative flex h-[250px] items-end justify-around gap-6 px-6 pb-8 pt-5">
+        <div className="relative flex h-[250px] items-end justify-around gap-12 px-6 pb-8 pt-5">
           <ChartBar
             label="Receitas"
             value={income}

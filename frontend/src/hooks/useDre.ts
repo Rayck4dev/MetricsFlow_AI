@@ -236,6 +236,65 @@ function buildChartData(transactions: DreTransaction[]): DreChartItem[] {
     }));
 }
 
+function getPeriodLabel(period: DrePeriod) {
+  const now = new Date();
+
+  switch (period) {
+    case "today":
+      return now.toLocaleDateString("pt-BR");
+
+    case "week":
+      return "Semana atual";
+
+    case "month":
+      return now.toLocaleDateString("pt-BR", {
+        month: "long",
+        year: "numeric",
+      });
+
+    case "last-month": {
+      const previousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+      return previousMonth.toLocaleDateString("pt-BR", {
+        month: "long",
+        year: "numeric",
+      });
+    }
+
+    case "quarter":
+      return "Trimestre atual";
+
+    case "year":
+      return String(now.getFullYear());
+
+    case "custom":
+      return "Período personalizado";
+
+    default:
+      return "";
+  }
+}
+
+function formatCurrency(value: number) {
+  return value.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+function formatPercentage(value: number) {
+  return value.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+function escapeCsvValue(value: string | number | null | undefined) {
+  const normalized = String(value ?? "");
+
+  return `"${normalized.replace(/"/g, '""')}"`;
+}
+
 export function useDre(transactions: DreTransaction[]) {
   const [period, setPeriod] = useState<DrePeriod>("month");
 
@@ -311,6 +370,169 @@ export function useDre(transactions: DreTransaction[]) {
     [periodTransactions],
   );
 
+  const exportDreCsv = () => {
+    const margin =
+      financialData.revenue > 0
+        ? (financialData.result / financialData.revenue) * 100
+        : 0;
+
+    const periodLabel = getPeriodLabel(period);
+
+    const lines: string[] = [];
+
+    lines.push(
+      [
+        escapeCsvValue("Seção"),
+        escapeCsvValue("Item"),
+        escapeCsvValue("Valor"),
+        escapeCsvValue("Percentual"),
+      ].join(";"),
+    );
+
+    lines.push(
+      [
+        escapeCsvValue("Relatório"),
+        escapeCsvValue("MetricsFlow AI - DRE"),
+        escapeCsvValue(""),
+        escapeCsvValue(""),
+      ].join(";"),
+    );
+
+    lines.push(
+      [
+        escapeCsvValue("Relatório"),
+        escapeCsvValue("Período"),
+        escapeCsvValue(periodLabel),
+        escapeCsvValue(""),
+      ].join(";"),
+    );
+
+    lines.push(
+      [
+        escapeCsvValue("Indicadores"),
+        escapeCsvValue("Receita Bruta"),
+        escapeCsvValue(`R$ ${formatCurrency(financialData.revenue)}`),
+        escapeCsvValue(""),
+      ].join(";"),
+    );
+
+    lines.push(
+      [
+        escapeCsvValue("Indicadores"),
+        escapeCsvValue("Custos"),
+        escapeCsvValue(`R$ ${formatCurrency(financialData.costs)}`),
+        escapeCsvValue(""),
+      ].join(";"),
+    );
+
+    lines.push(
+      [
+        escapeCsvValue("Indicadores"),
+        escapeCsvValue("Despesas"),
+        escapeCsvValue(`R$ ${formatCurrency(financialData.expenses)}`),
+        escapeCsvValue(""),
+      ].join(";"),
+    );
+
+    lines.push(
+      [
+        escapeCsvValue("Indicadores"),
+        escapeCsvValue("Resultado"),
+        escapeCsvValue(`R$ ${formatCurrency(financialData.result)}`),
+        escapeCsvValue(""),
+      ].join(";"),
+    );
+
+    lines.push(
+      [
+        escapeCsvValue("Indicadores"),
+        escapeCsvValue("Margem"),
+        escapeCsvValue(`${formatPercentage(margin)}%`),
+        escapeCsvValue(""),
+      ].join(";"),
+    );
+
+    function addBreakdownRows(section: string, items: DreBreakdownItem[]) {
+      if (!items.length) {
+        lines.push(
+          [
+            escapeCsvValue(section),
+            escapeCsvValue("Nenhum registro"),
+            escapeCsvValue("R$ 0,00"),
+            escapeCsvValue("0,00%"),
+          ].join(";"),
+        );
+
+        return;
+      }
+
+      items.forEach((item) => {
+        lines.push(
+          [
+            escapeCsvValue(section),
+            escapeCsvValue(item.label),
+            escapeCsvValue(`R$ ${formatCurrency(item.value)}`),
+            escapeCsvValue(`${formatPercentage(item.percentage)}%`),
+          ].join(";"),
+        );
+      });
+    }
+
+    addBreakdownRows("Receitas", revenueItems);
+
+    addBreakdownRows("Custos", costItems);
+
+    addBreakdownRows("Despesas", expenseItems);
+
+    if (!chartData.length) {
+      lines.push(
+        [
+          escapeCsvValue("Evolução mensal"),
+          escapeCsvValue("Nenhum registro"),
+          escapeCsvValue("R$ 0,00"),
+          escapeCsvValue(""),
+        ].join(";"),
+      );
+    } else {
+      chartData.forEach((item) => {
+        lines.push(
+          [
+            escapeCsvValue("Evolução mensal"),
+            escapeCsvValue(item.month),
+            escapeCsvValue(`R$ ${formatCurrency(item.result)}`),
+            escapeCsvValue(""),
+          ].join(";"),
+        );
+      });
+    }
+
+    const csv = lines.join("\r\n");
+
+    const csvWithBom = `\uFEFF${csv}`;
+
+    const blob = new Blob([csvWithBom], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+
+    link.href = url;
+    link.download = `metricsflow-dre-${year}-${month}.csv`;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+  };
+
   return {
     period,
     setPeriod,
@@ -324,5 +546,7 @@ export function useDre(transactions: DreTransaction[]) {
     expenseItems,
 
     chartData,
+
+    exportDreCsv,
   };
 }

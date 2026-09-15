@@ -7,8 +7,6 @@ import { motion } from "framer-motion";
 import { TransactionSelect } from "@/components/movimentacoes/transactions/TransactionSelect";
 import { TransactionDatePicker } from "@/components/movimentacoes/transactions/TransactionDatePicker";
 
-import type { TransactionType } from "@/constants/transaction.constants";
-
 export interface TransactionFormValues {
   type: "income" | "expense";
   amount: number;
@@ -36,31 +34,31 @@ interface TransactionFormProps {
 
 const paymentMethods = [
   {
-    value: "Pix",
+    value: "pix",
     label: "Pix",
   },
   {
-    value: "Cartão de crédito",
+    value: "credit_card",
     label: "Cartão de crédito",
   },
   {
-    value: "Cartão de débito",
+    value: "debit_card",
     label: "Cartão de débito",
   },
   {
-    value: "Boleto",
+    value: "bank_slip",
     label: "Boleto",
   },
   {
-    value: "Dinheiro",
+    value: "cash",
     label: "Dinheiro",
   },
   {
-    value: "Transferência",
+    value: "transfer",
     label: "Transferência",
   },
   {
-    value: "Outro",
+    value: "other",
     label: "Outro",
   },
 ];
@@ -70,22 +68,39 @@ function getToday() {
 }
 
 function formatAmount(value: number) {
-  if (!value) return "";
+  if (!value || value <= 0) {
+    return "";
+  }
 
-  return value.toFixed(2).replace(".", ",");
+  return value.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+function formatCurrencyInput(value: string) {
+  const digits = value.replace(/\D/g, "");
+
+  if (!digits) {
+    return "";
+  }
+
+  const numericValue = Number(digits) / 100;
+
+  return numericValue.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 
 function parseAmount(value: string) {
-  const normalized = value
-    .replace(/\s/g, "")
-    .replace(/R\$/gi, "")
-    .replace(/\./g, "")
-    .replace(",", ".")
-    .replace(/[^\d.-]/g, "");
+  const digits = value.replace(/\D/g, "");
 
-  const amount = Number(normalized);
+  if (!digits) {
+    return 0;
+  }
 
-  return Number.isFinite(amount) ? amount : 0;
+  return Number(digits) / 100;
 }
 
 export default function TransactionForm({
@@ -132,6 +147,12 @@ export default function TransactionForm({
       }));
   }, [categories]);
 
+  function handleAmountChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const formatted = formatCurrencyInput(event.target.value);
+
+    setAmountRaw(formatted);
+  }
+
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -142,7 +163,7 @@ export default function TransactionForm({
       amount,
       category,
       paymentMethod,
-      description,
+      description: description.trim(),
       date,
     };
 
@@ -197,7 +218,10 @@ export default function TransactionForm({
       </div>
 
       <div className="space-y-2">
-        <label className="block text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">
+        <label
+          htmlFor="transaction-amount"
+          className="block text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500"
+        >
           Valor
         </label>
 
@@ -207,11 +231,14 @@ export default function TransactionForm({
           </span>
 
           <input
+            id="transaction-amount"
             type="text"
             value={amountRaw}
-            inputMode="decimal"
+            inputMode="numeric"
+            autoComplete="off"
+            spellCheck={false}
             placeholder="0,00"
-            onChange={(event) => setAmountRaw(event.target.value)}
+            onChange={handleAmountChange}
             disabled={isSubmitting}
             className="h-12 w-full bg-transparent pl-10 pr-4 text-lg font-bold text-white outline-none placeholder:text-slate-700 disabled:opacity-60"
           />

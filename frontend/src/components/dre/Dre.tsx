@@ -15,15 +15,9 @@ export interface DreProps {
   transactions: DreTransaction[];
   userName?: string;
   companyName?: string;
-  onExport?: () => void;
 }
 
-export default function Dre({
-  transactions,
-  userName,
-  companyName,
-  onExport,
-}: DreProps) {
+export default function Dre({ transactions, userName, companyName }: DreProps) {
   const {
     period,
     setPeriod,
@@ -35,7 +29,8 @@ export default function Dre({
     expenseItems,
 
     chartData,
-  
+
+    exportDreCsv,
   } = useDre(transactions);
 
   return (
@@ -44,7 +39,7 @@ export default function Dre({
         companyName={companyName}
         period={period}
         onPeriodChange={setPeriod}
-        onExport={onExport}
+        onExport={exportDreCsv}
       />
 
       <DreCards

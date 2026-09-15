@@ -68,10 +68,11 @@ export function DreHeader({
           <button
             type="button"
             onClick={onExport}
-            className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl border border-surface-border bg-surface-sidebar px-4 text-[10px] font-bold text-slate-400 transition-all hover:border-brand-500/30 hover:bg-brand-500/5 hover:text-brand-300 active:scale-[0.98]"
+            disabled={!onExport}
+            className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl border border-surface-border bg-surface-sidebar px-4 text-[10px] font-bold text-slate-400 transition-all hover:border-brand-500/30 hover:bg-brand-500/5 hover:text-brand-300 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
           >
             <Download size={13} />
-            Exportar
+            Exportar CSV
           </button>
         </div>
       </div>

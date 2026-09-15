@@ -10,6 +10,7 @@ import {
   useMotionValueEvent,
 } from "framer-motion";
 import { ArrowRight, LogIn, Sparkles, X } from "lucide-react";
+
 const navItems = [
   {
     label: "Como Funciona",

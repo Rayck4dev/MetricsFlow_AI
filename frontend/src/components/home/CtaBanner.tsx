@@ -5,15 +5,11 @@ import { motion } from "framer-motion";
 import {
   ArrowRight,
   CheckCircle2,
-  MessageSquare,
+  MessageCircle,
   Sparkles,
 } from "lucide-react";
 
-const BENEFITS = [
-  "Sem planilhas",
-  "Comece grátis",
-  "Dados organizados automaticamente",
-];
+const BENEFITS = ["Registre pelo WhatsApp", "Texto ou áudio", "Comece grátis"];
 
 export function CtaBanner() {
   return (
@@ -76,7 +72,7 @@ export function CtaBanner() {
 
 function CtaBackground() {
   return (
-    <div className="pointer-events-none absolute inset-0">
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0">
       <div className="absolute left-1/2 top-1/2 h-[450px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-500/[0.06] blur-[130px]" />
 
       <div className="absolute left-1/2 top-0 h-px w-full max-w-5xl -translate-x-1/2 bg-gradient-to-r from-transparent via-brand-500/20 to-transparent" />
@@ -92,6 +88,7 @@ function CtaDecorations() {
       <div className="pointer-events-none absolute -bottom-32 -left-20 h-64 w-64 rounded-full bg-emerald-500/[0.07] blur-[90px]" />
 
       <div
+        aria-hidden="true"
         className="
           pointer-events-none absolute inset-0
           opacity-[0.025]
@@ -122,17 +119,22 @@ function CtaBadge() {
         delay: 0.1,
       }}
       className="
-        inline-flex items-center gap-1.5
+        inline-flex
+        items-center
+        gap-1.5
         rounded-full
-        border border-brand-500/20
+        border
+        border-brand-500/20
         bg-brand-500/10
-        px-3.5 py-1.5
-        text-[10px] font-semibold
+        px-3.5
+        py-1.5
+        text-[10px]
+        font-semibold
         text-brand-400
       "
     >
       <Sparkles size={13} />
-      Comece em menos de 2 minutos
+      Seu financeiro começa no WhatsApp
     </motion.span>
   );
 }
@@ -141,22 +143,23 @@ function CtaHeading() {
   return (
     <h2
       className="
-        mx-auto mt-6
+        mx-auto
+        mt-6
         max-w-3xl
         font-heading
         text-3xl
         font-extrabold
-        leading-[1.1]
-        tracking-[-0.025em]
+        leading-[1.08]
+        tracking-[-0.03em]
         text-white
         sm:text-4xl
         md:text-5xl
       "
     >
-      Pare de apenas acompanhar
+      Transforme suas conversas
+      <br className="hidden sm:block" />
       <span className="bg-gradient-to-r from-white to-brand-400 bg-clip-text text-transparent">
-        {" "}
-        o seu dinheiro.
+        em gestão financeira.
       </span>
     </h2>
   );
@@ -166,7 +169,8 @@ function CtaDescription() {
   return (
     <p
       className="
-        mx-auto mt-5
+        mx-auto
+        mt-5
         max-w-xl
         text-sm
         leading-6
@@ -174,9 +178,8 @@ function CtaDescription() {
         md:text-[15px]
       "
     >
-      Registre vendas, despesas e movimentações pelo WhatsApp e deixe o
-      MetricsFlow AI transformar suas conversas em uma visão clara do seu
-      negócio.
+      Registre suas vendas e despesas pelo WhatsApp, confirme os lançamentos e
+      acompanhe tudo organizado no MetricsFlow.
     </p>
   );
 }
@@ -211,16 +214,25 @@ function CtaActions() {
 function CreateAccountButton() {
   return (
     <Link
-      href="/register"
+      href="/cadastro"
       className="
         group
-        flex w-full items-center justify-center gap-2
+        flex
+        w-full
+        items-center
+        justify-center
+        gap-2
         rounded-xl
         bg-brand-600
-        px-7 py-3.5
-        text-sm font-semibold text-white
-        shadow-xl shadow-brand-600/20
-        transition-all duration-300
+        px-7
+        py-3.5
+        text-sm
+        font-semibold
+        text-white
+        shadow-xl
+        shadow-brand-600/20
+        transition-all
+        duration-300
         hover:-translate-y-0.5
         hover:bg-brand-500
         hover:shadow-2xl
@@ -228,11 +240,12 @@ function CreateAccountButton() {
         sm:w-auto
       "
     >
-      Criar Minha Conta Grátis
+      Criar minha conta grátis
       <ArrowRight
         size={17}
         className="
-          transition-transform duration-300
+          transition-transform
+          duration-300
           group-hover:translate-x-1
         "
       />
@@ -243,17 +256,26 @@ function CreateAccountButton() {
 function DemoButton() {
   return (
     <Link
-      href="/dashboard"
+      href="/demo"
       className="
         group
-        flex w-full items-center justify-center gap-2
+        flex
+        w-full
+        items-center
+        justify-center
+        gap-2
         rounded-xl
-        border border-white/[0.08]
+        border
+        border-white/[0.08]
         bg-white/[0.03]
-        px-7 py-3.5
-        text-sm font-semibold text-slate-300
+        px-7
+        py-3.5
+        text-sm
+        font-semibold
+        text-slate-300
         backdrop-blur-sm
-        transition-all duration-300
+        transition-all
+        duration-300
         hover:-translate-y-0.5
         hover:border-white/[0.14]
         hover:bg-white/[0.06]
@@ -261,15 +283,16 @@ function DemoButton() {
         sm:w-auto
       "
     >
-      <MessageSquare
+      <MessageCircle
         size={16}
         className="
           text-emerald-400
-          transition-transform duration-300
+          transition-transform
+          duration-300
           group-hover:scale-110
         "
       />
-      Ver Demonstração
+      Ver demonstração
     </Link>
   );
 }

@@ -1,4 +1,0 @@
--- MetricsFlow AI
--- RLS da tabela public.transactions
--- A versão consolidada está em ../05_rls_policies.sql.
--- Este arquivo é mantido para organização por tabela.

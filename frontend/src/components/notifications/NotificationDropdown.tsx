@@ -12,6 +12,7 @@ interface NotificationDropdownProps {
   loading?: boolean;
   onMarkAsRead?: (notificationId: string) => void;
   onMarkAllAsRead?: () => void;
+  onDismiss?: (notificationId: string) => void;
   onClose?: () => void;
 }
 
@@ -21,6 +22,7 @@ export function NotificationDropdown({
   loading = false,
   onMarkAsRead,
   onMarkAllAsRead,
+  onDismiss,
   onClose,
 }: NotificationDropdownProps) {
   return (
@@ -126,11 +128,16 @@ export function NotificationDropdown({
                   }}
                   exit={{
                     opacity: 0,
+                    height: 0,
+                  }}
+                  transition={{
+                    duration: 0.18,
                   }}
                 >
                   <NotificationItem
                     notification={notification}
                     onRead={onMarkAsRead}
+                    onDismiss={onDismiss}
                   />
                 </motion.div>
               ))}

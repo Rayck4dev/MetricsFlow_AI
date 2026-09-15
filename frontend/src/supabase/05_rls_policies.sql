@@ -279,3 +279,47 @@ BEGIN
   END IF;
 END;
 $$;
+alter table public.notifications enable row level security;
+
+
+-- =========================================================
+-- Notifications
+-- =========================================================
+
+drop policy if exists "Users can view own notifications"
+on public.notifications;
+
+create policy "Users can view own notifications"
+on public.notifications
+for select
+to authenticated
+using (
+    auth.uid() = user_id
+);
+
+
+drop policy if exists "Users can mark own notifications as read"
+on public.notifications;
+
+create policy "Users can mark own notifications as read"
+on public.notifications
+for update
+to authenticated
+using (
+    auth.uid() = user_id
+)
+with check (
+    auth.uid() = user_id
+);
+
+
+drop policy if exists "Users can delete own notifications"
+on public.notifications;
+
+create policy "Users can delete own notifications"
+on public.notifications
+for delete
+to authenticated
+using (
+    auth.uid() = user_id
+);

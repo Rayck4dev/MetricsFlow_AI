@@ -75,7 +75,6 @@ function DemoSectionContent({
         <DemoLockedPage
           title="WhatsApp"
           description="Conecte o WhatsApp ao MetricsFlow AI para acompanhar suas movimentações e interações financeiras."
-          badge="Em breve"
         />
       );
 
