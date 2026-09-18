@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import type { Movimentacao } from "@/components/movimentacoes/types";
+import type { ToastType } from "@/components/ui/Toast";
 
 import { createClient } from "@/lib/supabase/client";
 import { useCompanyRole } from "@/hooks/useCompanyRole";
@@ -12,6 +13,13 @@ interface Category {
   id: string;
   name: string;
   type: "income" | "expense";
+}
+
+interface ToastState {
+  open: boolean;
+  type: ToastType;
+  title: string;
+  message?: string;
 }
 
 export function useMovimentacoesPage() {
@@ -30,11 +38,36 @@ export function useMovimentacoesPage() {
 
   const [loading, setLoading] = useState(true);
 
+  const [toast, setToast] = useState<ToastState>({
+    open: false,
+    type: "success",
+    title: "",
+  });
+
   const { role, loading: roleLoading } = useCompanyRole();
 
   const isOwner = role === "owner";
 
   const supabase = createClient();
+
+  const showToast = useCallback(
+    (type: ToastType, title: string, message?: string) => {
+      setToast({
+        open: true,
+        type,
+        title,
+        message,
+      });
+    },
+    [],
+  );
+
+  const closeToast = useCallback(() => {
+    setToast((current) => ({
+      ...current,
+      open: false,
+    }));
+  }, []);
 
   const formatTransactionDate = useCallback((date: string) => {
     const transactionDate = new Date(`${date}T12:00:00`);
@@ -409,6 +442,19 @@ export function useMovimentacoesPage() {
     }
 
     await loadTransactions(companyId);
+
+    const typeLabel = transaction.type === "income" ? "Receita" : "Despesa";
+
+    const amountLabel = transaction.amount.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+
+    showToast(
+      "success",
+      `${typeLabel} registrada com sucesso!`,
+      `${transaction.description} — ${amountLabel}`,
+    );
   }
 
   async function handleUpdateTransaction(
@@ -493,5 +539,8 @@ export function useMovimentacoesPage() {
     handleAddTransaction,
     handleUpdateTransaction,
     handleDeleteTransaction,
+
+    toast,
+    closeToast,
   };
 }

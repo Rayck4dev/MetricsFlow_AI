@@ -2,6 +2,7 @@
 
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Movimentacoes } from "@/components/movimentacoes/Movimentacoes";
+import Toast from "@/components/ui/Toast";
 
 import { useMovimentacoesPage } from "@/hooks/useMovimentacoesPage";
 
@@ -17,6 +18,8 @@ export default function MovimentacoesPage() {
     handleUpdateTransaction,
     handleDeleteTransaction,
     exportTransactionsCsv,
+    toast,
+    closeToast,
   } = useMovimentacoesPage();
 
   if (loading || roleLoading) {
@@ -64,6 +67,14 @@ export default function MovimentacoesPage() {
             />
           </div>
         </main>
+
+        <Toast
+          open={toast.open}
+          type={toast.type}
+          title={toast.title}
+          message={toast.message}
+          onClose={closeToast}
+        />
       </div>
     </div>
   );

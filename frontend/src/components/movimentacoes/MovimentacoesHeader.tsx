@@ -69,14 +69,6 @@ export function MovimentacoesHeader({
       </div>
 
       <div className="relative mt-5 flex items-center gap-2 border-t border-surface-border pt-4">
-        <CalendarDays size={13} className="text-slate-600" />
-
-        <span className="text-[9px] font-medium text-slate-500">
-          Período atual
-        </span>
-
-        <span className="text-[9px] font-bold text-slate-300">Agosto 2026</span>
-
         <span className="ml-auto hidden h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)] sm:block" />
 
         <span className="hidden text-[9px] font-medium text-emerald-400 sm:block">

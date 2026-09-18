@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import { CalendarRange, WalletCards } from "lucide-react";
 
+import { TransactionSelect } from "@/components/movimentacoes/transactions/TransactionSelect";
+
 import type { FinancePreferences } from "./Preferencias";
 
 interface PreferenciasFinanceProps {
@@ -72,11 +74,10 @@ export function PreferenciasFinance({
       </div>
 
       <div className="space-y-4 p-5 sm:p-6">
-        <SelectField
+        <TransactionSelect
           label="Período financeiro padrão"
           value={values.defaultPeriod}
           options={periodOptions}
-          icon={<CalendarRange size={13} />}
           onChange={(value) => onChange("defaultPeriod", value)}
         />
 
@@ -97,49 +98,5 @@ export function PreferenciasFinance({
         </div>
       </div>
     </motion.section>
-  );
-}
-
-interface SelectFieldProps {
-  label: string;
-  value: string;
-  options: {
-    value: string;
-    label: string;
-  }[];
-  icon: React.ReactNode;
-  onChange: (value: string) => void;
-}
-
-function SelectField({
-  label,
-  value,
-  options,
-  icon,
-  onChange,
-}: SelectFieldProps) {
-  return (
-    <label className="block space-y-2">
-      <span className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500">
-        {icon}
-        {label}
-      </span>
-
-      <select
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="h-11 w-full cursor-pointer appearance-none rounded-xl border border-surface-border bg-surface-sidebar px-3.5 text-xs font-medium text-slate-300 outline-none transition-all hover:border-slate-700 focus:border-brand-500/60 focus:bg-surface-main focus:ring-2 focus:ring-brand-500/10"
-      >
-        {options.map((option) => (
-          <option
-            key={option.value}
-            value={option.value}
-            className="bg-[#122033] text-slate-200"
-          >
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </label>
   );
 }
