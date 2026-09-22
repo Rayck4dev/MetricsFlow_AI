@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   CalendarDays,
@@ -47,34 +48,119 @@ function FilterDropdown({
   onChange,
 }: FilterDropdownProps) {
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState<"bottom" | "top">("bottom");
+  const [menuStyle, setMenuStyle] = useState<React.CSSProperties>({});
+
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const selected = options.find((item) => item.value === value);
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (!ref.current?.contains(event.target as Node)) {
-        setOpen(false);
-      }
+  function updatePosition() {
+    if (!buttonRef.current) return;
+
+    const rect = buttonRef.current.getBoundingClientRect();
+
+    const menuHeight = Math.min(options.length * 42 + 12, 256);
+    const gap = 8;
+
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+
+    const shouldOpenTop =
+      spaceBelow < menuHeight + gap && spaceAbove > spaceBelow;
+
+    setPosition(shouldOpenTop ? "top" : "bottom");
+
+    const viewportPadding = 12;
+
+    let left = rect.left;
+    let width = Math.max(rect.width, 210);
+
+    if (left + width > window.innerWidth - viewportPadding) {
+      left = window.innerWidth - width - viewportPadding;
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
+    if (left < viewportPadding) {
+      left = viewportPadding;
+      width = Math.min(width, window.innerWidth - viewportPadding * 2);
+    }
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+    setMenuStyle({
+      position: "fixed",
+      left,
+      width,
+      zIndex: 9999,
+      ...(shouldOpenTop
+        ? {
+            bottom: window.innerHeight - rect.top + gap,
+          }
+        : {
+            top: rect.bottom + gap,
+          }),
+    });
+  }
+
+  function handleOpen() {
+    if (!open) {
+      updatePosition();
+    }
+
+    setOpen((current) => !current);
+  }
 
   function handleSelect(option: DropdownOption) {
     onChange(option.value);
     setOpen(false);
   }
 
+  useEffect(() => {
+    if (!open) return;
+
+    updatePosition();
+
+    function handleClickOutside(event: MouseEvent) {
+      const target = event.target as Node;
+
+      if (
+        !buttonRef.current?.contains(target) &&
+        !menuRef.current?.contains(target)
+      ) {
+        setOpen(false);
+      }
+    }
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    }
+
+    function handleReposition() {
+      updatePosition();
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+
+    window.addEventListener("resize", handleReposition);
+    window.addEventListener("scroll", handleReposition, true);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+
+      window.removeEventListener("resize", handleReposition);
+      window.removeEventListener("scroll", handleReposition, true);
+    };
+  }, [open, options.length]);
+
   return (
-    <div ref={ref} className="relative z-[80] min-w-[185px]">
+    <div className="w-full min-w-0 lg:min-w-[185px] lg:flex-1">
       <motion.button
+        ref={buttonRef}
         type="button"
-        onClick={() => setOpen((current) => !current)}
+        onClick={handleOpen}
         whileTap={{ scale: 0.98 }}
         className={`group flex h-11 w-full items-center gap-3 rounded-xl border px-3.5 text-left outline-none transition-all duration-200 ${
           open
@@ -120,29 +206,32 @@ function FilterDropdown({
         </motion.span>
       </motion.button>
 
-      <AnimatePresence>
-        {open && (
+      {open &&
+        typeof document !== "undefined" &&
+        createPortal(
           <motion.div
+            ref={menuRef}
             initial={{
               opacity: 0,
-              y: -6,
               scale: 0.98,
+              y: position === "top" ? 6 : -6,
             }}
             animate={{
               opacity: 1,
-              y: 0,
               scale: 1,
+              y: 0,
             }}
             exit={{
               opacity: 0,
-              y: -5,
               scale: 0.98,
+              y: position === "top" ? 5 : -5,
             }}
             transition={{
               duration: 0.16,
               ease: "easeOut",
             }}
-            className="absolute left-0 top-[calc(100%+8px)] z-[9999] w-full min-w-[210px] origin-top overflow-hidden rounded-xl border border-surface-border bg-[#0b1329]/[98%] p-1.5 shadow-[0_20px_50px_rgba(0,0,0,0.45)] backdrop-blur-xl"
+            style={menuStyle}
+            className="origin-center overflow-hidden rounded-xl border border-surface-border bg-[#0b1329] p-1.5 shadow-[0_20px_50px_rgba(0,0,0,0.45)] backdrop-blur-xl"
           >
             <div className="pointer-events-none absolute -right-8 -top-8 h-20 w-20 rounded-full bg-brand-500/10 blur-2xl" />
 
@@ -181,37 +270,20 @@ function FilterDropdown({
                       }`}
                     />
 
-                    <span className="flex-1 text-[10px] font-semibold">
+                    <span className="min-w-0 flex-1 text-[10px] font-semibold">
                       {option.label}
                     </span>
 
-                    <AnimatePresence>
-                      {active && (
-                        <motion.span
-                          initial={{
-                            opacity: 0,
-                            scale: 0.5,
-                          }}
-                          animate={{
-                            opacity: 1,
-                            scale: 1,
-                          }}
-                          exit={{
-                            opacity: 0,
-                            scale: 0.5,
-                          }}
-                        >
-                          <Check size={13} className="text-brand-400" />
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
+                    {active && (
+                      <Check size={13} className="shrink-0 text-brand-400" />
+                    )}
                   </motion.button>
                 );
               })}
             </div>
-          </motion.div>
+          </motion.div>,
+          document.body,
         )}
-      </AnimatePresence>
     </div>
   );
 }
@@ -280,7 +352,7 @@ export function MovimentacoesFilters({
   }
 
   return (
-    <section className="relative z-[70] overflow-visible border-t border-surface-border bg-[#0d2038]/60">
+    <section className="relative z-[50] overflow-visible border-t border-surface-border bg-[#0d2038]/60">
       <button
         type="button"
         onClick={() => setExpanded((current) => !current)}
@@ -348,7 +420,7 @@ export function MovimentacoesFilters({
             }}
             className="overflow-visible"
           >
-            <div className="relative z-[80] flex flex-col gap-3 px-5 pb-5 lg:flex-row lg:items-end">
+            <div className="relative z-[60] flex flex-col gap-3 px-5 pb-5 lg:flex-row lg:items-end">
               <FilterDropdown
                 label="Tipo"
                 value={type}

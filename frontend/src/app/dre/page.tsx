@@ -10,6 +10,15 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { createClient } from "@/lib/supabase/client";
 import { useCompanyRole } from "@/hooks/useCompanyRole";
 
+type DreTransactionRow = {
+  id: string;
+  type: DreTransaction["type"];
+  amount: number | string;
+  description: string;
+  payment_method: string;
+  transaction_date: string;
+  categories: { name: string } | { name: string }[] | null;
+};
 export default function DrePage() {
   const [transactions, setTransactions] = useState<DreTransaction[]>([]);
 
@@ -94,7 +103,7 @@ export default function DrePage() {
     if (transactionsError) throw transactionsError;
 
     const formattedTransactions: DreTransaction[] = (transactionData ?? []).map(
-      (item: any) => {
+      (item: DreTransactionRow) => {
         const category = Array.isArray(item.categories)
           ? item.categories[0]
           : item.categories;
@@ -149,7 +158,7 @@ export default function DrePage() {
         <div className="flex min-h-screen">
           <Sidebar />
           <main className="min-w-0 flex-1 overflow-x-hidden">
-            <div className="mx-auto w-full max-w-[1400px] px-5 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+            <div className="mx-auto w-full max-w-[1400px] px-5 pb-5 pt-20 sm:px-6 sm:pb-6 lg:px-8 lg:py-8">
               <div className="space-y-6">
                 <div className="h-24 animate-pulse rounded-2xl border border-surface-border bg-surface-panel" />
                 <div className="h-64 animate-pulse rounded-2xl border border-surface-border bg-surface-panel" />
@@ -172,7 +181,7 @@ export default function DrePage() {
         <div className="flex min-h-screen">
           <Sidebar userName={userName} companyName={companyName} />
           <main className="min-w-0 flex-1 overflow-x-hidden">
-            <div className="mx-auto w-full max-w-[1400px] px-5 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+            <div className="mx-auto w-full max-w-[1400px] px-5 pb-5 pt-20 sm:px-6 sm:pb-6 lg:px-8 lg:py-8">
               <div className="space-y-6">
                 <div className="h-24 animate-pulse rounded-2xl border border-surface-border bg-surface-panel" />
                 <div className="h-64 animate-pulse rounded-2xl border border-surface-border bg-surface-panel" />
@@ -190,7 +199,7 @@ export default function DrePage() {
       <div className="flex min-h-screen">
         <Sidebar userName={userName} companyName={companyName} />
         <main className="min-w-0 flex-1 overflow-x-hidden">
-          <div className="mx-auto w-full max-w-[1400px] min-w-0 px-5 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+          <div className="mx-auto w-full max-w-[1400px] min-w-0 px-5 pb-5 pt-20 sm:px-6 sm:pb-6 lg:px-8 lg:py-8">
             <Dre
               transactions={transactions}
               userName={userName}
@@ -202,3 +211,4 @@ export default function DrePage() {
     </div>
   );
 }
+

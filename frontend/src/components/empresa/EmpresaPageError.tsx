@@ -21,7 +21,7 @@ export default function EmpresaPageError({
         <Sidebar userName={userName} companyName={companyName} />
 
         <main className="min-w-0 flex-1">
-          <div className="flex min-h-screen items-center justify-center p-6">
+          <div className="flex min-h-screen items-center justify-center px-6 pb-6 pt-20 lg:p-6">
             <div className="max-w-md rounded-2xl border border-red-500/20 bg-surface-panel px-6 py-5 text-center">
               <p className="text-sm font-semibold text-white">
                 Não foi possível carregar a empresa
@@ -43,3 +43,4 @@ export default function EmpresaPageError({
     </div>
   );
 }
+

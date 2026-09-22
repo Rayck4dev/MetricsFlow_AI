@@ -108,7 +108,7 @@ export function DrePeriodSelector({ value, onChange }: DrePeriodSelectorProps) {
   }
 
   return (
-    <div ref={containerRef} className="relative z-[100] min-w-0">
+    <div ref={containerRef} className="relative z-20 min-w-0">
       <motion.button
         type="button"
         whileTap={{ scale: 0.98 }}
@@ -254,3 +254,4 @@ export function DrePeriodSelector({ value, onChange }: DrePeriodSelectorProps) {
     </div>
   );
 }
+

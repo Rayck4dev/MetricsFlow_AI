@@ -25,13 +25,13 @@ export function DreHeader({
       initial={{ opacity: 0, y: -14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45 }}
-      className="relative z-[70] overflow-visible rounded-2xl border border-surface-border bg-surface-panel/90 p-5 shadow-2xl shadow-black/10 backdrop-blur-xl sm:p-6"
+      className="relative z-10 overflow-visible rounded-2xl border border-surface-border bg-surface-panel/90 p-5 shadow-2xl shadow-black/10 backdrop-blur-xl sm:p-6"
     >
       <div className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-brand-500/10 blur-3xl" />
 
       <div className="pointer-events-none absolute -bottom-20 left-1/3 h-40 w-40 rounded-full bg-cpm-accent/5 blur-3xl" />
 
-      <div className="relative z-[80] flex min-w-0 flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+      <div className="relative z-10 flex min-w-0 flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
         <div className="min-w-0">
           <div className="mb-3 flex flex-wrap items-center gap-2">
             <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-brand-500/20 bg-brand-500/10">
@@ -60,7 +60,7 @@ export function DreHeader({
           )}
         </div>
 
-        <div className="relative z-[100] flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="relative z-10 flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
           <NotificationBell />
 
           <DrePeriodSelector value={period} onChange={onPeriodChange} />
@@ -79,3 +79,4 @@ export function DreHeader({
     </motion.header>
   );
 }
+

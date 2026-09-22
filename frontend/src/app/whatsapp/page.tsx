@@ -29,11 +29,11 @@ export default function WhatsAppPage() {
   const whatsappConnected = connection.connection?.status === "verified";
 
   return (
-    <div className="h-screen overflow-hidden bg-[#031321] text-slate-100">
-      <div className="flex h-full">
+    <div className="min-h-screen bg-[#031321] text-slate-100">
+      <div className="flex min-h-screen">
         <Sidebar userName={user?.name} companyName={user?.companyName} />
 
-        <main className="relative min-w-0 flex-1 overflow-hidden">
+        <main className="relative min-w-0 flex-1 overflow-x-hidden overflow-y-auto">
           <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
             <div
               className="
@@ -150,15 +150,15 @@ export default function WhatsAppPage() {
               "
             />
           </div>
-          <div className="relative z-10 mx-auto flex h-full w-full max-w-[1500p] flex-col px-4 sm:px-6 lg:px-8">
+          <div className="relative z-10 mx-auto flex w-full max-w-[1500px] flex-col px-4 pb-8 pt-20 sm:px-6 sm:pb-8 lg:h-screen lg:min-h-0 lg:px-8 lg:pb-0 lg:pt-0">
             <WhatsAppHeader
               whatsappConnected={whatsappConnected}
               phoneNumber={connection.connection?.phoneNumber}
             />
 
-            <section className="min-h-0 flex-1 pb-4 lg:pb-5">
-              <div className="grid h-full min-h-0 gap-4 lg:grid-cols-[1.08fr_0.92fr]">
-                <div className="min-h-0">
+            <section className="pb-5 lg:min-h-0 lg:flex-1 lg:overflow-hidden">
+              <div className="grid gap-4 lg:h-full lg:min-h-0 lg:grid-cols-[1.08fr_0.92fr]">
+                <div className="min-h-[360px] lg:min-h-0">
                   <WhatsAppChat
                     text={whatsapp.text}
                     result={whatsapp.result}
@@ -170,7 +170,7 @@ export default function WhatsAppPage() {
                   />
                 </div>
 
-                <div className="min-h-0">
+                <div className="min-h-[360px] lg:min-h-0">
                   <WhatsAppResultPanel
                     result={whatsapp.result}
                     canConfirm={whatsapp.canConfirm}
@@ -209,3 +209,6 @@ export default function WhatsAppPage() {
     </div>
   );
 }
+
+
+

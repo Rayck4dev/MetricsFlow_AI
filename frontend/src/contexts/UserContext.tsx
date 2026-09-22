@@ -9,6 +9,8 @@ import {
   type ReactNode,
 } from "react";
 
+import type { AuthChangeEvent } from "@supabase/supabase-js";
+
 import { createClient } from "@/lib/supabase/client";
 
 import type { UserData } from "@/types/user";
@@ -61,7 +63,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event) => {
+    } = supabase.auth.onAuthStateChange((event: AuthChangeEvent) => {
       if (
         event === "SIGNED_IN" ||
         event === "SIGNED_OUT" ||
@@ -102,3 +104,4 @@ export function useUser() {
 
   return context;
 }
+

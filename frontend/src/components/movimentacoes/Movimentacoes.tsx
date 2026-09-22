@@ -132,7 +132,7 @@ export function Movimentacoes({
             duration: 0.45,
           }}
           className="
-            relative z-50
+            relative
             overflow-visible
             rounded-2xl
             border border-surface-border
@@ -154,7 +154,7 @@ export function Movimentacoes({
             "
           />
 
-          <div className="relative z-50 flex flex-col gap-4">
+          <div className="relative flex flex-col gap-4">
             <div
               className="
                 flex flex-col gap-3

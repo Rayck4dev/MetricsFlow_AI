@@ -15,7 +15,7 @@ export function WhatsAppHeader({
   phoneNumber,
 }: WhatsAppHeaderProps) {
   return (
-    <section className="relative h-[360px] shrink-0 overflow-visible">
+    <section className="relative shrink-0 overflow-hidden py-4 sm:py-6 lg:h-[360px] lg:overflow-visible lg:py-0">
       <div className="pointer-events-none absolute inset-0 overflow-visible">
         <div
           className="
@@ -133,21 +133,21 @@ export function WhatsAppHeader({
         />
       </div>
 
-      <div className="relative mx-auto grid h-full w-full max-w-[1500px] grid-cols-[minmax(0,1fr)_430px] items-center">
-        <div className="relative z-20 mb-20 max-w-[720px] mt-10">
+      <div className="relative mx-auto grid h-full w-full max-w-[1500px] items-center lg:grid-cols-[minmax(0,1fr)_430px]">
+        <div className="relative z-20 max-w-[720px] lg:mb-20 lg:mt-10">
           <div className="mb-3 inline-flex items-center gap-2 rounded-xl border border-emerald-400/15 bg-emerald-400/[0.06] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.16em] text-emerald-300">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_9px_rgba(52,211,153,.8)]" />
             WhatsApp + IA
           </div>
 
-          <h1 className="max-w-[700px] font-heading text-[39px] font-bold leading-[0.97] tracking-[-0.045em] text-white sm:text-[45px] lg:text-[51px]">
+          <h1 className="max-w-[700px] font-heading text-[32px] font-bold leading-tight text-white sm:text-[42px] lg:text-[51px] lg:leading-[0.97]">
             Seu assistente financeiro
             <span className="block bg-gradient-to-r from-emerald-400 to-cyan-300 bg-clip-text text-transparent">
               no WhatsApp
             </span>
           </h1>
 
-          <p className="mt-4 max-w-[640px] text-[13px] leading-6 text-slate-400 sm:text-sm">
+          <p className="mt-4 max-w-[640px] text-xs leading-6 text-slate-400 sm:text-sm">
             Converse naturalmente sobre suas movimentações. O MetricsFlow
             interpreta, valida e pede sua confirmação antes de registrar.
           </p>
@@ -176,7 +176,7 @@ export function WhatsAppHeader({
           </div>
         </div>
 
-        <div className="relative z-[-50] h-full">
+        <div className="relative z-0 hidden h-full lg:block">
           <WhatsAppPhoneMockup className="absolute right-[35px] top-[10px]" />
 
           <motion.div
@@ -242,3 +242,4 @@ function StatusBadge({
     </div>
   );
 }
+

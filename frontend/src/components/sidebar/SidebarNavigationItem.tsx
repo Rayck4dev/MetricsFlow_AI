@@ -13,6 +13,8 @@ interface SidebarNavigationItemProps {
   onHover: (id: SidebarSection) => void;
   onDemoNavigation?: (section: SidebarSection) => void;
   variant?: "main" | "account";
+  layoutNamespace?: string;
+  onNavigate?: () => void;
 }
 
 export function SidebarNavigationItem({
@@ -23,15 +25,26 @@ export function SidebarNavigationItem({
   onHover,
   onDemoNavigation,
   variant = "main",
+  layoutNamespace = "sidebar",
+  onNavigate,
 }: SidebarNavigationItemProps) {
   const Icon = item.icon;
   const isAccount = variant === "account";
+  const activeLayoutId = `${layoutNamespace}-${
+    isAccount ? "account-active" : "active-tab"
+  }`;
+  const hoverLayoutId = `${layoutNamespace}-${
+    isAccount ? "account-hover" : "hover-tab"
+  }`;
+  const dotLayoutId = `${layoutNamespace}-${
+    isAccount ? "account-dot" : "active-dot"
+  }`;
 
   const content = (
     <>
       {active && (
         <motion.div
-          layoutId={isAccount ? "sidebar-account-active" : "sidebar-active-tab"}
+          layoutId={activeLayoutId}
           className="
             absolute
             inset-0
@@ -50,7 +63,7 @@ export function SidebarNavigationItem({
 
       {hovered && !active && (
         <motion.div
-          layoutId={isAccount ? "sidebar-account-hover" : "sidebar-hover-tab"}
+          layoutId={hoverLayoutId}
           className="
             absolute
             inset-0
@@ -101,7 +114,7 @@ export function SidebarNavigationItem({
 
         {active && (
           <motion.span
-            layoutId={isAccount ? "sidebar-account-dot" : "sidebar-active-dot"}
+            layoutId={dotLayoutId}
             className="
               ml-auto
               h-1.5 w-1.5
@@ -135,7 +148,10 @@ export function SidebarNavigationItem({
         type="button"
         whileTap={{ scale: 0.97 }}
         onMouseEnter={() => onHover(item.id)}
-        onClick={() => onDemoNavigation?.(item.id)}
+        onClick={() => {
+          onDemoNavigation?.(item.id);
+          onNavigate?.();
+        }}
         className={baseClass}
       >
         {content}
@@ -148,6 +164,7 @@ export function SidebarNavigationItem({
       <Link
         href={item.href}
         onMouseEnter={() => onHover(item.id)}
+        onClick={onNavigate}
         className={baseClass}
       >
         {content}

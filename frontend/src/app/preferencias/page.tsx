@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 
 import { Preferencias } from "@/components/preferencias/Preferencias";
 import { Sidebar } from "@/components/layout/Sidebar";
@@ -10,8 +9,6 @@ import { useCompanyRole } from "@/hooks/useCompanyRole";
 
 export default function PreferenciasPage() {
   const supabase = createClient();
-  const router = useRouter();
-
   const { role, loading: roleLoading } = useCompanyRole();
 
   const [userName, setUserName] = useState("Usuário");
@@ -87,7 +84,7 @@ export default function PreferenciasPage() {
         <Sidebar userName={userName} companyName={companyName} />
 
         <main className="min-w-0 flex-1">
-          <div className="mx-auto w-full max-w-[1500px] p-4 sm:p-6 lg:p-8">
+          <div className="mx-auto w-full max-w-[1500px] px-4 pb-4 pt-20 sm:px-6 sm:pb-6 lg:p-8">
             <Preferencias />
           </div>
         </main>
@@ -95,3 +92,4 @@ export default function PreferenciasPage() {
     </div>
   );
 }
+

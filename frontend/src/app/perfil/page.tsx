@@ -46,7 +46,7 @@ export default function PerfilPage() {
           <Sidebar userName="Usuário" companyName={companyName || "Empresa"} />
 
           <main className="min-w-0 flex-1">
-            <div className="flex min-h-screen items-center justify-center p-5">
+            <div className="flex min-h-screen items-center justify-center px-5 pb-5 pt-20 lg:p-5">
               <div className="w-full max-w-md rounded-2xl border border-red-500/10 bg-surface-panel p-6 text-center">
                 <p className="text-sm font-bold text-white">
                   Não foi possível carregar o perfil
@@ -77,7 +77,7 @@ export default function PerfilPage() {
         <Sidebar userName={user.name} companyName={companyName || "Empresa"} />
 
         <main className="min-w-0 flex-1">
-          <div className="mx-auto w-full max-w-[1500px] p-4 sm:p-6 lg:p-8">
+          <div className="mx-auto w-full max-w-[1500px] px-4 pb-4 pt-20 sm:px-6 sm:pb-6 lg:p-8">
             {error && (
               <div className="mb-4 rounded-xl border border-red-500/10 bg-red-500/5 px-4 py-3">
                 <p className="text-[10px] font-medium text-red-400">{error}</p>
@@ -96,3 +96,4 @@ export default function PerfilPage() {
     </div>
   );
 }
+

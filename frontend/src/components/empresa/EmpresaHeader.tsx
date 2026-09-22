@@ -24,7 +24,7 @@ export function EmpresaHeader({ companyName }: EmpresaHeaderProps) {
         duration: 0.45,
       }}
       className="
-        relative z-[100]
+        relative z-10
         overflow-visible
         rounded-2xl
         border border-surface-border
@@ -63,7 +63,7 @@ export function EmpresaHeader({ companyName }: EmpresaHeaderProps) {
         "
       />
 
-      <div className="relative overflow-visible flex items-start justify-between gap-4">
+      <div className="relative flex flex-col items-start gap-4 overflow-visible sm:flex-row sm:justify-between">
         <div className="flex min-w-0 items-start gap-4">
           <div
             className="
@@ -148,10 +148,11 @@ export function EmpresaHeader({ companyName }: EmpresaHeaderProps) {
           </div>
         </div>
 
-        <div className="relative z-[100] shrink-0">
+        <div className="relative z-10 shrink-0 self-start">
           <NotificationBell />
         </div>
       </div>
     </motion.header>
   );
 }
+

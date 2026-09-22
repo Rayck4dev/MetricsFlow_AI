@@ -29,7 +29,7 @@ export default function MovimentacoesPage() {
           <Sidebar />
 
           <main className="min-w-0 flex-1 overflow-x-hidden">
-            <div className="mx-auto w-full max-w-[1400px] px-5 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+            <div className="mx-auto w-full max-w-[1400px] px-5 pb-5 pt-20 sm:px-6 sm:pb-6 lg:px-8 lg:py-8">
               <div className="space-y-6">
                 <div className="h-24 animate-pulse rounded-2xl border border-surface-border bg-surface-panel" />
 
@@ -50,7 +50,7 @@ export default function MovimentacoesPage() {
         <Sidebar userName={userName} companyName={companyName} />
 
         <main className="min-w-0 flex-1 overflow-x-hidden">
-          <div className="mx-auto w-full max-w-[1400px] min-w-0 px-5 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+          <div className="mx-auto w-full max-w-[1400px] min-w-0 px-5 pb-5 pt-20 sm:px-6 sm:pb-6 lg:px-8 lg:py-8">
             <Movimentacoes
               transactions={transactions}
               userName={userName}
@@ -79,3 +79,4 @@ export default function MovimentacoesPage() {
     </div>
   );
 }
+

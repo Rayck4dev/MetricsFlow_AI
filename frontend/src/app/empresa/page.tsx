@@ -28,7 +28,7 @@ export default function EmpresaPage() {
           <Sidebar />
 
           <main className="min-w-0 flex-1">
-            <div className="mx-auto w-full max-w-[1500px] p-4 sm:p-6 lg:p-8">
+            <div className="mx-auto w-full max-w-[1500px] px-4 pb-4 pt-20 sm:px-6 sm:pb-6 lg:p-8">
               <div className="space-y-4">
                 <div className="h-40 animate-pulse rounded-3xl border border-surface-border bg-surface-panel" />
 
@@ -52,7 +52,7 @@ export default function EmpresaPage() {
           <Sidebar userName={userName} companyName={company?.name} />
 
           <main className="min-w-0 flex-1">
-            <div className="flex min-h-screen items-center justify-center p-6">
+            <div className="flex min-h-screen items-center justify-center px-6 pb-6 pt-20 lg:p-6">
               <div className="max-w-md rounded-2xl border border-red-500/20 bg-surface-panel px-6 py-5 text-center">
                 <p className="text-sm font-semibold text-white">
                   Não foi possível carregar a empresa
@@ -82,7 +82,7 @@ export default function EmpresaPage() {
           <Sidebar userName={userName} />
 
           <main className="min-w-0 flex-1">
-            <div className="flex min-h-screen items-center justify-center p-6">
+            <div className="flex min-h-screen items-center justify-center px-6 pb-6 pt-20 lg:p-6">
               <div className="rounded-2xl border border-surface-border bg-surface-panel px-6 py-5 text-center">
                 <p className="text-sm font-semibold text-white">
                   Nenhuma empresa encontrada
@@ -105,7 +105,7 @@ export default function EmpresaPage() {
         <Sidebar userName={userName} companyName={company.name} />
 
         <main className="min-w-0 flex-1">
-          <div className="mx-auto w-full max-w-[1500px] p-4 sm:p-6 lg:p-8">
+          <div className="mx-auto w-full max-w-[1500px] px-4 pb-4 pt-20 sm:px-6 sm:pb-6 lg:p-8">
             <Empresa
               company={company}
               members={members}
@@ -120,3 +120,4 @@ export default function EmpresaPage() {
     </div>
   );
 }
+

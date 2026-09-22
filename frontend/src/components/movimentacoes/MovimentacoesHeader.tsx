@@ -1,12 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  CalendarDays,
-  Sparkles,
-} from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 import { useUser } from "@/contexts/UserContext";
 import { NotificationBell } from "@/components/notifications/Notification";
@@ -21,8 +16,6 @@ interface MovimentacoesHeaderProps {
 export function MovimentacoesHeader({
   userName,
   companyName,
-  onAddIncome,
-  onAddExpense,
 }: MovimentacoesHeaderProps) {
   const { user } = useUser();
 
@@ -63,7 +56,7 @@ export function MovimentacoesHeader({
           </p>
         </div>
 
-        <div className="relative z-[100] shrink-0 self-start xl:self-center">
+        <div className="relative z-10 shrink-0 self-start xl:self-center">
           <NotificationBell />
         </div>
       </div>
@@ -78,3 +71,6 @@ export function MovimentacoesHeader({
     </motion.header>
   );
 }
+
+
+

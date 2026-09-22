@@ -47,8 +47,9 @@ export function NotificationDropdown({
         ease: "easeOut",
       }}
       className="
-        absolute right-0 top-full z-50 mt-2
-        w-[min(380px,calc(100vw-24px))]
+        absolute left-0 top-full z-[300] mt-2
+        w-[min(340px,calc(100vw-24px))]
+        sm:left-auto sm:right-0 sm:w-[min(380px,calc(100vw-24px))]
         overflow-hidden rounded-2xl
         border border-surface-border
         bg-surface-panel/95
