@@ -2,13 +2,13 @@
 
 > **CPM — Controle e Planejamento Financeiro para MEIs**
 
-O **MetricsFlow AI** é uma plataforma web de gestão financeira desenvolvida para **Microempreendedores Individuais (MEIs)**, com o objetivo de simplificar o controle financeiro e proporcionar uma visão clara da saúde financeira do negócio.
+**Você conversa. O MetricsFlow organiza.**
 
-A plataforma centraliza **receitas, despesas, categorias, histórico financeiro, indicadores e DRE**, permitindo que o empreendedor acompanhe seus resultados sem depender de planilhas complexas.
+O **MetricsFlow AI** é uma plataforma de gestão financeira desenvolvida para **Microempreendedores Individuais (MEIs)**, com foco em simplificar o controle das movimentações financeiras e oferecer uma visão clara da saúde financeira do negócio.
 
-A V1 do projeto foi desenvolvida com foco na construção da plataforma, autenticação, gerenciamento de empresas, controle de usuários, movimentações financeiras e visualização dos indicadores.
+A plataforma centraliza **receitas, despesas, categorias, histórico financeiro, indicadores, DRE, empresas, usuários e preferências**, permitindo que o empreendedor acompanhe seus resultados sem depender de planilhas complexas.
 
-A arquitetura também foi preparada para futuras evoluções envolvendo **WhatsApp e inteligência artificial**, previstas para a V2.
+A V1 estabeleceu a plataforma web de gestão financeira. A V2 evolui essa estrutura com uma arquitetura baseada em **frontend + backend**, preparando o sistema para recursos de inteligência artificial e integração com WhatsApp.
 
 ---
 
@@ -20,19 +20,23 @@ O objetivo do MetricsFlow AI é oferecer ao MEI uma ferramenta simples, visual e
 - Registrar despesas;
 - Organizar movimentações por categorias;
 - Consultar o histórico financeiro;
+- Buscar movimentações;
 - Filtrar movimentações;
 - Editar transações;
 - Excluir transações;
-- Visualizar receitas;
-- Visualizar custos e despesas;
+- Visualizar receitas, custos e despesas;
 - Acompanhar o resultado financeiro;
 - Analisar a evolução financeira através de gráficos;
 - Visualizar uma DRE simplificada;
 - Gerenciar informações da empresa;
+- Gerenciar membros da empresa;
 - Gerenciar informações pessoais;
-- Configurar preferências da plataforma;
+- Configurar preferências;
 - Controlar diferentes níveis de acesso;
-- Preparar a plataforma para futuras integrações com WhatsApp e IA.
+- Receber notificações financeiras;
+- Exportar informações financeiras;
+- Preparar o sistema para registro financeiro através do WhatsApp;
+- Preparar o sistema para interpretação de mensagens utilizando inteligência artificial.
 
 ---
 
@@ -40,7 +44,7 @@ O objetivo do MetricsFlow AI é oferecer ao MEI uma ferramenta simples, visual e
 
 ## 📊 Dashboard
 
-O dashboard apresenta uma visão geral da situação financeira da empresa.
+O dashboard apresenta uma visão geral da situação financeira da empresa atualmente selecionada.
 
 Entre os principais indicadores estão:
 
@@ -52,11 +56,13 @@ Entre os principais indicadores estão:
 - Quantidade de movimentações;
 - Evolução financeira;
 - Gráficos;
-- Resumo das movimentações;
+- Resumo financeiro;
 - Transações recentes;
 - Ações rápidas.
 
-Os dados do dashboard são organizados considerando a empresa atualmente selecionada pelo usuário.
+Os dados são obtidos a partir das movimentações financeiras vinculadas à empresa.
+
+A arquitetura também permite que os dados sejam atualizados conforme novas movimentações são registradas.
 
 ---
 
@@ -80,7 +86,7 @@ O mesmo fluxo é utilizado para registrar despesas.
 
 ## Histórico
 
-As movimentações são apresentadas em uma tabela contendo informações como:
+As movimentações são apresentadas em uma tabela contendo:
 
 - Tipo;
 - Descrição;
@@ -89,14 +95,17 @@ As movimentações são apresentadas em uma tabela contendo informações como:
 - Data;
 - Valor.
 
-Também são disponibilizados recursos de:
+Também estão disponíveis:
 
 - Busca;
 - Filtro por tipo;
 - Filtro por categoria;
 - Filtro por período;
 - Edição;
-- Exclusão.
+- Exclusão;
+- Exportação para CSV.
+
+As movimentações possuem uma origem, permitindo diferenciar registros realizados pela plataforma web de futuras movimentações provenientes de integrações externas.
 
 ---
 
@@ -110,12 +119,14 @@ A estrutura contempla:
 - Custos;
 - Despesas;
 - Resultado;
+- Margem;
 - Distribuição por categorias;
 - Comparação de indicadores;
 - Gráficos;
-- Seleção de período.
+- Seleção de período;
+- Exportação dos dados para CSV.
 
-A DRE foi estruturada de maneira desacoplada para permitir que os dados apresentados possam evoluir juntamente com a integração do backend.
+A DRE utiliza as movimentações financeiras registradas para calcular os principais indicadores do período selecionado.
 
 ---
 
@@ -123,15 +134,15 @@ A DRE foi estruturada de maneira desacoplada para permitir que os dados apresent
 
 A área de perfil permite que o usuário visualize e gerencie suas informações pessoais.
 
-Atualmente contempla:
+Contempla:
 
 - Nome;
 - E-mail;
 - Telefone;
-- Informações relacionadas à conta;
+- Informações da conta;
 - Segurança.
 
-A autenticação dos usuários é realizada através do sistema de autenticação do Supabase.
+A autenticação e a sessão do usuário são gerenciadas pelo **Supabase Auth**.
 
 ---
 
@@ -139,7 +150,7 @@ A autenticação dos usuários é realizada através do sistema de autenticaçã
 
 A área de empresa concentra as informações relacionadas à organização.
 
-A estrutura contempla:
+Contempla:
 
 - Dados da empresa;
 - Dados cadastrais;
@@ -148,7 +159,7 @@ A estrutura contempla:
 - Gerenciamento da equipe;
 - Papéis de acesso.
 
-O sistema trabalha atualmente com dois papéis principais:
+O sistema utiliza atualmente dois papéis principais:
 
 ### Proprietário
 
@@ -156,7 +167,9 @@ Possui acesso administrativo à empresa e às funcionalidades restritas.
 
 ### Colaborador
 
-Pode utilizar as funcionalidades financeiras liberadas para membros da empresa, mas não possui os mesmos privilégios administrativos do proprietário.
+Pode utilizar as funcionalidades financeiras disponibilizadas aos membros, mas possui permissões diferentes das do proprietário.
+
+A autorização é determinada pelo vínculo existente entre o usuário e a empresa através de `company_members`.
 
 ---
 
@@ -169,16 +182,42 @@ Entre elas:
 - Aparência;
 - Notificações;
 - Preferências financeiras;
+- Período financeiro padrão;
+- Moeda;
 - Configurações relacionadas à conta;
 - Área para ações sensíveis.
+
+As preferências financeiras são persistidas no banco de dados.
+
+---
+
+# 🔔 Notificações
+
+O MetricsFlow possui um sistema de notificações integrado ao banco de dados.
+
+As notificações podem informar eventos relacionados às movimentações financeiras e ao funcionamento da plataforma.
+
+A estrutura contempla:
+
+- Notificações por usuário;
+- Identificação da empresa;
+- Identificação do usuário responsável pela ação;
+- Estado de leitura;
+- Estado de arquivamento;
+- Data de criação;
+- Preferências de recebimento.
+
+O sistema diferencia notificações de demonstração das notificações reais do usuário autenticado.
+
+As notificações relacionadas a movimentações respeitam as preferências configuradas pelo usuário.
 
 ---
 
 # 🔐 Autenticação
 
-O sistema utiliza autenticação através do **Supabase Auth**.
+O sistema utiliza **Supabase Auth** para autenticação e gerenciamento de sessões.
 
-A estrutura atual contempla:
+A estrutura contempla:
 
 - Login;
 - Cadastro;
@@ -187,9 +226,21 @@ A estrutura atual contempla:
 - Recuperação de senha;
 - Redefinição de senha;
 - Persistência da sessão;
-- Controle do usuário autenticado.
+- Identificação do usuário autenticado;
+- Identificação da empresa vinculada;
+- Controle de acesso por papel.
 
-O sistema também identifica automaticamente o vínculo entre o usuário autenticado e sua empresa através da tabela `company_members`.
+O vínculo entre usuário e empresa é estabelecido através da tabela:
+
+```text
+auth.users
+    │
+    ▼
+company_members
+    │
+    ▼
+companies
+```
 
 ---
 
@@ -197,116 +248,110 @@ O sistema também identifica automaticamente o vínculo entre o usuário autenti
 
 O acesso às funcionalidades é determinado pelo papel do usuário dentro da empresa.
 
-Os papéis atualmente utilizados são:
-
 ```text
-owner
- │
- ├── Acesso ao Dashboard
- ├── Acesso às Movimentações
- ├── Acesso à DRE
- ├── Acesso ao Perfil
- ├── Acesso à Empresa
- └── Acesso às Preferências
-
-collaborator
- │
- ├── Acesso ao Dashboard
- ├── Acesso às Movimentações
- ├── Acesso ao Perfil
- └── Acesso às Preferências
+                    Usuário autenticado
+                            │
+                            ▼
+                    company_members
+                            │
+                 ┌──────────┴──────────┐
+                 ▼                     ▼
+              owner              collaborator
+                 │                     │
+                 ▼                     ▼
+        Acesso administrativo    Acesso financeiro
 ```
 
-A estrutura permite que novas regras de permissão sejam adicionadas futuramente.
+## Proprietário
+
+Possui acesso a:
+
+- Dashboard;
+- Movimentações;
+- DRE;
+- Perfil;
+- Empresa;
+- Membros;
+- Preferências;
+- Operações administrativas.
+
+## Colaborador
+
+Possui acesso a:
+
+- Dashboard;
+- Movimentações;
+- Perfil;
+- Preferências.
+
+Operações administrativas e ações restritas são controladas de acordo com o papel do usuário.
 
 ---
 
-# 📱 WhatsApp
+# 🧭 Onboarding
 
-A integração com WhatsApp faz parte da evolução planejada para a **V2**.
+O sistema possui um fluxo de onboarding para configuração inicial da empresa.
 
-A proposta é permitir que o MEI possa registrar movimentações financeiras através de mensagens.
-
-O fluxo planejado é:
+O processo permite:
 
 ```text
-Usuário
+Cadastro
    ↓
-WhatsApp
+Autenticação
    ↓
-Webhook
+Onboarding
    ↓
-Backend
+Criação / identificação da empresa
    ↓
-Inteligência Artificial
+Vínculo do usuário
    ↓
-Interpretação da mensagem
+Configuração inicial
    ↓
-JSON estruturado
-   ↓
-Supabase
-   ↓
-Movimentação financeira
+Categorias padrão
    ↓
 Dashboard
 ```
 
-A funcionalidade ainda não faz parte do fluxo financeiro principal da V1.
-
----
-
-# 🤖 Inteligência Artificial
-
-A utilização de inteligência artificial está planejada para a segunda fase do projeto.
-
-A IA deverá interpretar mensagens enviadas pelo usuário e identificar informações financeiras.
-
-Exemplo:
-
-```text
-Usuário:
-
-"Recebi 850 reais de um projeto de criação de site hoje"
-```
-
-A IA deverá transformar a mensagem em informações estruturadas semelhantes a:
-
-```json
-{
-  "type": "income",
-  "amount": 850,
-  "description": "Projeto de criação de site",
-  "category": "Serviços",
-  "date": "2026-08-28"
-}
-```
-
-A partir dessas informações, o backend poderá validar os dados e registrar a movimentação no banco.
-
-A proposta da V2 é utilizar APIs de inteligência artificial existentes, sem necessidade de treinamento de um modelo próprio.
+A criação da empresa e o vínculo do usuário como proprietário são tratados através das regras do banco e da aplicação.
 
 ---
 
 # 🏗️ Arquitetura do projeto
 
-O projeto utiliza **Next.js com App Router**, organizando as páginas, componentes e recursos por domínio funcional.
-
-Estrutura atual simplificada:
+O MetricsFlow utiliza uma arquitetura **monorepo**, contendo frontend e backend no mesmo repositório Git.
 
 ```text
 metricsflow-ai/
 │
-├── .next/
-├── node_modules/
-├── public/
+├── frontend/
+│   └── Next.js
+│
+├── backend/
+│   └── NestJS
+│
+├── .gitignore
+├── README.md
+└── LICENSE
+```
+
+A separação permite que frontend e backend evoluam de forma independente dentro do mesmo projeto.
+
+---
+
+# 🖥️ Frontend
+
+O frontend é desenvolvido utilizando **Next.js com App Router**, React e TypeScript.
+
+Estrutura simplificada:
+
+```text
+frontend/
 │
 ├── src/
-│   │
 │   ├── app/
 │   │   ├── (auth)/
 │   │   ├── api/
 │   │   ├── auth/
-│   │   │   └── callback/
 │   │   ├── dashboard/
 │   │   ├── demo/
 │   │   ├── dre/
@@ -315,133 +360,223 @@ metricsflow-ai/
 │   │   ├── onboarding/
 │   │   ├── perfil/
 │   │   ├── preferencias/
-│   │   ├── recuperar-senha/
-│   │   ├── redefinir-senha/
-│   │   ├── whatsapp/
-│   │   ├── favicon.ico
-│   │   ├── globals.css
-│   │   ├── layout.tsx
-│   │   └── page.tsx
+│   │   └── whatsapp/
 │   │
 │   ├── components/
-│   │
 │   ├── contexts/
-│   │
 │   ├── data/
-│   │
 │   ├── hooks/
-│   │
 │   ├── lib/
-│   │
-│   ├── types/
-│   │
-├── .env.local
-├── .gitignore
-├── eslint.config.mjs
-├── LICENSE
-├── next-env.d.ts
-├── next.config.ts
+│   └── types/
+│
+├── public/
 ├── package.json
-├── postcss.config.mjs
-├── README.md
-├── tailwind.config.ts
-└── tsconfig.json
+└── ...
 ```
 
 ---
 
-# 🧩 Organização da aplicação
+# ⚙️ Backend
 
-## `src/app`
+A V2 introduz um backend próprio desenvolvido com **NestJS**.
 
-Contém as páginas e rotas da aplicação utilizando o App Router do Next.js.
+O backend centraliza APIs, autenticação, regras de negócio e integrações que não devem ficar expostas no frontend.
 
-Principais áreas:
+Estrutura simplificada:
 
 ```text
-app/
-├── (auth)/
-├── dashboard/
-├── demo/
-├── dre/
-├── empresa/
-├── movimentacoes/
-├── onboarding/
-├── perfil/
-├── preferencias/
-└── whatsapp/
+backend/
+│
+├── src/
+│   ├── modules/
+│   │   ├── ai/
+│   │   ├── auth/
+│   │   ├── categories/
+│   │   ├── companies/
+│   │   ├── health/
+│   │   ├── supabase/
+│   │   ├── transactions/
+│   │   └── whatsapp/
+│   │
+│   ├── app.module.ts
+│   └── main.ts
+│
+├── .env
+├── package.json
+└── ...
 ```
 
----
-
-## `src/components`
-
-Contém componentes reutilizáveis da interface.
-
-A separação por componentes permite que elementos como cards, tabelas, formulários, gráficos, modais e elementos de navegação sejam reutilizados em diferentes páginas.
-
----
-
-## `src/contexts`
-
-Contém os contextos globais da aplicação.
-
-Um dos principais contextos é responsável pelos dados do usuário autenticado e pelo vínculo do usuário com a empresa.
-
-Exemplo conceitual:
+O backend possui prefixo global:
 
 ```text
-Auth
- ↓
-Usuário
- ↓
-Empresa
- ↓
-Role
- ↓
-Permissões
+/api
 ```
 
+Principais rotas atualmente estruturadas:
+
+```text
+GET    /api
+GET    /api/health
+GET    /api/supabase/test
+
+GET    /api/companies
+POST   /api/companies
+GET    /api/companies/:companyId/members
+
+GET    /api/transactions
+POST   /api/transactions
+PATCH  /api/transactions/:id
+DELETE /api/transactions/:id
+
+GET    /api/categories
+
+GET    /api/whatsapp/connection
+POST   /api/whatsapp/connection
+
+POST   /api/whatsapp/demo
+POST   /api/whatsapp/confirm
+
+GET    /api/whatsapp/webhook
+POST   /api/whatsapp/webhook
+```
+
+A estrutura de WhatsApp está preparada no backend, mas a integração efetiva com o WhatsApp ainda não está disponível no fluxo de produção.
+
 ---
 
-## `src/data`
+# 🧠 Inteligência Artificial
 
-Contém dados estáticos e estruturas utilizadas principalmente para desenvolvimento e apresentação da aplicação.
+A V2 introduz uma camada de inteligência artificial preparada para interpretar mensagens financeiras.
+
+A responsabilidade da IA é **interpretar informações**, e não executar diretamente operações no banco.
+
+Fluxo conceitual:
+
+```text
+Mensagem
+   ↓
+IA
+   ↓
+JSON estruturado
+   ↓
+Validação do Backend
+   ↓
+Regras de negócio
+   ↓
+Confirmação
+   ↓
+Banco de dados
+```
+
+A estrutura de interpretação contempla informações como:
+
+```json
+{
+  "intent": "create_transaction",
+  "type": "income",
+  "amount": 850,
+  "description": "Projeto de criação de site",
+  "categoryId": null,
+  "categoryName": null,
+  "paymentMethod": null,
+  "transactionDate": null,
+  "confidence": 0.95,
+  "missingFields": []
+}
+```
+
+A aplicação deve validar a resposta antes de qualquer persistência.
+
+A IA não deve:
+
+- Criar categorias inexistentes;
+- Inventar informações;
+- Registrar uma movimentação sem confirmação;
+- Ignorar campos obrigatórios;
+- Bypassar as regras de autorização.
 
 ---
 
-## `src/hooks`
+# 📱 WhatsApp
 
-Contém hooks personalizados utilizados para encapsular comportamentos reutilizáveis.
+A integração com WhatsApp é a principal funcionalidade ainda pendente da V2.
 
----
+A arquitetura do backend já possui a estrutura necessária para receber e processar mensagens, porém a integração completa com a plataforma do WhatsApp ainda não está concluída.
 
-## `src/lib`
+O fluxo planejado é:
 
-Contém funções auxiliares, configurações e integrações utilizadas pela aplicação.
+```text
+                 WHATSAPP
+                     │
+                     ▼
+              Meta Cloud API
+                     │
+                     ▼
+                  Webhook
+                     │
+                     ▼
+             NestJS Backend
+                     │
+                     ▼
+             Identificação
+             do usuário
+                     │
+                     ▼
+          Identificação da empresa
+                     │
+                     ▼
+          Processamento da mensagem
+                     │
+              ┌──────┴──────┐
+              ▼             ▼
+            Texto          Áudio
+              │             │
+              │       Transcrição
+              │             │
+              └──────┬──────┘
+                     ▼
+               IA / Parser
+                     │
+                     ▼
+             Dados estruturados
+                     │
+                     ▼
+               Validação
+                     │
+                     ▼
+              Confirmação
+                     │
+              ┌──────┴──────┐
+              ▼             ▼
+          Confirmar       Corrigir/
+              │           Cancelar
+              ▼
+            Supabase
+              │
+              ▼
+          Transação
+              │
+              ▼
+          Dashboard
+```
 
-Entre elas está a configuração do cliente Supabase.
+### Regra principal
 
----
+Nenhuma movimentação deverá ser registrada apenas porque a IA interpretou uma mensagem.
 
-## `src/types`
+O fluxo previsto exige:
 
-Contém tipos TypeScript compartilhados entre diferentes partes da aplicação.
-
----
-
-## `src/tests`
-
-Contém os testes automatizados e estruturas relacionadas à validação da aplicação.
-
-A pasta será utilizada para validar principalmente:
-
-- Autenticação;
-- Permissões;
-- Movimentações;
-- Regras de negócio;
-- Componentes;
-- Fluxos principais.
+```text
+Interpretar
+    ↓
+Validar
+    ↓
+Solicitar confirmação
+    ↓
+Usuário confirma
+    ↓
+Registrar
+```
 
 ---
 
@@ -449,166 +584,107 @@ A pasta será utilizada para validar principalmente:
 
 O banco de dados utiliza **Supabase / PostgreSQL**.
 
-A estrutura principal é baseada nas seguintes entidades:
+Principais entidades:
 
 ```text
-profiles
+auth.users
     │
+    ├── profiles
     │
-    ▼
-company_members
-    │
-    ▼
-companies
-    │
-    ├──────────────┐
-    ▼              ▼
-categories    transactions
+    └── company_members
+             │
+             ▼
+          companies
+             │
+       ┌─────┼─────────────┐
+       ▼     ▼             ▼
+ categories transactions notifications
                   │
                   ▼
           whatsapp_messages
 ```
 
----
+## Empresas
 
-# 🏢 Empresas
-
-A tabela `companies` representa as empresas cadastradas na plataforma.
-
-Principais informações:
-
-- ID;
-- Nome;
-- Documento;
-- Telefone;
-- Código de convite;
-- Data de criação;
-- Data de atualização.
-
-Cada empresa possui suas próprias categorias e movimentações.
-
----
-
-# 👥 Membros
-
-A tabela `company_members` relaciona usuários às empresas.
-
-Cada membro possui um papel:
+Representadas pela tabela:
 
 ```text
-owner
-collaborator
+companies
 ```
 
-A relação utiliza:
+Cada empresa possui suas próprias categorias, membros e movimentações.
+
+## Membros
+
+Representados por:
 
 ```text
-company_id
-user_id
-role
+company_members
 ```
 
-Também existe uma restrição para evitar múltiplos proprietários vinculados ao mesmo usuário.
+Relacionam usuários às empresas e armazenam o papel de acesso.
 
----
+## Categorias
 
-# 🗂️ Categorias
+Representadas por:
 
-As categorias são relacionadas diretamente à empresa.
+```text
+categories
+```
 
-Cada categoria possui:
-
-- ID;
-- Empresa;
-- Nome;
-- Tipo;
-- Cor;
-- Indicador de categoria padrão;
-- Data de criação;
-- Ordem de exibição.
-
-O tipo da categoria diferencia:
+Cada categoria pertence a uma empresa e possui um tipo:
 
 ```text
 income
 expense
 ```
 
-A estrutura permite que cada empresa tenha seu próprio conjunto de categorias.
+## Transações
 
----
+Representadas por:
 
-# 💸 Transações
+```text
+transactions
+```
 
-As transações representam as movimentações financeiras realizadas pela empresa.
+Uma transação contém informações como:
 
-Uma transação possui informações como:
-
+- Empresa;
+- Categoria;
+- Usuário responsável;
 - Tipo;
 - Valor;
 - Descrição;
-- Categoria;
 - Forma de pagamento;
 - Data;
-- Empresa;
-- Usuário responsável pelo registro;
-- Origem da movimentação;
-- Texto original do WhatsApp, quando aplicável.
+- Origem;
+- Data de criação;
+- Data de atualização.
 
-As transações são utilizadas pelo:
+A origem permite identificar, por exemplo:
 
-- Dashboard;
-- Histórico;
-- DRE;
-- Gráficos;
-- Indicadores financeiros.
+```text
+web
+whatsapp
+```
 
----
+A origem `whatsapp` será utilizada quando a integração estiver concluída.
 
-# 🔒 Segurança
+## Notificações
 
-A arquitetura do projeto considera o isolamento dos dados por empresa.
+Representadas por:
 
-São utilizados conceitos como:
+```text
+notifications
+```
 
-- Autenticação;
-- Controle de membros;
-- Papéis de acesso;
-- Isolamento por empresa;
-- Row Level Security (RLS);
-- Validação de dados;
-- Integridade referencial;
-- Controle das operações financeiras.
-
-A aplicação utiliza o usuário autenticado para identificar a empresa e as permissões correspondentes.
-
-As tabelas financeiras possuem políticas de acesso baseadas no vínculo do usuário com `company_members`.
-
----
-
-# 🧠 Functions e regras de negócio do Supabase
-
-A camada de banco possui funções PostgreSQL utilizadas para centralizar regras relacionadas a autenticação, empresas, membros e categorias.
-
-Entre as principais funções estão:
-
-- Verificação de proprietário da empresa;
-- Verificação de membro da empresa;
-- Identificação da empresa do usuário autenticado;
-- Identificação do papel do usuário;
-- Criação de empresa durante o onboarding;
-- Associação do usuário como proprietário;
-- Entrada em uma empresa através de código de convite;
-- Verificação de informações do usuário;
-- Criação automática de categorias padrão;
-- Criação automática de perfil após cadastro;
-- Atualização automática de `updated_at`.
+As notificações são vinculadas ao usuário e podem também estar relacionadas a uma empresa e ao usuário responsável pela ação.
 
 ---
 
 # 🏷️ Categorias padrão
 
-Ao criar uma nova empresa, uma trigger executa automaticamente a função responsável por criar categorias padrão.
+Ao criar uma empresa, categorias padrão são disponibilizadas automaticamente.
 
 ### Receitas
 
@@ -625,69 +701,135 @@ Ao criar uma nova empresa, uma trigger executa automaticamente a função respon
 - Ferramentas / Sistema;
 - Outras Despesas.
 
-Essas categorias são associadas automaticamente à empresa recém-criada.
+A estrutura permite que cada empresa possua seu próprio conjunto de categorias.
 
 ---
 
-# 👤 Criação automática de perfil
+# 🧠 Functions e Triggers
 
-Após a criação de um usuário no Supabase Auth, uma trigger pode executar a função responsável por criar ou atualizar o registro correspondente na tabela `profiles`.
+A camada PostgreSQL possui funções e triggers responsáveis por centralizar regras relacionadas ao sistema.
 
-O processo utiliza informações disponíveis no usuário autenticado, como:
+Entre as responsabilidades estão:
 
-- ID;
-- E-mail;
-- Nome informado no cadastro.
-
-A criação da empresa não é realizada nesse processo.
-
-A empresa é criada posteriormente através do fluxo de onboarding.
+- Verificação de proprietário;
+- Verificação de membro;
+- Identificação da empresa do usuário;
+- Identificação do papel do usuário;
+- Criação de empresa;
+- Associação do usuário como proprietário;
+- Entrada em empresa através de convite;
+- Criação de categorias padrão;
+- Criação automática de perfil;
+- Atualização automática de `updated_at`;
+- Geração de notificações relacionadas a movimentações.
 
 ---
 
-# 🔑 Row Level Security — RLS
+# 🔒 Segurança
 
-O banco utiliza **Row Level Security (RLS)** para impedir que usuários acessem dados de empresas às quais não pertencem.
+A arquitetura utiliza múltiplas camadas de proteção.
 
-A autorização é baseada principalmente na relação:
+São utilizados:
+
+- Supabase Auth;
+- Controle de sessão;
+- Controle de membros;
+- Papéis de acesso;
+- Row Level Security;
+- Validação de dados;
+- Integridade referencial;
+- Funções PostgreSQL;
+- Triggers;
+- Validação no backend;
+- Separação de variáveis de ambiente;
+- Segredos mantidos no backend.
+
+A relação de autorização principal é:
 
 ```text
 auth.uid()
-     ↓
+    ↓
 company_members
-     ↓
+    ↓
 company_id
-     ↓
-dados da empresa
+    ↓
+dados autorizados
 ```
 
-Dessa forma, um usuário somente pode acessar os dados correspondentes às empresas das quais é membro.
-
-As políticas são aplicadas principalmente sobre:
-
-- `companies`;
-- `company_members`;
-- `categories`;
-- `transactions`;
-- `profiles`.
+Dessa forma, o usuário somente deve acessar dados das empresas às quais está vinculado.
 
 ---
 
-# 📐 UML
+# 🔐 Arquitetura de autenticação
 
-A modelagem da aplicação utiliza diagramas UML para representar os principais comportamentos e estruturas do sistema.
+```text
+Usuário
+   ↓
+Next.js
+   ↓
+Supabase Auth
+   ↓
+Sessão autenticada
+   ↓
+Usuário
+   ↓
+company_members
+   ↓
+Empresa + Role
+   ↓
+Permissões
+```
+
+Quando necessário, o backend valida o token de autenticação antes de executar operações protegidas.
 
 ---
 
-## Diagrama de Caso de Uso
+# 📐 Diagramas
 
-O diagrama apresenta as principais interações entre os usuários e o MetricsFlow AI.
+## Diagrama de arquitetura
+
+```mermaid
+flowchart TB
+
+    User["👤 Usuário"]
+
+    Frontend["Frontend<br/>Next.js + React + TypeScript"]
+
+    Backend["Backend<br/>NestJS"]
+
+    Supabase["Supabase"]
+
+    Auth["Supabase Auth"]
+
+    Database[("PostgreSQL")]
+
+    AI["AI API"]
+
+    WhatsApp["WhatsApp / Meta<br/>(integração pendente)"]
+
+    User --> Frontend
+
+    Frontend --> Auth
+    Frontend --> Backend
+
+    Backend --> Supabase
+    Supabase --> Database
+
+    Backend --> AI
+
+    WhatsApp -.->|Futura integração| Backend
+```
+
+---
+
+# 👥 Diagrama de Caso de Uso
 
 ```mermaid
 flowchart LR
 
     Owner["👤 Proprietário"]
     Collaborator["👤 Colaborador"]
+
     System(("MetricsFlow AI"))
 
     Owner -->|Autenticar-se| System
@@ -698,19 +840,19 @@ flowchart LR
     Owner -->|Gerenciar membros| System
     Owner -->|Gerenciar perfil| System
     Owner -->|Configurar preferências| System
+    Owner -->|Gerenciar notificações| System
 
     Collaborator -->|Autenticar-se| System
     Collaborator -->|Visualizar dashboard| System
     Collaborator -->|Gerenciar movimentações| System
     Collaborator -->|Gerenciar perfil| System
     Collaborator -->|Configurar preferências| System
+    Collaborator -->|Receber notificações| System
 ```
 
 ---
 
 # 📦 Diagrama de Classes
-
-O diagrama representa as principais entidades relacionadas ao domínio financeiro.
 
 ```mermaid
 classDiagram
@@ -726,7 +868,7 @@ classDiagram
         +UUID id
         +string name
         +string document
-        +string phoneNumber
+        +string phone
         +string inviteCode
         +Date createdAt
         +Date updatedAt
@@ -747,24 +889,36 @@ classDiagram
         +TransactionType type
         +string color
         +boolean isDefault
-        +Date createdAt
         +integer sortOrder
+        +Date createdAt
     }
 
     class Transaction {
         +UUID id
         +UUID companyId
         +UUID categoryId
-        +UUID userId
+        +UUID createdByUserId
         +TransactionType type
         +decimal amount
         +string description
         +PaymentMethod paymentMethod
         +Date transactionDate
         +string origin
-        +string rawWhatsappText
         +Date createdAt
         +Date updatedAt
+    }
+
+    class Notification {
+        +UUID id
+        +UUID userId
+        +UUID actorUserId
+        +UUID companyId
+        +string type
+        +string title
+        +string message
+        +boolean read
+        +boolean dismissed
+        +Date createdAt
     }
 
     class WhatsAppMessage {
@@ -781,14 +935,14 @@ classDiagram
     Company "1" --> "*" Transaction : possui
     Category "1" --> "*" Transaction : classifica
     Profile "1" --> "*" Transaction : registra
-    Transaction "1" --> "*" WhatsAppMessage : origem
+    Profile "1" --> "*" Notification : recebe
+    Company "1" --> "*" Notification : relaciona
+    Transaction "1" --> "*" WhatsAppMessage : poderá originar
 ```
 
 ---
 
-# 🔄 Diagrama de Sequência
-
-O fluxo abaixo representa o registro de uma movimentação financeira.
+# 🔄 Diagrama de Sequência — Movimentação Web
 
 ```mermaid
 sequenceDiagram
@@ -796,34 +950,78 @@ sequenceDiagram
     actor Usuario
     participant Frontend as Next.js
     participant Auth as Supabase Auth
-    participant API as Backend/API
+    participant API as NestJS API
     participant DB as PostgreSQL
 
-    Usuario->>Frontend: Preenche formulário
-    Usuario->>Frontend: Confirma movimentação
+    Usuario->>Frontend: Preenche movimentação
+    Usuario->>Frontend: Confirma
 
     Frontend->>Auth: Verifica sessão
     Auth-->>Frontend: Usuário autenticado
 
-    Frontend->>API: Envia dados da transação
-
+    Frontend->>API: Envia dados
     API->>DB: Valida empresa e permissões
-    DB-->>API: Dados autorizados
+    DB-->>API: Operação autorizada
 
     API->>DB: Insere transação
     DB-->>API: Transação criada
 
-    API-->>Frontend: Retorna movimentação
-
+    API-->>Frontend: Retorna resultado
     Frontend-->>Usuario: Atualiza interface
-    Frontend-->>Usuario: Exibe nova movimentação
+```
+
+---
+
+# 🤖 Diagrama de Sequência — Fluxo futuro do WhatsApp
+
+> Este fluxo representa a arquitetura planejada. A integração efetiva com o WhatsApp ainda não está concluída.
+
+```mermaid
+sequenceDiagram
+
+    actor Usuario
+
+    participant WhatsApp as WhatsApp
+    participant Meta as Meta Cloud API
+    participant API as NestJS
+    participant AI as AI API
+    participant DB as Supabase
+
+    Usuario->>WhatsApp: Envia mensagem
+    WhatsApp->>Meta: Mensagem
+    Meta->>API: Webhook
+
+    API->>API: Identifica usuário e empresa
+
+    alt Texto
+        API->>AI: Envia texto
+    else Áudio
+        API->>AI: Solicita transcrição
+        AI-->>API: Texto transcrito
+        API->>AI: Interpreta texto
+    end
+
+    AI-->>API: JSON estruturado
+
+    API->>API: Valida dados
+    API->>WhatsApp: Solicita confirmação
+
+    Usuario->>WhatsApp: Confirma
+
+    WhatsApp->>Meta: Confirmação
+    Meta->>API: Webhook
+
+    API->>DB: Registra transação
+    DB-->>API: Transação criada
+
+    API->>WhatsApp: Confirma lançamento
 ```
 
 ---
 
 # ⚙️ Diagrama de Atividade
 
-O fluxo representa o processo de cadastro de uma movimentação.
+## Registro de movimentação pela plataforma
 
 ```mermaid
 flowchart TD
@@ -831,15 +1029,15 @@ flowchart TD
     A([Início])
     B[Usuário acessa Movimentações]
     C[Seleciona Receita ou Despesa]
-    D[Preenche os dados]
+    D[Preenche dados]
     E{Dados válidos?}
-    F[Exibir erros de validação]
+    F[Exibir erros]
     G[Verificar autenticação]
     H{Usuário autorizado?}
     I[Negar operação]
     J[Registrar transação]
-    K[Atualizar Dashboard]
-    L[Atualizar Histórico]
+    K[Gerar atualização]
+    L[Atualizar interface]
     M([Fim])
 
     A --> B
@@ -858,9 +1056,7 @@ flowchart TD
 
     H -->|Sim| J
     J --> K
-    J --> L
-
-    K --> M
+    K --> L
     L --> M
 ```
 
@@ -868,85 +1064,151 @@ flowchart TD
 
 # 🏛️ C4 Model
 
-A arquitetura também pode ser representada utilizando o **C4 Model**, através dos diagramas de contexto e container.
-
----
-
-## Diagrama de Contexto — C4
-
-O diagrama de contexto apresenta o MetricsFlow AI e os principais atores e sistemas externos.
+## Diagrama de Contexto
 
 ```mermaid
 C4Context
 
-    title MetricsFlow AI - Diagrama de Contexto
+    title MetricsFlow AI - Contexto
 
     Person(owner, "Proprietário", "MEI responsável pela empresa")
     Person(collaborator, "Colaborador", "Membro autorizado da empresa")
 
-    System(metricsflow, "MetricsFlow AI", "Plataforma de controle e planejamento financeiro para MEIs")
+    System(metricsflow, "MetricsFlow AI", "Plataforma de gestão financeira para MEIs")
 
     System_Ext(google, "Google", "Provedor de autenticação")
-    System_Ext(supabase, "Supabase", "Autenticação, banco de dados e serviços backend")
-    System_Ext(whatsapp, "WhatsApp", "Canal planejado para registro de movimentações")
+    System_Ext(supabase, "Supabase", "Autenticação e banco de dados")
+    System_Ext(openai, "AI API", "Interpretação e processamento de linguagem")
+    System_Ext(whatsapp, "WhatsApp / Meta", "Canal planejado para interação financeira")
 
     Rel(owner, metricsflow, "Gerencia empresa e finanças")
     Rel(collaborator, metricsflow, "Registra e consulta movimentações")
 
-    Rel(metricsflow, google, "Utiliza autenticação Google")
-    Rel(metricsflow, supabase, "Armazena e consulta dados")
-    Rel(metricsflow, whatsapp, "Integração planejada na V2")
+    Rel(metricsflow, google, "Utiliza OAuth")
+    Rel(metricsflow, supabase, "Autentica e armazena dados")
+    Rel(metricsflow, openai, "Processamento de IA")
+    Rel(metricsflow, whatsapp, "Integração futura")
 ```
 
 ---
 
-# 📦 Diagrama de Containers — C4
-
-O diagrama de containers apresenta os principais componentes tecnológicos da plataforma.
+# 📦 C4 — Containers
 
 ```mermaid
 C4Container
 
-    title MetricsFlow AI - Diagrama de Containers
+    title MetricsFlow AI - Containers
 
-    Person(owner, "Proprietário", "Usuário responsável pela empresa")
-    Person(collaborator, "Colaborador", "Usuário membro da empresa")
+    Person(owner, "Proprietário", "Responsável pela empresa")
+    Person(collaborator, "Colaborador", "Membro da empresa")
 
     System_Boundary(metricsflow, "MetricsFlow AI") {
 
-        Container(web, "Web Application", "Next.js / React / TypeScript", "Interface principal da plataforma")
+        Container(web, "Frontend", "Next.js / React / TypeScript", "Interface web da plataforma")
 
-        Container(api, "API / Backend", "Next.js API", "Processamento das operações e regras de negócio")
+        Container(api, "Backend", "NestJS / TypeScript", "API, autenticação, regras e integrações")
 
         Container(auth, "Authentication", "Supabase Auth", "Autenticação e gerenciamento de sessões")
 
-        ContainerDb(database, "Database", "PostgreSQL / Supabase", "Dados de usuários, empresas, categorias e transações")
+        ContainerDb(database, "Database", "PostgreSQL / Supabase", "Usuários, empresas, categorias, transações e notificações")
 
-        Container(whatsapp, "WhatsApp Integration", "Webhook / API", "Integração planejada para registro de movimentações")
+        Container(ai, "AI Module", "NestJS + AI API", "Interpretação e processamento de mensagens")
 
-        Container(ai, "AI Processing", "AI API", "Interpretação de mensagens financeiras planejada para V2")
+        Container(whatsapp, "WhatsApp Module", "NestJS / Webhook", "Estrutura preparada para integração com WhatsApp")
     }
 
-    System_Ext(google, "Google", "OAuth Provider")
-    System_Ext(wa, "WhatsApp", "Messaging Platform")
+    System_Ext(google, "Google", "OAuth")
+    System_Ext(meta, "Meta / WhatsApp", "Messaging Platform")
 
     Rel(owner, web, "Utiliza")
     Rel(collaborator, web, "Utiliza")
 
-    Rel(web, auth, "Autentica usuário")
+    Rel(web, auth, "Autentica")
     Rel(web, api, "Envia requisições")
 
     Rel(api, database, "Consulta e altera dados")
-    Rel(auth, database, "Gerencia dados de autenticação")
+    Rel(auth, database, "Gerencia autenticação")
 
-    Rel(wa, whatsapp, "Envia mensagens")
+    Rel(api, ai, "Processa mensagens")
     Rel(whatsapp, ai, "Envia conteúdo para interpretação")
 
-    Rel(ai, api, "Retorna dados estruturados")
-    Rel(api, database, "Registra movimentação")
-
+    Rel(meta, whatsapp, "Integração futura")
     Rel(auth, google, "OAuth")
 ```
+
+---
+
+# 🧩 Organização do Backend
+
+O backend é organizado por módulos de domínio.
+
+```text
+backend/src/modules/
+
+├── ai/
+│   ├── ai.module.ts
+│   ├── parser.service.ts
+│   ├── transcription.service.ts
+│   └── types.ts
+│
+├── auth/
+│
+├── categories/
+│
+├── companies/
+│
+├── health/
+│
+├── supabase/
+│
+├── transactions/
+│
+└── whatsapp/
+    ├── whatsapp.controller.ts
+    ├── whatsapp.module.ts
+    ├── whatsapp.service.ts
+    ├── meta.service.ts
+    ├── process-message.service.ts
+    ├── message-guard.service.ts
+    ├── types.ts
+    └── dto/
+```
+
+Essa organização permite que cada domínio evolua de maneira independente.
+
+---
+
+# 🧩 Organização do Frontend
+
+```text
+frontend/src/
+
+├── app/
+├── components/
+├── contexts/
+├── data/
+├── hooks/
+├── lib/
+└── types/
+```
+
+Os componentes são organizados de acordo com os domínios da aplicação.
+
+Entre eles:
+
+- Dashboard;
+- Movimentações;
+- DRE;
+- Perfil;
+- Empresa;
+- Preferências;
+- WhatsApp;
+- Autenticação;
+- Notificações;
+- Formulários;
+- Modais;
+- Tabelas;
+- Gráficos.
 
 ---
 
@@ -961,43 +1223,90 @@ C4Container
 - **Framer Motion**
 - **Lucide React**
 - **Recharts**
+- **React Day Picker**
 
-## Backend / Infraestrutura
+## Backend
+
+- **NestJS**
+- **TypeScript**
+- **REST API**
+- **Class Validator**
+- **Supabase**
+- **OpenAI API**
+
+## Banco e infraestrutura
 
 - **Supabase**
 - **PostgreSQL**
 - **Supabase Auth**
-- **Row Level Security (RLS)**
+- **Row Level Security**
 - **PostgreSQL Functions**
 - **PostgreSQL Triggers**
 
 ## Desenvolvimento
 
+- **Git**
+- **GitHub**
 - **ESLint**
 - **TypeScript**
-- **Git / GitHub**
+- **npm**
 
-## Futuras integrações
+## Integrações
 
-- WhatsApp API;
-- Webhooks;
-- API de Inteligência Artificial;
-- Processamento de mensagens.
+- **Google OAuth**
+- **OpenAI API**
+- **Meta WhatsApp Cloud API — integração pendente**
+
+---
+
+# 🌐 Portas de desenvolvimento
+
+Durante o desenvolvimento local, frontend e backend utilizam portas diferentes.
+
+```text
+Frontend Next.js
+http://localhost:3002
+
+Backend NestJS
+http://localhost:3001
+```
+
+O frontend utiliza a variável:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001/api
+```
+
+O backend utiliza:
+
+```env
+PORT=3001
+```
 
 ---
 
 # 🛠️ Instalação
 
-Clone o repositório:
+## 1. Clone o repositório
 
 ```bash
-git clone https://github.com/Rayck4dev/MetricsFlow_AI
+git clone https://github.com/Rayck4dev/MetricsFlow_AI.git
 ```
 
 Entre no diretório:
 
 ```bash
-cd metricsflow-ai
+cd MetricsFlow_AI
+```
+
+---
+
+# 🖥️ Configuração do Frontend
+
+Entre na pasta:
+
+```bash
+cd frontend
 ```
 
 Instale as dependências:
@@ -1006,34 +1315,97 @@ Instale as dependências:
 npm install
 ```
 
-Crie o arquivo de variáveis de ambiente:
+Crie:
 
 ```text
 .env.local
 ```
 
-Configure as variáveis necessárias do Supabase.
+Configure as variáveis necessárias do Supabase e da API.
 
-Execute o projeto em desenvolvimento:
+Exemplo:
 
-```bash
-npm run dev
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001/api
 ```
 
-A aplicação ficará disponível no endereço informado pelo Next.js, normalmente:
+Execute:
+
+```bash
+npm run dev -- -p 3002
+```
+
+A aplicação ficará disponível em:
 
 ```text
-http://localhost:3000
+http://localhost:3002
 ```
 
 ---
 
-# 📌 Status da V1
+# ⚙️ Configuração do Backend
 
-## Frontend
+Em outro terminal:
 
+```bash
+cd backend
+```
+
+Instale as dependências:
+
+```bash
+npm install
+```
+
+Crie:
+
+```text
+.env
+```
+
+Configure as variáveis necessárias para:
+
+- Porta;
+- Supabase;
+- OpenAI;
+- Configurações do WhatsApp;
+- Segredos de integração.
+
+Exemplo:
+
+```env
+PORT=3001
+```
+
+Execute:
+
+```bash
+npm run start:dev
+```
+
+A API ficará disponível em:
+
+```text
+http://localhost:3001
+```
+
+Health check:
+
+```text
+http://localhost:3001/api/health
+```
+
+---
+
+# 📌 Status atual do projeto
+
+## V1 — Plataforma Financeira
+
+### Frontend
+
+- [x] Landing Page
+- [x] Área de demonstração
 - [x] Dashboard
-- [x] Header
 - [x] Cards financeiros
 - [x] Gráficos
 - [x] Resumo financeiro
@@ -1044,9 +1416,12 @@ http://localhost:3000
 - [x] Cadastro de despesas
 - [x] Edição de transações
 - [x] Exclusão de transações
+- [x] Busca
 - [x] Filtros financeiros
-- [x] Histórico de movimentações
+- [x] Histórico
+- [x] Exportação CSV
 - [x] DRE
+- [x] Exportação da DRE
 - [x] Perfil
 - [x] Empresa
 - [x] Preferências
@@ -1057,290 +1432,241 @@ http://localhost:3000
 - [x] Recuperação de senha
 - [x] Redefinição de senha
 - [x] Controle de acesso por papel
-- [x] Área de demonstração
-- [x] Estrutura inicial do WhatsApp
+- [x] Sistema de notificações
+- [x] Feedback visual de operações
+- [x] Estrutura visual do WhatsApp
 
 ---
 
-# 🗄️ Status do Backend
+# 🚀 Status da V2
 
-- [x] Supabase configurado
-- [x] PostgreSQL
-- [x] Supabase Auth
-- [x] Perfis
+## Arquitetura
+
+- [x] Estrutura monorepo
+- [x] Separação `frontend/` e `backend/`
+- [x] Frontend Next.js
+- [x] Backend NestJS
+- [x] API REST
+- [x] Configuração de ambientes separados
+- [x] CORS
+- [x] Health check
+
+## Backend
+
+- [x] Estrutura NestJS
+- [x] Supabase integrado
+- [x] Autenticação via token
+- [x] Guard de autenticação
 - [x] Empresas
 - [x] Membros
-- [x] Papéis de acesso
 - [x] Categorias
 - [x] Transações
-- [x] Relacionamentos
-- [x] PostgreSQL Functions
-- [x] PostgreSQL Triggers
-- [x] Row Level Security
-- [x] Políticas de segurança
-- [x] Isolamento de dados por empresa
-- [x] Integração frontend + banco
-
----
-
-# 🚀 Roadmap
-
-## V1 — Plataforma Financeira
-
-```text
-Planejamento
-     ↓
-Design
-     ↓
-Arquitetura
-     ↓
-Frontend
-     ↓
-Autenticação
-     ↓
-Banco de Dados
-     ↓
-Integração Supabase
-     ↓
-Dashboard
-     ↓
-Movimentações
-     ↓
-DRE
-     ↓
-Controle de acesso
-     ↓
-Testes
-     ↓
-Entrega
-```
-
----
-
-# 🤖 V2 — Inteligência e Automação
-
-A segunda fase do projeto tem como objetivo transformar o MetricsFlow AI em um assistente financeiro mais automatizado.
-
-## WhatsApp
-
-- [ ] Configurar API/WhatsApp
-- [ ] Configurar webhook
-- [ ] Receber mensagens
-- [ ] Processar mensagens
-- [ ] Identificar usuário
-- [ ] Identificar empresa
-- [ ] Registrar histórico das mensagens
+- [x] CRUD de transações
+- [x] Validação de permissões
+- [x] Módulo de IA
+- [x] Parser financeiro
+- [x] Estrutura de transcrição
+- [x] Estrutura inicial do módulo WhatsApp
 
 ## Inteligência Artificial
 
-- [ ] Integrar API de IA
-- [ ] Criar prompt estruturado
-- [ ] Utilizar Structured Outputs / JSON
-- [ ] Identificar tipo da movimentação
-- [ ] Identificar valor
-- [ ] Identificar descrição
-- [ ] Identificar categoria
-- [ ] Identificar data
-- [ ] Validar informações recebidas
+- [x] Serviço de interpretação
+- [x] Estrutura de tipos financeiros
+- [x] Structured Output
+- [x] Identificação de intenção
+- [x] Identificação de tipo
+- [x] Identificação de valor
+- [x] Identificação de descrição
+- [x] Identificação de categoria
+- [x] Identificação de forma de pagamento
+- [x] Identificação de data
+- [x] Validação da resposta estruturada
+- [x] Preparação para transcrição de áudio
 
-## Backend
+## WhatsApp
 
-- [ ] Criar rota para processamento
-- [ ] Validar resposta da IA
-- [ ] Executar inserção no Supabase
-- [ ] Retornar confirmação
-- [ ] Criar tratamento de erros
-- [ ] Criar logs
+- [ ] Configuração final da integração Meta
+- [ ] Webhook em ambiente público
+- [ ] Recebimento real de mensagens
+- [ ] Processamento real de mensagens
+- [ ] Identificação do usuário através do WhatsApp
+- [ ] Identificação da empresa
+- [ ] Confirmação via WhatsApp
+- [ ] Registro real de movimentações via WhatsApp
+- [ ] Processamento de áudio em produção
 
-## Dashboard
-
-- [ ] Atualização após lançamento via WhatsApp
-- [ ] Histórico de lançamentos automatizados
-- [ ] Identificação da origem da movimentação
-- [ ] Indicadores de automação
+> **Observação:** a integração com WhatsApp é a principal etapa ainda pendente da V2. A arquitetura e os módulos necessários já estão preparados para essa evolução.
 
 ---
 
-# 🧠 Visão futura
+# 🗺️ Roadmap
+
+```text
+                    METRICSFLOW AI
+                          │
+              ┌───────────┴───────────┐
+              │                       │
+             V1                      V2
+              │                       │
+     Gestão financeira        Automação + IA
+              │                       │
+       ┌──────┼──────┐          ┌─────┼─────┐
+       │      │      │          │     │     │
+      Auth   DB    Frontend     API   IA  WhatsApp
+       │      │      │          │     │     │
+       └──────┴──────┘          │     │     │
+              │                 │     │     └── Pendente
+              ▼                 ▼     ▼
+         Plataforma         Backend  Parser
+         financeira            │
+                               ▼
+                            Integração
+```
+
+---
+
+# 🔮 Próxima etapa
+
+A próxima etapa de desenvolvimento é concluir a integração real com o WhatsApp.
+
+O objetivo é finalizar o fluxo:
+
+```text
+WhatsApp
+    ↓
+Meta Cloud API
+    ↓
+Webhook NestJS
+    ↓
+Identificação do usuário
+    ↓
+Identificação da empresa
+    ↓
+Texto / Áudio
+    ↓
+Interpretação
+    ↓
+Validação
+    ↓
+Confirmação
+    ↓
+Supabase
+    ↓
+Transação
+    ↓
+Dashboard
+```
+
+A integração deverá respeitar as regras de segurança e confirmação antes de qualquer lançamento financeiro.
+
+---
+
+# 🧠 Visão do produto
 
 O MetricsFlow AI pretende evoluir de uma plataforma de controle financeiro para um **assistente de gestão financeira voltado para MEIs**.
 
-A evolução planejada inclui:
+A evolução do produto ocorre em duas etapas:
 
-- Registro financeiro via WhatsApp;
-- Automação de lançamentos;
-- Interpretação de mensagens;
-- Análise financeira inteligente;
-- Alertas;
-- Insights sobre receitas e despesas;
-- Auxílio na interpretação da DRE;
-- Recomendações baseadas no comportamento financeiro.
+### V1
 
-A proposta é reduzir a complexidade da gestão financeira para empreendedores que precisam administrar o próprio negócio sem necessariamente possuir conhecimentos avançados de contabilidade ou gestão financeira.
-
----
-
-# 👤 Matriz de papéis acumulados
-
-O MetricsFlow AI é desenvolvido individualmente. Dessa forma, todas as áreas necessárias para o desenvolvimento do projeto são acumuladas pela mesma desenvolvedora.
-
-| Papel                | Responsabilidades                                                                                          |
-| -------------------- | ---------------------------------------------------------------------------------------------------------- |
-| **Gestão / Produto** | Levantamento de requisitos, definição de funcionalidades, organização das tarefas e priorização do projeto |
-| **UI/UX**            | Arquitetura visual, experiência de navegação, identidade visual, responsividade e componentes              |
-| **Frontend**         | Desenvolvimento das páginas, componentização, estados, interações, validações e integração com dados       |
-| **Backend**          | Desenvolvimento das APIs, regras de negócio, autenticação e integrações                                    |
-| **Banco de Dados**   | Modelagem, relacionamentos, políticas de acesso, integridade e manutenção do banco                         |
-| **QA / Testes**      | Testes funcionais, validação dos fluxos, identificação e correção de bugs                                  |
-| **Documentação**     | README, documentação técnica, organização do projeto e registro das decisões                               |
-| **DevOps / Deploy**  | Configuração do ambiente, versionamento, build, deploy e infraestrutura                                    |
-
-## Desenvolvimento individual
-
-Por se tratar de um projeto desenvolvido individualmente, as diferentes responsabilidades são acumuladas ao longo das etapas do projeto.
-
-Essa abordagem permite que todas as decisões de **produto, design, desenvolvimento, banco de dados, testes e documentação** sejam centralizadas durante a construção do MetricsFlow AI.
-
----
-
-# 📋 Papéis considerados
-
-## Gestão / Produto
-
-- Levantamento de requisitos;
-- Organização das tarefas;
-- Definição de funcionalidades;
-- Priorização;
-- Planejamento das versões.
-
-## UI/UX
-
-- Estrutura visual;
-- Experiência de navegação;
-- Componentes;
-- Responsividade;
-- Identidade visual.
-
-## Frontend
-
-- Desenvolvimento das páginas;
-- Componentização;
-- Integração com dados;
-- Estados;
-- Interações;
-- Validações.
-
-## Backend
-
-- APIs;
-- Regras de negócio;
-- Autenticação;
-- Integrações;
-- Segurança.
-
-## Banco de Dados
-
-- Modelagem;
-- Relacionamentos;
-- Índices;
-- Políticas de acesso;
-- Functions;
-- Triggers;
-- Integridade dos dados.
-
-## QA / Testes
-
-- Testes funcionais;
-- Identificação de bugs;
-- Validação de fluxos;
-- Testes de integração;
-- Regressão.
-
-## Documentação
-
-- README;
-- Documentação técnica;
-- Diagramas;
-- Organização do projeto;
-- Registro das decisões.
-
-## DevOps / Deploy
-
-- Configuração do ambiente;
-- Versionamento;
-- Build;
-- Deploy;
-- Configuração de variáveis de ambiente;
-- Infraestrutura.
-
----
-
-# 🗺️ Roadmap geral
+A plataforma web estabelece a base de gestão:
 
 ```text
-                         METRICSFLOW AI
-                               │
-              ┌────────────────┴────────────────┐
-              │                                 │
-             V1                                V2
-              │                                 │
-      Gestão financeira                 Automação + IA
-              │                                 │
-      ├── Autenticação                    ├── WhatsApp
-      ├── Empresas                        ├── Webhook
-      ├── Membros                         ├── IA
-      ├── Categorias                      ├── Structured Output
-      ├── Transações                      ├── Processamento
-      ├── Dashboard                       ├── Automação
-      ├── DRE                             └── Insights
-      └── Segurança
+Autenticação
+      ↓
+Empresa
+      ↓
+Categorias
+      ↓
+Movimentações
+      ↓
+Dashboard
+      ↓
+DRE
 ```
 
----
+### V2
 
-# 📂 Estrutura da documentação do Supabase
-
-Os scripts relacionados ao banco de dados podem ser organizados da seguinte forma:
+A plataforma evolui para uma experiência conversacional:
 
 ```text
-supabase/
+WhatsApp
+    ↓
+Mensagem
+    ↓
+IA
+    ↓
+Confirmação
+    ↓
+Movimentação
+    ↓
+Dashboard
+```
+
+A proposta é tornar o controle financeiro mais simples para empreendedores que precisam administrar o próprio negócio sem depender de planilhas ou processos complexos.
+
+---
+
+# 👩‍💻 Desenvolvimento individual
+
+O MetricsFlow AI é desenvolvido individualmente.
+
+Dessa forma, as responsabilidades necessárias para a construção do produto são acumuladas pela mesma desenvolvedora.
+
+| Área             | Responsabilidades                                            |
+| ---------------- | ------------------------------------------------------------ |
+| Gestão / Produto | Requisitos, funcionalidades, planejamento e priorização      |
+| UI/UX            | Identidade visual, experiência, responsividade e componentes |
+| Frontend         | Next.js, React, TypeScript, componentes e integração         |
+| Backend          | NestJS, APIs, regras de negócio e integrações                |
+| Banco de Dados   | PostgreSQL, Supabase, RLS, Functions e Triggers              |
+| IA               | Integração, prompts, interpretação e Structured Output       |
+| QA / Testes      | Testes funcionais, validação e correção de bugs              |
+| DevOps           | Git, ambientes, build, deploy e variáveis                    |
+| Documentação     | README, diagramas e documentação técnica                     |
+
+---
+
+# 📂 Estrutura geral do projeto
+
+```text
+metricsflow-ai/
 │
-└── database/
-    │
-    ├── tables/
-    │   ├── profiles.sql
-    │   ├── companies.sql
-    │   ├── company_members.sql
-    │   ├── categories.sql
-    │   └── transactions.sql
-    │
-    ├── functions/
-    │   ├── is_company_owner.sql
-    │   ├── create_company.sql
-    │   ├── get_user_company.sql
-    │   ├── get_user_role.sql
-    │   ├── get_company_members.sql
-    │   ├── create_company_categories.sql
-    │   ├── handle_new_user.sql
-    │   ├── is_company_member.sql
-    │   ├── is_company_owner_by_id.sql
-    │   ├── join_company_by_invite.sql
-    │   └── update_updated_at.sql
-    │
-    ├── triggers/
-    │   ├── trigger_seed_company_categories.sql
-    │   ├── trigger_handle_new_user.sql
-    │   └── trigger_update_updated_at.sql
-    │
-    └── rls/
-        ├── profiles.sql
-        ├── companies.sql
-        ├── company_members.sql
-        ├── categories.sql
-        └── transactions.sql
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── app/
+│   │   ├── components/
+│   │   ├── contexts/
+│   │   ├── data/
+│   │   ├── hooks/
+│   │   ├── lib/
+│   │   └── types/
+│   ├── .env.local
+│   ├── package.json
+│   └── ...
+│
+├── backend/
+│   ├── src/
+│   │   ├── modules/
+│   │   │   ├── ai/
+│   │   │   ├── auth/
+│   │   │   ├── categories/
+│   │   │   ├── companies/
+│   │   │   ├── health/
+│   │   │   ├── supabase/
+│   │   │   ├── transactions/
+│   │   │   └── whatsapp/
+│   │   ├── app.module.ts
+│   │   └── main.ts
+│   ├── .env
+│   ├── package.json
+│   └── ...
+│
+├── README.md
+├── LICENSE
+└── .gitignore
 ```
-
-Essa organização separa a estrutura do banco, regras de negócio, triggers e políticas de segurança, facilitando a manutenção e a reprodução do ambiente.
 
 ---
 
@@ -1354,12 +1680,16 @@ Consulte o arquivo [`LICENSE`](./LICENSE) para obter os termos completos da lice
 
 # 🎯 MetricsFlow AI
 
-**Controle. Analise. Cresça.**
+**Você conversa. O MetricsFlow organiza.**
 
 Projeto desenvolvido como solução de **Controle e Planejamento Financeiro (CPM) para MEIs**.
 
----
+### V1
 
-A V1 concentra a estrutura principal de gestão financeira da plataforma.
+Plataforma web completa de gestão financeira.
 
-A V2 terá como foco a **automação através de WhatsApp e Inteligência Artificial**.
+### V2
+
+Evolução da plataforma para uma arquitetura com **frontend, backend e inteligência artificial**, preparando o registro financeiro conversacional através do WhatsApp.
+
+**Status atual:** plataforma financeira funcional, backend estruturado e integração com WhatsApp em desenvolvimento.
