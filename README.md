@@ -1,10 +1,14 @@
+<p align="center">
+  <img src="./frontend/public/logo_completa.png" width="200" alt="Metrics Logo" />
+</p>
+
 # MetricsFlow AI
 
 > **CPM — Controle e Planejamento Financeiro para MEIs**
 
-**Você conversa. O MetricsFlow organiza.**
+**Você conversa. A MetricsFlow organiza.**
 
-O **MetricsFlow AI** é uma plataforma de gestão financeira desenvolvida para **Microempreendedores Individuais (MEIs)**, com foco em simplificar o controle das movimentações financeiras e oferecer uma visão clara da saúde financeira do negócio.
+A **MetricsFlow AI** é uma plataforma de gestão financeira desenvolvida para **Microempreendedores Individuais (MEIs)**, com foco em simplificar o controle das movimentações financeiras e oferecer uma visão clara da saúde financeira do negócio.
 
 A plataforma centraliza **receitas, despesas, categorias, histórico financeiro, indicadores, DRE, empresas, usuários e preferências**, permitindo que o empreendedor acompanhe seus resultados sem depender de planilhas complexas.
 
