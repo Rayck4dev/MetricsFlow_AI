@@ -144,7 +144,7 @@ export function useEmpresa() {
         return;
       }
 
-      const userIds = memberRows.map((member) => member.user_id);
+      const userIds = memberRows.map((member: any) => member.user_id);
 
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
@@ -157,11 +157,11 @@ export function useEmpresa() {
 
       const profileMap = new Map<string, Profile>();
 
-      (profiles ?? []).forEach((profile) => {
+      (profiles ?? []).forEach((profile: Profile) => {
         profileMap.set(profile.id, profile);
       });
 
-      const formattedMembers: EmpresaMember[] = memberRows.map((member) => {
+      const formattedMembers: EmpresaMember[] = memberRows.map((member: any) => {
         const profile = profileMap.get(member.user_id);
 
         return {

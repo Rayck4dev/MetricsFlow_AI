@@ -2,11 +2,32 @@
   <img src="./frontend/public/logo_completa.png" width="200" alt="Metrics Logo" />
 </p>
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Frontend-NextJS-E0234E?style=for-the-badge&logo=nextjs&logoColor=white" alt="NextJS" />
+  <img src="https://img.shields.io/badge/Backend-NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white" alt="NestJS" />
+  <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React" />
+  <img src="https://img.shields.io/badge/Tailwind-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind" />
+  <img src="https://img.shields.io/badge/Framer-Motion-E2165C?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion" />
+  <img src="https://img.shields.io/badge/Lucide-React-000000?style=for-the-badge&logo=lucide&logoColor=white" alt="Lucide" />
+  <img src="https://img.shields.io/badge/Recharts-FFC436?style=for-the-badge&logo=recharts&logoColor=black" alt="Recharts" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="WhatsApp" />
+  <img src="https://img.shields.io/badge/Google-OAuth-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Google OAuth" />
+  <img src="https://img.shields.io/badge/OpenAI-000000?style=for-the-badge&logo=openai&logoColor=white" alt="OpenAI" />
+  <img src="https://img.shields.io/badge/REST-API-000000?style=for-the-badge&logo=rest-api&logoColor=white" alt="REST API" />
+  <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" />
+  <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white" alt="Git" />
+  <img src="https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white" alt="npm" />
+  <img src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black" alt="Swagger" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge" alt="License MIT" />
+</p>
+
 # MetricsFlow AI
 
 > **CPM — Controle e Planejamento Financeiro para MEIs**
 
 **Você conversa. A MetricsFlow organiza.**
+
 
 A **MetricsFlow AI** é uma plataforma de gestão financeira desenvolvida para **Microempreendedores Individuais (MEIs)**, com foco em simplificar o controle das movimentações financeiras e oferecer uma visão clara da saúde financeira do negócio.
 
@@ -31,6 +52,7 @@ A V1 estabeleceu a plataforma web de gestão financeira. A V2 evolui essa estrut
 [🔗 Atividade Prática Elaboração BMC e Proposta de Valor](https://www.notion.so/Atividade-Pr-tica-Elabora-o-BMC-e-Proposta-de-Valor-3e32ae5e90d180d4bd04fa468ce5541f?source=copy_link)
 
 ---
+
 ## 💰 Orçamento do projeto
 
 O orçamento e a estimativa financeira do projeto estão disponíveis no documento:
@@ -1089,9 +1111,11 @@ flowchart TD
 
 ---
 
-# 🏛️ C4 Model
+# 🏗️ Diagramação C4 — MetricsFlow AI
 
-## Diagrama de Contexto
+> A integração com WhatsApp está estruturada no código, mas **não implementada em produção**.
+
+## 🏛️ Diagrama de Contexto
 
 ```mermaid
 C4Context
@@ -1119,7 +1143,7 @@ C4Context
 
 ---
 
-# 📦 C4 — Containers
+## 📦 Diagrama de Containers 
 
 ```mermaid
 C4Container
@@ -1161,6 +1185,112 @@ C4Container
 
     Rel(meta, whatsapp, "Integração futura")
     Rel(auth, google, "OAuth")
+```
+
+---
+
+---
+
+## 🧩 Diagramas de Componentes
+
+---
+
+## Componentes — Frontend (Next.js)
+
+```mermaid
+C4Component
+
+    title MetricsFlow AI - Componentes do Frontend
+
+    Person(user, "Usuário", "Proprietário ou Colaborador")
+
+    Container_Boundary(frontend, "Frontend — Next.js / App Router") {
+
+        Component(landing, "Landing Page", "Next.js Page /", "Página pública de apresentação da plataforma")
+        Component(auth_pages, "Auth Pages", "Next.js Pages /(auth)", "Login, Cadastro, Recuperar Senha e Redefinição de Senha")
+        Component(callback, "Auth Callback", "Next.js Route Handler /auth/callback", "Processa retorno OAuth. Cria perfil e redireciona para onboarding ou dashboard.")
+        Component(onboarding, "Onboarding", "Next.js Page /onboarding", "Fluxo de configuração inicial: criar ou ingressar em empresa via código de convite")
+        Component(dashboard, "Dashboard", "Next.js Page /dashboard", "Visão financeira consolidada: faturamento, receitas, despesas, lucro, gráficos e transações recentes")
+        Component(movimentacoes, "Movimentações", "Next.js Page /movimentacoes", "CRUD de receitas e despesas. Filtros, busca e exportação para CSV.")
+        Component(dre, "DRE", "Next.js Page /dre", "Demonstração do Resultado do Exercício com gráficos e exportação CSV")
+        Component(empresa, "Empresa", "Next.js Page /empresa", "Dados cadastrais, membros, papéis de acesso e código de convite")
+        Component(perfil, "Perfil", "Next.js Page /perfil", "Informações pessoais e configurações de segurança")
+        Component(preferencias, "Preferências", "Next.js Page /preferencias", "Aparência, notificações, moeda e configurações da conta")
+        Component(demo, "Demo", "Next.js Page /demo", "Modo demonstração da plataforma sem autenticação real")
+
+        Component(middleware, "Middleware", "Next.js Middleware", "Intercepta requisições e protege rotas autenticadas. Redireciona usuários não autenticados.")
+        Component(hooks, "Custom Hooks", "React Hooks /hooks", "useEmpresa, useTransactions, useCompanyRole, useDRE, useNotifications, usePreferences...")
+        Component(contexts, "Contexts", "React Context /contexts", "CompanyContext: distribui empresa ativa e estado global entre os componentes")
+        Component(components_ui, "Componentes UI", "React Components /components", "Sidebar, Header, Cards, Charts, Modals, Forms e Tables reutilizáveis")
+        Component(supa_client, "Supabase Client", "lib/supabase/client.ts · server.ts", "Instâncias do cliente Supabase para uso no browser e no servidor")
+    }
+
+    System_Ext(supa_auth, "Supabase Auth", "Autenticação e sessões JWT")
+    System_Ext(postgres, "PostgreSQL", "Banco de dados com RLS")
+    System_Ext(backend_api, "Backend API", "NestJS REST API")
+
+    Rel(user, landing, "Acessa")
+    Rel(user, auth_pages, "Faz login ou cadastro")
+    Rel(auth_pages, supa_auth, "Autentica via email ou Google OAuth")
+    Rel(callback, supa_auth, "Troca code por sessão")
+    Rel(callback, postgres, "Cria perfil do usuário OAuth")
+    Rel(middleware, supa_auth, "Valida sessão em cada requisição")
+    Rel(dashboard, hooks, "Consulta dados financeiros")
+    Rel(movimentacoes, hooks, "CRUD de transações")
+    Rel(dre, hooks, "Consulta indicadores do período")
+    Rel(empresa, hooks, "Gerencia membros e dados")
+    Rel(hooks, supa_client, "Queries com RLS")
+    Rel(hooks, backend_api, "Chama API REST")
+    Rel(supa_client, supa_auth, "Obtém token de sessão")
+    Rel(supa_client, postgres, "Lê e escreve dados")
+    Rel(contexts, hooks, "Distribui estado da empresa")
+    Rel(components_ui, contexts, "Consome estado global")
+```
+
+---
+
+## Componentes — Backend (NestJS)
+
+```mermaid
+C4Component
+
+    title MetricsFlow AI - Componentes do Backend
+
+    Container_Boundary(backend, "Backend — NestJS") {
+
+        Component(app_module, "AppModule", "NestJS Module app.module.ts", "Módulo raiz da aplicação. Registra e conecta todos os módulos.")
+
+        Component(health, "HealthModule", "NestJS Module GET /api/health", "Verifica disponibilidade da API")
+        Component(auth_mod, "AuthModule", "NestJS Module Guard JWT", "Valida tokens JWT emitidos pelo Supabase Auth e protege rotas")
+        Component(supa_mod, "SupabaseModule", "NestJS Module SDK", "Provê e gerencia a instância do cliente Supabase para uso interno")
+        Component(companies_mod, "CompaniesModule", "NestJS Module GET POST /api/companies", "Criação e listagem de empresas. Listagem de membros via GET /api/companies/:id/members")
+        Component(transactions_mod, "TransactionsModule", "NestJS Module GET POST PATCH DELETE /api/transactions", "CRUD completo de movimentações financeiras com validação de empresa e permissões")
+        Component(categories_mod, "CategoriesModule", "NestJS Module GET /api/categories", "Listagem das categorias vinculadas à empresa do usuário autenticado")
+        Component(ai_mod, "AIModule", "NestJS Module AI API", "Envia mensagens para a AI API e retorna JSON estruturado com intent, tipo, valor e confiança")
+        Component(wa_mod, "WhatsAppModule", "NestJS Module GET POST /api/whatsapp", "Estrutura de Webhook e rotas preparadas. Integração com WhatsApp não implementada.")
+    }
+
+    System_Ext(supa_auth_ext, "Supabase Auth", "Validação de JWT")
+    System_Ext(db_ext, "PostgreSQL", "Banco de dados com RLS")
+    System_Ext(ai_ext, "AI API", "Interpretação de linguagem natural")
+    System_Ext(whatsapp_ext, "WhatsApp / Meta Cloud API", "Integração futura — não implementada")
+
+    Rel(app_module, health, "Registra")
+    Rel(app_module, auth_mod, "Registra")
+    Rel(app_module, supa_mod, "Registra")
+    Rel(app_module, companies_mod, "Registra")
+    Rel(app_module, transactions_mod, "Registra")
+    Rel(app_module, categories_mod, "Registra")
+    Rel(app_module, ai_mod, "Registra")
+    Rel(app_module, wa_mod, "Registra")
+
+    Rel(auth_mod, supa_auth_ext, "Valida token JWT")
+    Rel(supa_mod, db_ext, "Acesso via SDK")
+    Rel(companies_mod, db_ext, "Lê e escreve companies e company_members")
+    Rel(transactions_mod, db_ext, "Lê e escreve transactions")
+    Rel(categories_mod, db_ext, "Lê categories")
+    Rel(ai_mod, ai_ext, "Envia mensagem, recebe JSON estruturado")
+    Rel(wa_mod, whatsapp_ext, "Receberá webhook — integração futura")
 ```
 
 ---
@@ -1236,53 +1366,6 @@ Entre eles:
 - Modais;
 - Tabelas;
 - Gráficos.
-
----
-
-# 🧱 Stack
-
-## Frontend
-
-- **Next.js**
-- **React**
-- **TypeScript**
-- **Tailwind CSS**
-- **Framer Motion**
-- **Lucide React**
-- **Recharts**
-- **React Day Picker**
-
-## Backend
-
-- **NestJS**
-- **TypeScript**
-- **REST API**
-- **Class Validator**
-- **Supabase**
-- **OpenAI API**
-
-## Banco e infraestrutura
-
-- **Supabase**
-- **PostgreSQL**
-- **Supabase Auth**
-- **Row Level Security**
-- **PostgreSQL Functions**
-- **PostgreSQL Triggers**
-
-## Desenvolvimento
-
-- **Git**
-- **GitHub**
-- **ESLint**
-- **TypeScript**
-- **npm**
-
-## Integrações
-
-- **Google OAuth**
-- **OpenAI API**
-- **Meta WhatsApp Cloud API — integração pendente**
 
 ---
 
@@ -1512,7 +1595,7 @@ http://localhost:3001/api/health
 
 ## WhatsApp
 
-- [ ] Configuração final da integração Meta
+- [x] Configuração final da integração Meta
 - [ ] Webhook em ambiente público
 - [ ] Recebimento real de mensagens
 - [ ] Processamento real de mensagens

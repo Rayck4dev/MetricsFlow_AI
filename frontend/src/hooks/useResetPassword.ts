@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { AuthChangeEvent } from "@supabase/supabase-js";
 
 import { createClient } from "@/lib/supabase/client";
 
@@ -45,13 +46,15 @@ export function useResetPassword() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY" && session) {
-        setHasRecoverySession(true);
-        setError("");
-        setCheckingSession(false);
-      }
-    });
+    } = supabase.auth.onAuthStateChange(
+      (event: AuthChangeEvent, session: AuthChangeEvent) => {
+        if (event === "PASSWORD_RECOVERY" && session) {
+          setHasRecoverySession(true);
+          setError("");
+          setCheckingSession(false);
+        }
+      },
+    );
 
     return () => {
       subscription.unsubscribe();
