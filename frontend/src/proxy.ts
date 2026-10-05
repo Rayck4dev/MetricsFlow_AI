@@ -53,7 +53,7 @@ export async function proxy(request: NextRequest) {
           });
 
           cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
+            response.cookies.set(name, value, options); //path, maxAge, httpOnly, sameSite
           });
         },
       },
@@ -70,6 +70,8 @@ export async function proxy(request: NextRequest) {
 
     loginUrl.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
 
+    //  /dashboard vira /login?next=%2Fdashboard
+    
     return NextResponse.redirect(loginUrl);
   }
 
