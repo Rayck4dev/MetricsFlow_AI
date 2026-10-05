@@ -26,7 +26,7 @@ interface MenuPosition {
   openUp: boolean;
 }
 
-const MENU_MAX_HEIGHT = 220;
+const MENU_MAX_HEIGHT = 160;
 const MENU_GAP = 6;
 const VIEWPORT_PADDING = 12;
 
@@ -69,7 +69,7 @@ export function TransactionSelect({
 
     const availableSpace = shouldOpenUp ? spaceAbove : spaceBelow;
 
-    const menuHeight = Math.min(MENU_MAX_HEIGHT, Math.max(120, availableSpace));
+    const menuHeight = Math.min(MENU_MAX_HEIGHT, Math.max(80, availableSpace));
 
     const top = shouldOpenUp
       ? rect.top - MENU_GAP - menuHeight
@@ -209,7 +209,7 @@ export function TransactionSelect({
           <div
             ref={menuRef}
             role="listbox"
-            className="fixed z-[9999] overflow-hidden rounded-xl border border-surface-border bg-surface-panel/98 p-1.5 shadow-2xl shadow-black/40 backdrop-blur-xl mt-6"
+            className="fixed z-[9999] overflow-hidden rounded-xl border border-surface-border bg-surface-panel/98 p-1.5 shadow-2xl shadow-black/40 backdrop-blur-xl"
             style={{
               top: menuPosition.top,
               left: menuPosition.left,

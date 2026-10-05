@@ -9,6 +9,7 @@ import { useMovimentacoesPage } from "@/hooks/useMovimentacoesPage";
 export default function MovimentacoesPage() {
   const {
     transactions,
+    categories,
     userName,
     companyName,
     loading,
@@ -53,6 +54,7 @@ export default function MovimentacoesPage() {
           <div className="mx-auto w-full max-w-[1400px] min-w-0 px-5 pb-5 pt-20 sm:px-6 sm:pb-6 lg:px-8 lg:py-8">
             <Movimentacoes
               transactions={transactions}
+              categories={categories}
               userName={userName}
               companyName={companyName}
               onAddIncome={handleAddTransaction}

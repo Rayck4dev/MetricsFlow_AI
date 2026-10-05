@@ -18,8 +18,15 @@ import { useMovimentacoes } from "@/hooks/useMovimentacoes";
 
 import type { Movimentacao } from "@/types";
 
+interface CategoryOption {
+  id: string;
+  name: string;
+  type: "income" | "expense";
+}
+
 export interface MovimentacoesProps {
   transactions: Movimentacao[];
+  categories?: CategoryOption[];
 
   userName?: string;
   companyName?: string;
@@ -42,6 +49,7 @@ export interface MovimentacoesProps {
 
 export function Movimentacoes({
   transactions,
+  categories: externalCategories = [],
   userName,
   companyName,
   onAddIncome,
@@ -96,6 +104,14 @@ export function Movimentacoes({
     onUpdateTransaction,
     onDeleteTransaction,
   });
+
+  const incomeCategories = externalCategories
+    .filter((c) => c.type === "income")
+    .map((c) => c.name);
+
+  const expenseCategories = externalCategories
+    .filter((c) => c.type === "expense")
+    .map((c) => c.name);
 
   function handleExport() {
     onExport?.(filteredTransactions);
@@ -198,7 +214,7 @@ export function Movimentacoes({
           <ReceitaModal
             onClose={closeIncomeModal}
             onSubmit={handleIncome}
-            categories={categories}
+            categories={incomeCategories}
           />
         )}
 
@@ -206,7 +222,7 @@ export function Movimentacoes({
           <DespesaModal
             onClose={closeExpenseModal}
             onSubmit={handleExpense}
-            categories={categories}
+            categories={expenseCategories}
           />
         )}
 
@@ -215,7 +231,10 @@ export function Movimentacoes({
             transaction={editingTransaction}
             onClose={closeEdit}
             onSubmit={handleEdit}
-            categories={categories}
+            categories={[
+              ...incomeCategories,
+              ...expenseCategories,
+            ]}
           />
         )}
 
