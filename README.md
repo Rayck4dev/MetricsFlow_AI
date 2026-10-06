@@ -68,8 +68,8 @@ Frontend e backend permanecem no mesmo repositório Git, mas são aplicações s
 
 ## 📚 Documentação
 
-- [Documentação técnica](./docs/README.md)
 - [Visão do produto](./docs/projeto/visao-do-produto.md)
+- [Funcionalidades](./docs/produto/funcionalidades.md)
 - [Organização e plano de carreira](./docs/projeto/organizacao-e-carreira.md)
 - [Documentação acadêmica](./docs/projeto/documentacao-academica.md)
 - [Arquitetura](./docs/arquitetura/arquitetura.md)
