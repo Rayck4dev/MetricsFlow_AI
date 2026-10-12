@@ -1,18 +1,25 @@
 import { Controller, Get, Query, Request, UseGuards } from '@nestjs/common';
 
 import { AuthGuard } from '../auth/auth.guard';
-import { CategoryFiltersDto } from './dto/category-filters.dto';
+
 import { CategoriesService } from './categories.service';
+import { CategoryFiltersDto } from './dto/category-filters.dto';
+
+interface AuthenticatedRequest {
+  user: {
+    id: string;
+  };
+}
 
 @Controller('categories')
+@UseGuards(AuthGuard)
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
-  @UseGuards(AuthGuard)
   @Get()
-  async findByCompany(
+  findByCompany(
     @Query() filters: CategoryFiltersDto,
-    @Request() request: any,
+    @Request() request: AuthenticatedRequest,
   ) {
     return this.categoriesService.findByCompany(filters, request.user.id);
   }

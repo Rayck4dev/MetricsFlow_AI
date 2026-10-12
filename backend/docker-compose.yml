@@ -1,0 +1,17 @@
+services:
+  api:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: metricsflow-api
+    restart: unless-stopped
+
+    env_file:
+      - ../backend/.env
+
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+
+    ports:
+      - 3001:3001

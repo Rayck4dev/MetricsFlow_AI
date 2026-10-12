@@ -120,7 +120,7 @@ export default function Home() {
                 Você conversa.
                 <br />
                 <span className="bg-gradient-to-r from-white via-white to-brand-400 bg-clip-text text-transparent">
-                  O MetricsFlow organiza.
+                  A MetricsFlow organiza.
                 </span>
               </motion.h1>
 

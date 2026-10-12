@@ -53,20 +53,27 @@ A IA não deve:
 
 # 📱 WhatsApp
 
-A integração com WhatsApp é a principal funcionalidade ainda pendente da V2.
+A aplicação inclui uma demonstração interativa da experiência de conversa em
+`/whatsapp/demo`. Ela processa mensagens de texto pelo backend, permite gravar
+áudio no navegador e usa o serviço de transcrição da OpenAI antes de interpretar
+a mensagem.
 
-A arquitetura do backend já possui a estrutura necessária para receber e processar mensagens, porém a integração completa com a plataforma do WhatsApp ainda não está concluída.
+> **A demonstração não é uma conexão com o WhatsApp nem com a Meta Cloud API.**
+> As mensagens são salvas na conta autenticada e a confirmação registra a
+> movimentação na empresa ativa. Áudios enviados são encaminhados à OpenAI
+> para transcrição. Use dados fictícios ao apresentar a demonstração.
 
-O fluxo planejado é:
+Mensagens de texto podem usar o parser local quando `OPENAI_API_KEY` não está
+configurada. O envio e a transcrição de áudio requerem essa chave no backend.
+
+A integração de produção com a Meta é uma etapa separada e permanece pendente.
+Ela envolve webhook público, verificação da conexão e entrega de mensagens
+reais, não cobertas pela demonstração.
+
+### Fluxo da demonstração
 
 ```text
-                 WHATSAPP
-                     │
-                     ▼
-              Meta Cloud API
-                     │
-                     ▼
-                  Webhook
+          Interface demonstrativa
                      │
                      ▼
              NestJS Backend
@@ -84,7 +91,7 @@ O fluxo planejado é:
               ┌──────┴──────┐
               ▼             ▼
             Texto          Áudio
-              │             │
+              │          OpenAI
               │       Transcrição
               │             │
               └──────┬──────┘

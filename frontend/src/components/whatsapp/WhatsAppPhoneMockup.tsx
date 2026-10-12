@@ -17,159 +17,51 @@ export function WhatsAppPhoneMockup({
 
   return (
     <div
-      className={`relative flex h-[395px] w-[340px] items-start justify-center ${className}`}
+      className={`relative flex h-[370px] w-[285px] items-center justify-center sm:h-[405px] sm:w-[310px] ${className}`}
     >
-      <div
-        className="
-    pointer-events-none
-    absolute
-    left-1/2
-    top-1/2
-    h-[88%]
-    w-[82%]
-    -translate-x-1/2
-    -translate-y-1/2
-    rounded-[45%]
-    bg-emerald-400/[0.11]
-    blur-[85px]
-  "
-      />
-
       <motion.div
-        initial={{
-          y: 22,
-          rotate: 7,
-          opacity: 0,
-        }}
-        animate={{
-          y: [0, -6, 0],
-          rotate: [7, 6.3, 7],
-          opacity: 1,
-        }}
+        initial={{ opacity: 0, y: 18, rotate: 3 }}
+        animate={{ opacity: 1, y: [0, -5, 0], rotate: 3 }}
         transition={{
-          y: {
-            duration: 6,
-            repeat: Infinity,
-            ease: "easeInOut",
-          },
-          rotate: {
-            duration: 6,
-            repeat: Infinity,
-            ease: "easeInOut",
-          },
-          opacity: {
-            duration: 0.7,
-            ease: "easeOut",
-          },
+          opacity: { duration: 0.6 },
+          y: { duration: 5, repeat: Infinity, ease: "easeInOut" },
+          rotate: { duration: 0.6 },
         }}
         className="relative z-10"
       >
-        <div className="relative w-[235px]">
-          <div className="pointer-events-none absolute -inset-2 rounded-[44px] bg-gradient-to-br from-emerald-400/20 via-cyan-400/10 to-transparent blur-xl" />
+        <div className="pointer-events-none absolute -inset-3 rounded-[46px] bg-gradient-to-br from-emerald-400/20 via-cyan-400/[0.08] to-transparent blur-xl" />
 
-          <div className="relative rounded-[43px] border-[5px] border-[#334155] bg-[#020617] p-[5px] shadow-[0_35px_90px_-25px_rgba(0,0,0,.95)]">
-            <div className="absolute -left-[8px] top-[86px] h-7 w-[3px] rounded-l-sm bg-slate-600" />
+        <div className="relative w-[222px] rounded-[39px] border-[5px] border-[#344454] bg-[#020811] p-[5px] shadow-[0_35px_90px_-25px_rgba(0,0,0,0.9)] sm:w-[235px]">
+          <div className="absolute -left-[8px] top-20 h-7 w-[3px] rounded-l bg-slate-600" />
+          <div className="absolute -left-[8px] top-32 h-10 w-[3px] rounded-l bg-slate-600" />
+          <div className="absolute -right-[8px] top-28 h-12 w-[3px] rounded-r bg-slate-600" />
 
-            <div className="absolute -left-[8px] top-[122px] h-10 w-[3px] rounded-l-sm bg-slate-600" />
-
-            <div className="absolute -left-[8px] top-[172px] h-9 w-[3px] rounded-l-sm bg-slate-600" />
-
-            <div className="absolute -right-[8px] top-[125px] h-14 w-[3px] rounded-r-sm bg-slate-600" />
-
-            <div className="relative overflow-hidden rounded-[37px] bg-[#071923]">
-              <div className="aspect-[0.515]">
-                <WhatsAppConversation messages={messages} isTyping={isTyping} />
-              </div>
-
-              <div className="pointer-events-none absolute left-0 right-0 top-0 z-[90] flex items-center justify-between px-5 pt-[7px] text-[7px] font-semibold text-white">
-                <span>10:25</span>
-
-                <div className="flex items-center gap-1.5">
-                  <Wifi size={7} />
-
-                  <span className="text-[6px]">5G</span>
-
-                  <BatteryMedium size={10} />
-                </div>
-              </div>
-
-              <div
-                className="
-                  pointer-events-none
-                  absolute
-                  left-1/2
-                  top-[6px]
-                  z-[100]
-                  h-[17px]
-                  w-[78px]
-                  -translate-x-1/2
-                  rounded-full
-                  bg-black
-                "
-              >
-                <span className="absolute right-2.5 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-[#081119] ring-1 ring-white/5" />
-              </div>
-
-              <div
-                className="
-                  pointer-events-none
-                  absolute
-                  inset-0
-                  z-[70]
-                  rounded-[37px]
-                  bg-gradient-to-br
-                  from-white/[0.055]
-                  via-transparent
-                  to-transparent
-                "
-              />
-
-              <div
-                className="
-                  pointer-events-none
-                  absolute
-                  -right-[10%]
-                  top-0
-                  z-[71]
-                  h-full
-                  w-[25%]
-                  -rotate-[10deg]
-                  bg-white/[0.018]
-                  blur-md
-                "
-              />
-
-              <div
-                className="
-                  pointer-events-none
-                  absolute
-                  bottom-[6px]
-                  left-1/2
-                  z-[110]
-                  h-[3px]
-                  w-[62px]
-                  -translate-x-1/2
-                  rounded-full
-                  bg-white/45
-                "
-              />
+          <div className="relative overflow-hidden rounded-[31px] bg-[#071923]">
+            <div className="aspect-[0.515]">
+              <WhatsAppConversation messages={messages} isTyping={isTyping} />
             </div>
+
+            <div className="pointer-events-none absolute left-0 right-0 top-0 z-30 flex items-center justify-between px-5 pt-[7px] text-[7px] font-semibold text-white">
+              <span>10:25</span>
+              <div className="flex items-center gap-1.5">
+                <Wifi size={8} />
+                <span className="text-[6px]">5G</span>
+                <BatteryMedium size={10} />
+              </div>
+            </div>
+
+            <div className="pointer-events-none absolute left-1/2 top-[5px] z-40 h-[17px] w-[76px] -translate-x-1/2 rounded-full bg-black">
+              <span className="absolute right-2.5 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-[#081119] ring-1 ring-white/5" />
+            </div>
+
+            <div className="pointer-events-none absolute inset-0 z-20 rounded-[31px] bg-gradient-to-br from-white/[0.05] via-transparent to-transparent" />
+
+            <div className="pointer-events-none absolute bottom-[6px] left-1/2 z-40 h-[3px] w-[62px] -translate-x-1/2 rounded-full bg-white/45" />
           </div>
         </div>
       </motion.div>
 
-      <motion.div
-        animate={{
-          opacity: [0.18, 0.35, 0.18],
-          scale: [0.92, 1, 0.92],
-        }}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="pointer-events-none absolute bottom-5 left-1/2 h-12 w-36 -translate-x-1/2 rounded-full bg-emerald-400/10 blur-3xl"
-      />
+      <div className="pointer-events-none absolute bottom-3 left-1/2 h-10 w-36 -translate-x-1/2 rounded-full bg-emerald-400/10 blur-3xl" />
     </div>
   );
 }

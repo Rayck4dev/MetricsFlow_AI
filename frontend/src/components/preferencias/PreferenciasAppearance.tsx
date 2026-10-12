@@ -38,7 +38,7 @@ export function PreferenciasAppearance({
             </h2>
 
             <p className="mt-0.5 text-[9px] text-slate-600">
-              Interface atual do MetricsFlow.
+              Interface atual da MetricsFlow AI.
             </p>
           </div>
         </div>
@@ -90,7 +90,7 @@ export function PreferenciasAppearance({
         </motion.button>
 
         <p className="mt-3 text-[9px] leading-relaxed text-slate-600">
-          O MetricsFlow utiliza atualmente o modo escuro como tema padrão.
+          A MetricsFlow AI utiliza atualmente o modo escuro como tema padrão.
         </p>
       </div>
     </motion.section>

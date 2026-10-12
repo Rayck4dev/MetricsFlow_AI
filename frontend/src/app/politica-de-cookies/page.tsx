@@ -52,7 +52,7 @@ export default function PoliticaDeCookiesPage() {
 
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-400">
               Esta Política explica como cookies e tecnologias semelhantes podem
-              ser utilizados pelo MetricsFlow AI.
+              ser utilizados pela MetricsFlow AI.
             </p>
 
             <p className="mt-2 text-xs text-slate-500">
@@ -64,7 +64,7 @@ export default function PoliticaDeCookiesPage() {
             <Cookie size={18} className="mt-0.5 shrink-0 text-brand-400" />
 
             <p className="text-xs leading-relaxed text-slate-300">
-              O MetricsFlow AI utiliza tecnologias de armazenamento e
+              A MetricsFlow AI utiliza tecnologias de armazenamento e
               autenticação necessárias ao funcionamento da aplicação. Esta
               Política descreve o papel dos cookies e diferencia seu uso de
               outros mecanismos de armazenamento do navegador.
@@ -158,7 +158,7 @@ export default function PoliticaDeCookiesPage() {
               icon={<EyeOff size={17} />}
             >
               <p>
-                O MetricsFlow AI não declara, nesta Política, a utilização de
+                A MetricsFlow AI não declara, nesta Política, a utilização de
                 cookies de publicidade ou rastreamento para fins de marketing
                 sem que esses mecanismos estejam efetivamente implementados.
               </p>

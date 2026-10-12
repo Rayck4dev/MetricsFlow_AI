@@ -1,6 +1,6 @@
 # 📂 Estrutura geral do projeto
 
-O MetricsFlow AI utiliza uma organização em **monorepo**, mantendo frontend, backend e documentação no mesmo repositório Git.
+A MetricsFlow AI utiliza uma organização em **monorepo**, mantendo frontend, backend e documentação no mesmo repositório Git.
 
 Apesar de estarem no mesmo repositório, frontend e backend são aplicações separadas, com responsabilidades distintas.
 
@@ -424,7 +424,7 @@ Essa separação reduz o acoplamento e facilita a manutenção e evolução do s
 
 ### 📦 Monorepo
 
-O MetricsFlow utiliza uma estrutura de monorepo.
+A MetricsFlow utiliza uma estrutura de monorepo.
 
 Isso significa que frontend, backend e documentação são mantidos dentro de um único repositório Git:
 

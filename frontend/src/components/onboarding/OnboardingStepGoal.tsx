@@ -132,7 +132,7 @@ export default function OnboardingStepGoal({
         <Lightbulb size={14} className="mt-0.5 shrink-0 text-amber-400" />
 
         <p className="text-[11px] leading-relaxed text-amber-200/80">
-          Seu objetivo ajuda o MetricsFlow a destacar as informações mais
+          Seu objetivo ajuda a MetricsFlow AI a destacar as informações mais
           importantes para sua rotina.
         </p>
       </motion.div>

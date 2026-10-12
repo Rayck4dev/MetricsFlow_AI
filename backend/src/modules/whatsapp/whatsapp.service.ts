@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   UnauthorizedException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 
 import { createHmac, timingSafeEqual } from 'node:crypto';
@@ -9,14 +10,21 @@ import type { Request } from 'express';
 import type { User } from '@supabase/supabase-js';
 
 import { ParserService } from '../ai/parser.service';
+import { TranscriptionService } from '../ai/transcription.service';
 import { CategoriesService } from '../categories/categories.service';
 import { CompaniesService } from '../companies/companies.service';
 import { SupabaseService } from '../supabase.service';
 
 import type { ConfirmWhatsappDto } from './dto/confirm-whatsapp.dto';
 import type { ConnectWhatsappDto } from './dto/connect-whatsapp.dto';
+import { MessageGuardService } from './message-guard.service';
 import { MetaService } from './meta.service';
 import { ProcessMessageService } from './process-message.service';
+import {
+  formatConfirmation,
+  missingQuestion,
+  normalizeParsedMessage,
+} from './services/financial-message.utils';
 
 @Injectable()
 export class WhatsappService {
@@ -25,114 +33,582 @@ export class WhatsappService {
     private readonly categoriesService: CategoriesService,
     private readonly supabaseService: SupabaseService,
     private readonly parserService: ParserService,
+    private readonly transcriptionService: TranscriptionService,
+    private readonly messageGuardService: MessageGuardService,
     private readonly metaService: MetaService,
     private readonly processMessageService: ProcessMessageService,
   ) {}
 
-  async processDemoMessage(text: string, user: User) {
-    const companies = await this.companiesService.findByUser(user.id);
+  /**
+   * Registra mensagens de demonstração na tabela whatsapp_messages.
+   */
+  private async recordDemoMessage(params: {
+    companyId: string;
+    userId: string;
+    direction: 'inbound' | 'outbound';
+    messageType: string;
+    text?: string | null;
+    transcription?: string | null;
+    pendingTransactionId?: string | null;
+    transactionId?: string | null;
+  }) {
+    const supabase = this.supabaseService.getClient();
+    const providerMessageId = `demo-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
-    if (!companies.length) {
-      throw new BadRequestException(
-        'Usuário não está vinculado a uma empresa.',
+    const { data, error } = await supabase
+      .from('whatsapp_messages')
+      .insert({
+        company_id: params.companyId,
+        user_id: params.userId,
+        provider_message_id: providerMessageId,
+        phone_number: 'demo',
+        direction: params.direction,
+        message_type: params.messageType,
+        message_text: params.text ?? null,
+        transcription: params.transcription ?? null,
+        pending_transaction_id: params.pendingTransactionId ?? null,
+        transaction_id: params.transactionId ?? null,
+        status: 'processed',
+      })
+      .select('id, created_at')
+      .maybeSingle();
+
+    if (error) {
+      throw new InternalServerErrorException(
+        'Não foi possível salvar a mensagem da demonstração.',
       );
     }
 
-    const company = companies[0];
+    return data;
+  }
+
+  /**
+   * Recupera o histórico de mensagens da demonstração ou retorna a mensagem de boas-vindas padrão.
+   */
+  async getDemoMessages(user: User) {
+    const company = await this.getUserCompany(user.id);
+    const supabase = this.supabaseService.getClient();
+
+    const welcomeText =
+      'Oi! 👋 Sou o assistente financeiro da MetricsFlow AI. Posso ajudar a registrar receitas e despesas do seu negócio. Por exemplo: "Recebi R$ 350 por uma venda via Pix". Vamos registrar sua próxima movimentação?';
+
+    const { data: history, error: historyError } = await supabase
+      .from('whatsapp_messages')
+      .select(
+        'id, direction, message_type, message_text, transcription, status, pending_transaction_id, transaction_id, created_at',
+      )
+      .eq('user_id', user.id)
+      .eq('company_id', company.id)
+      .eq('phone_number', 'demo')
+      .order('created_at', { ascending: false })
+      .limit(100);
+
+    if (historyError) {
+      throw new InternalServerErrorException(
+        'Não foi possível carregar o histórico da demonstração.',
+      );
+    }
+
+    const { data: pending, error: pendingError } = await supabase
+      .from('pending_transactions')
+      .select(
+        'id,type,amount,description,category_id,category_name,payment_method,transaction_date,raw_message,missing_fields,status,expires_at',
+      )
+      .eq('user_id', user.id)
+      .eq('company_id', company.id)
+      .in('status', ['awaiting_information', 'awaiting_confirmation'])
+      .gt('expires_at', new Date().toISOString())
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (pendingError) {
+      throw new InternalServerErrorException(
+        'Não foi possível carregar a proposta pendente da demonstração.',
+      );
+    }
+
+    const formattedMessages = [...(history ?? [])].reverse().map((m, index) => {
+      const date = new Date(m.created_at);
+      const time = !Number.isNaN(date.getTime())
+        ? date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+        : '12:00';
+
+      return {
+        id: index + 1,
+        mine: m.direction === 'inbound',
+        messageType: m.message_type,
+        text: m.message_text ?? m.transcription ?? '',
+        transcription: m.transcription ?? null,
+        time,
+        status: 'read' as const,
+        pendingTransactionId: m.pending_transaction_id,
+        transactionId: m.transaction_id,
+        createdAt: m.created_at,
+      };
+    });
+
+    if (formattedMessages.length === 0) {
+      return {
+        welcomeMessage: welcomeText,
+        messages: [
+          {
+            id: 1,
+            mine: false,
+            messageType: 'text',
+            text: welcomeText,
+            time: new Date().toLocaleTimeString('pt-BR', {
+              hour: '2-digit',
+              minute: '2-digit',
+            }),
+            status: 'read' as const,
+            createdAt: new Date().toISOString(),
+          },
+        ],
+        pending: pending ?? null,
+        company: { id: company.id, name: company.name },
+      };
+    }
+
+    return {
+      welcomeMessage: welcomeText,
+      messages: formattedMessages,
+      pending: pending ?? null,
+      company: { id: company.id, name: company.name },
+    };
+  }
+
+  /**
+   * Processa áudio enviado pela demonstração do WhatsApp.
+   */
+  async processDemoAudio(
+    file: { buffer?: Buffer; mimetype?: string; originalname?: string },
+    user: User,
+  ) {
+    if (!file?.buffer || file.buffer.length === 0) {
+      throw new BadRequestException('Nenhum arquivo de áudio foi recebido.');
+    }
+
+    const rawArrayBuffer = file.buffer.buffer.slice(
+      file.buffer.byteOffset,
+      file.buffer.byteOffset + file.buffer.byteLength,
+    ) as ArrayBuffer;
+
+    const transcription = await this.transcriptionService.transcribeAudio(
+      rawArrayBuffer,
+      file.mimetype || 'audio/webm',
+      file.originalname || 'whatsapp-demo.webm',
+    );
+
+    const normalizedText = transcription.trim();
+    if (!normalizedText) {
+      throw new BadRequestException(
+        'Não consegui entender o áudio. Tente falar mais perto do microfone ou envie por texto.',
+      );
+    }
+
+    const result = await this.processDemoMessage(normalizedText, user, {
+      isAudio: true,
+      transcription: normalizedText,
+    });
+
+    return {
+      ...result,
+      transcription: normalizedText,
+    };
+  }
+
+  /**
+   * Processa mensagens enviadas pela demonstração do WhatsApp Web.
+   * Não depende da API oficial da Meta.
+   */
+  async processDemoMessage(
+    text: string,
+    user: User,
+    options?: { isAudio?: boolean; transcription?: string },
+  ) {
+    const normalizedText = text?.trim();
+
+    if (!normalizedText) {
+      throw new BadRequestException('Digite uma mensagem para continuar.');
+    }
+
+    if (normalizedText.length > 4000) {
+      throw new BadRequestException(
+        'A mensagem ultrapassa o limite permitido.',
+      );
+    }
+
+    const company = await this.getUserCompany(user.id);
+    const supabase = this.supabaseService.getClient();
+
+    // 1. Procura uma proposta ativa deste usuário e desta empresa
+    const { data: pendingLatest, error: pendingError } = await supabase
+      .from('pending_transactions')
+      .select(
+        'id,type,amount,description,category_id,category_name,payment_method,transaction_date,raw_message,missing_fields,status,expires_at',
+      )
+      .eq('user_id', user.id)
+      .eq('company_id', company.id)
+      .in('status', ['awaiting_information', 'awaiting_confirmation'])
+      .gt('expires_at', new Date().toISOString())
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (pendingError) {
+      throw new InternalServerErrorException(
+        'Não foi possível consultar as propostas pendentes.',
+      );
+    }
+
+    const pending = pendingLatest;
+
+    // 2. Registrar mensagem recebida do usuário
+    await this.recordDemoMessage({
+      companyId: company.id,
+      userId: user.id,
+      direction: 'inbound',
+      messageType: options?.isAudio ? 'audio' : 'text',
+      text: normalizedText,
+      transcription: options?.transcription ?? null,
+      pendingTransactionId: pending?.id ?? null,
+    });
+
+    // 3. Checar intenções de comando rápido sobre proposta existente
+    const isConfirmation =
+      /^(confirmar|confirmo|sim|ok|pode confirmar|pode registrar|confirmado)[.! ]*$/i.test(
+        normalizedText,
+      );
+    const isCancellation =
+      /^(cancelar|cancela|cancele|não|nao|desistir|deixa pra lá|deixa para lá)[.! ]*$/i.test(
+        normalizedText,
+      );
+    const isCorrection =
+      /^(corrigir|corrige|editar|alterar|quero corrigir|quero alterar)[.! ]*$/i.test(
+        normalizedText,
+      );
+
+    if (isConfirmation && pending && pending.status === 'awaiting_confirmation') {
+      const confirmResult = await this.confirmTransaction(
+        { pendingTransactionId: pending.id },
+        user,
+      );
+
+      const replyText =
+        '✅ Movimentação registrada com sucesso na MetricsFlow AI!';
+
+      await this.recordDemoMessage({
+        companyId: company.id,
+        userId: user.id,
+        direction: 'outbound',
+        messageType: 'text',
+        text: replyText,
+        transactionId: confirmResult.transactionId,
+        pendingTransactionId: pending.id,
+      });
+
+      return {
+        ok: true,
+        confirmed: true,
+        transactionId: confirmResult.transactionId,
+        message: replyText,
+        reply: replyText,
+      };
+    }
+
+    if (isCancellation && pending) {
+      const { data: cancelled, error: cancelError } = await supabase
+        .from('pending_transactions')
+        .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+        .eq('id', pending.id)
+        .eq('user_id', user.id)
+        .eq('company_id', company.id)
+        .in('status', ['awaiting_information', 'awaiting_confirmation'])
+        .select('id')
+        .maybeSingle();
+
+      if (cancelError) {
+        throw new InternalServerErrorException(
+          'Não foi possível cancelar a proposta da demonstração.',
+        );
+      }
+
+      if (!cancelled) {
+        throw new BadRequestException(
+          'A proposta da demonstração não está mais disponível.',
+        );
+      }
+
+      const replyText =
+        '❌ Tudo certo, a proposta foi cancelada. Nenhuma movimentação foi registrada. Se quiser, envie outra receita ou despesa.';
+
+      await this.recordDemoMessage({
+        companyId: company.id,
+        userId: user.id,
+        direction: 'outbound',
+        messageType: 'text',
+        text: replyText,
+        pendingTransactionId: pending.id,
+      });
+
+      return {
+        ok: true,
+        cancelled: true,
+        message: replyText,
+        reply: replyText,
+      };
+    }
+
+    if (isCorrection && pending) {
+      const { data: cancelled, error: cancelError } = await supabase
+        .from('pending_transactions')
+        .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+        .eq('id', pending.id)
+        .eq('user_id', user.id)
+        .eq('company_id', company.id)
+        .in('status', ['awaiting_information', 'awaiting_confirmation'])
+        .select('id')
+        .maybeSingle();
+
+      if (cancelError) {
+        throw new InternalServerErrorException(
+          'Não foi possível descartar a proposta da demonstração.',
+        );
+      }
+
+      if (!cancelled) {
+        throw new BadRequestException(
+          'A proposta da demonstração não está mais disponível.',
+        );
+      }
+
+      const replyText =
+        '✏️ Certo! A proposta anterior foi descartada. Envie novamente a movimentação com os dados corrigidos. Nada foi registrado ainda.';
+
+      await this.recordDemoMessage({
+        companyId: company.id,
+        userId: user.id,
+        direction: 'outbound',
+        messageType: 'text',
+        text: replyText,
+      });
+
+      return {
+        ok: true,
+        corrected: true,
+        message: replyText,
+        reply: replyText,
+      };
+    }
+
+    // 4. Guard de segurança
+    const guard = this.messageGuardService.check(
+      normalizedText,
+      Boolean(pending && pending.status === 'awaiting_information'),
+    );
+
+    if (!guard.allowed) {
+      await this.recordDemoMessage({
+        companyId: company.id,
+        userId: user.id,
+        direction: 'outbound',
+        messageType: 'text',
+        text: guard.response,
+        pendingTransactionId: pending?.id ?? null,
+      });
+
+      return {
+        ok: false,
+        reason: guard.reason,
+        message: guard.response,
+        reply: guard.response,
+      };
+    }
 
     const categories = await this.categoriesService.findByCompany(
-      {
-        company_id: company.id,
-      },
+      { company_id: company.id },
       user.id,
     );
 
+    const isCompletingInfo =
+      pending && pending.status === 'awaiting_information';
+    const combinedText = isCompletingInfo
+      ? `${pending.raw_message}\nInformação complementar: ${normalizedText}`
+      : normalizedText;
+
     const parsed = await this.parserService.parseWhatsAppMessage(
-      text,
+      combinedText,
       categories,
     );
 
+    if (!parsed || parsed.intent !== 'create_transaction') {
+      const replyText =
+        'Não consegui identificar uma movimentação financeira válida. Informe uma receita ou despesa, por exemplo: "Gastei R$ 150 com materiais via Pix".';
+
+      await this.recordDemoMessage({
+        companyId: company.id,
+        userId: user.id,
+        direction: 'outbound',
+        messageType: 'text',
+        text: replyText,
+        pendingTransactionId: pending?.id ?? null,
+      });
+
+      return {
+        ok: false,
+        message: replyText,
+        reply: replyText,
+      };
+    }
+
+    normalizeParsedMessage(parsed, combinedText, categories);
+
+    const missingFields = Array.isArray(parsed.missingFields)
+      ? parsed.missingFields
+      : [];
+
+    const status =
+      missingFields.length > 0
+        ? 'awaiting_information'
+        : 'awaiting_confirmation';
+
+    const proposalData = {
+      type: parsed.type,
+      amount: parsed.amount,
+      description: parsed.description,
+      category_id: parsed.categoryId,
+      category_name: parsed.categoryName,
+      payment_method: parsed.paymentMethod,
+      transaction_date: parsed.transactionDate,
+      raw_message: combinedText,
+      missing_fields: missingFields,
+      status,
+      updated_at: new Date().toISOString(),
+    };
+
+    let savedPending: {
+      id: string;
+      status: string;
+      expires_at: string;
+    } | null = null;
+
+    if (isCompletingInfo) {
+      const { data, error } = await supabase
+        .from('pending_transactions')
+        .update(proposalData)
+        .eq('id', pending.id)
+        .eq('user_id', user.id)
+        .eq('company_id', company.id)
+        .select('id,status,expires_at')
+        .maybeSingle();
+
+      if (error) {
+        throw new InternalServerErrorException(
+          'Não foi possível atualizar a proposta de movimentação.',
+        );
+      }
+
+      savedPending = data;
+    } else {
+      const { data, error } = await supabase
+        .from('pending_transactions')
+        .insert({
+          company_id: company.id,
+          user_id: user.id,
+          ...proposalData,
+        })
+        .select('id,status,expires_at')
+        .single();
+
+      if (error) {
+        throw new InternalServerErrorException(
+          'Não foi possível salvar a proposta de movimentação.',
+        );
+      }
+
+      savedPending = data;
+    }
+
+    if (!savedPending) {
+      throw new InternalServerErrorException(
+        'Falha ao persistir a proposta de movimentação.',
+      );
+    }
+
+    const replyText =
+      savedPending.status === 'awaiting_confirmation'
+        ? formatConfirmation(parsed)
+        : missingQuestion(parsed);
+
+    await this.recordDemoMessage({
+      companyId: company.id,
+      userId: user.id,
+      direction: 'outbound',
+      messageType: 'text',
+      text: replyText,
+      pendingTransactionId: savedPending.id,
+    });
+
     return {
       ok: true,
-      message: text,
-      userId: user.id,
+      pendingTransactionId: savedPending.id,
+      status: savedPending.status,
+      expiresAt: savedPending.expires_at,
+      message: replyText,
+      reply: replyText,
+      canConfirm: savedPending.status === 'awaiting_confirmation',
       companyId: company.id,
       companyName: company.name,
       categories,
       parsed,
+      missingFields,
     };
   }
 
+  /**
+   * Confirma exclusivamente uma proposta salva no Supabase.
+   * Os valores financeiros não são recebidos do frontend.
+   */
   async confirmTransaction(body: ConfirmWhatsappDto, user: User) {
-    const parsed = body.parsed;
+    const pendingId = body?.pendingTransactionId || body?.pending_transaction_id;
 
-    if (!parsed || parsed.intent !== 'create_transaction') {
-      throw new BadRequestException('Movimentação inválida.');
+    if (!pendingId) {
+      throw new BadRequestException('Informe o identificador da proposta.');
     }
 
-    if (parsed.missingFields.length > 0) {
-      throw new BadRequestException('Ainda existem informações pendentes.');
-    }
-
-    if (
-      !parsed.type ||
-      !parsed.amount ||
-      parsed.amount <= 0 ||
-      !parsed.description ||
-      !parsed.categoryId ||
-      !parsed.paymentMethod ||
-      !parsed.transactionDate
-    ) {
-      throw new BadRequestException('Dados insuficientes para confirmar.');
-    }
-
-    const companies = await this.companiesService.findByUser(user.id);
-
-    if (!companies.length) {
-      throw new BadRequestException('Empresa não encontrada.');
-    }
-
-    const company = companies[0];
-
-    const categories = await this.categoriesService.findByCompany(
-      {
-        company_id: company.id,
-      },
-      user.id,
-    );
-
-    const category = categories.find((item) => item.id === parsed.categoryId);
-
-    if (!category || category.type !== parsed.type) {
-      throw new BadRequestException('Categoria inválida para esta empresa.');
-    }
-
+    const company = await this.getUserCompany(user.id);
     const supabase = this.supabaseService.getClient();
 
-    const { data: transaction, error } = await supabase
-      .from('transactions')
-      .insert({
-        company_id: company.id,
-        category_id: parsed.categoryId,
-        created_by_user_id: user.id,
-        type: parsed.type,
-        amount: parsed.amount,
-        description: parsed.description,
-        payment_method: parsed.paymentMethod,
-        transaction_date: parsed.transactionDate,
-        origin: 'whatsapp',
-        raw_whatsapp_text: body.rawText ?? parsed.description,
-      })
-      .select('id')
-      .single();
+    const { data: transactionId, error } = await supabase.rpc(
+      'confirm_pending_whatsapp_transaction',
+      {
+        p_pending_id: pendingId,
+        p_user_id: user.id,
+        p_company_id: company.id,
+      },
+    );
 
     if (error) {
-      throw new Error(error.message);
+      if (['P0002', 'P0001', '22023'].includes(error.code ?? '')) {
+        throw new BadRequestException(error.message);
+      }
+
+      throw new InternalServerErrorException(
+        'Não foi possível confirmar a movimentação.',
+      );
+    }
+
+    if (!transactionId) {
+      throw new BadRequestException(
+        'A proposta expirou ou já foi confirmada. Gere uma nova proposta.',
+      );
     }
 
     return {
       ok: true,
-      transactionId: transaction.id,
+      transactionId,
+      message: 'Movimentação confirmada com sucesso.',
     };
   }
 
@@ -146,7 +622,9 @@ export class WhatsappService {
       .maybeSingle();
 
     if (error) {
-      throw new Error(error.message);
+      throw new InternalServerErrorException(
+        'Não foi possível consultar a conexão do WhatsApp.',
+      );
     }
 
     return {
@@ -155,24 +633,14 @@ export class WhatsappService {
   }
 
   async connectWhatsApp(body: ConnectWhatsappDto, user: User) {
-    const phoneNumber = body.phoneNumber ?? '';
-
+    const phoneNumber = body.phoneNumber?.trim() ?? '';
     const normalized = this.metaService.normalizePhone(phoneNumber);
 
-    if (normalized.length < 10) {
-      throw new BadRequestException('Informe o número com DDI e DDD.');
+    if (!/^\d{10,15}$/.test(normalized)) {
+      throw new BadRequestException('Informe um número válido com DDI e DDD.');
     }
 
-    const companies = await this.companiesService.findByUser(user.id);
-
-    if (!companies.length) {
-      throw new BadRequestException(
-        'Usuário não está vinculado a uma empresa.',
-      );
-    }
-
-    const company = companies[0];
-
+    const company = await this.getUserCompany(user.id);
     const supabase = this.supabaseService.getClient();
 
     const { data, error } = await supabase
@@ -182,8 +650,8 @@ export class WhatsappService {
           user_id: user.id,
           company_id: company.id,
           phone_number: normalized,
-          status: 'verified',
-          verified_at: new Date().toISOString(),
+          status: 'pending',
+          verified_at: null,
           updated_at: new Date().toISOString(),
         },
         {
@@ -194,45 +662,52 @@ export class WhatsappService {
       .single();
 
     if (error) {
-      throw new Error(error.message);
+      throw new InternalServerErrorException(
+        'Não foi possível registrar o número do WhatsApp.',
+      );
     }
 
     return {
       ok: true,
       connection: data,
+      message:
+        'Número registrado. A verificação ainda precisa ser implementada.',
     };
   }
 
   async verifyWebhook(mode: string, token: string, challenge: string) {
     const verifyToken = process.env.WHATSAPP_VERIFY_TOKEN;
 
-    if (mode === 'subscribe' && token && token === verifyToken && challenge) {
-      return challenge;
+    if (
+      !verifyToken ||
+      mode !== 'subscribe' ||
+      !token ||
+      token !== verifyToken ||
+      !challenge
+    ) {
+      throw new UnauthorizedException('Falha na verificação do webhook.');
     }
 
-    throw new UnauthorizedException('Webhook verification failed');
+    return challenge;
   }
 
-  async receiveWebhook(
-    request: Request & {
-      rawBody?: Buffer;
-    },
-    body: unknown,
-  ) {
+  async receiveWebhook(request: Request & { rawBody?: Buffer }, body: unknown) {
     const rawBody = request.rawBody;
 
     if (!rawBody) {
-      throw new BadRequestException('Raw body não disponível.');
+      throw new BadRequestException(
+        'Raw body não disponível para validar o webhook.',
+      );
     }
 
-    const signature = request.headers['x-hub-signature-256'];
+    const signatureHeader = request.headers['x-hub-signature-256'];
 
-    const signatureValue = Array.isArray(signature) ? signature[0] : signature;
+    const signature = Array.isArray(signatureHeader)
+      ? signatureHeader[0]
+      : signatureHeader;
 
-    const isValid = this.isValidMetaSignature(rawBody, signatureValue ?? null);
-
-    if (!isValid) {
-      throw new UnauthorizedException('Invalid webhook signature');
+    if (!this.isValidMetaSignature(rawBody, signature ?? null)) {
+      throw new UnauthorizedException('Assinatura do webhook inválida.');
     }
 
     const messages = this.metaService.parseMetaWebhook(body);
@@ -248,14 +723,13 @@ export class WhatsappService {
 
     for (const message of messages) {
       try {
-        results.push(
+        const result =
           await this.processMessageService.processIncomingWhatsAppMessage(
             message,
-          ),
-        );
-      } catch (error) {
-        console.error('Erro ao processar mensagem WhatsApp:', error);
+          );
 
+        results.push(result);
+      } catch {
         results.push({
           status: 'failed',
         });
@@ -268,34 +742,43 @@ export class WhatsappService {
     };
   }
 
-  private isValidMetaSignature(rawBody: Buffer, signature: string | null) {
-    console.log({
-      hasAppSecret: Boolean(process.env.WHATSAPP_APP_SECRET),
-      nodeEnv: process.env.NODE_ENV,
-      hasSignature: Boolean(signature),
-    });
+  private async getUserCompany(userId: string) {
+    const companies = await this.companiesService.findByUser(userId);
 
-    const appSecret = process.env.WHATSAPP_APP_SECRET;
-
-    if (!appSecret) {
-      return process.env.NODE_ENV !== 'production';
+    if (!companies.length) {
+      throw new BadRequestException(
+        'Usuário não está vinculado a uma empresa.',
+      );
     }
 
-    if (!signature?.startsWith('sha256=')) {
+    return companies[0];
+  }
+
+  private isValidMetaSignature(
+    rawBody: Buffer,
+    signature: string | null,
+  ): boolean {
+    const appSecret = process.env.WHATSAPP_APP_SECRET;
+
+    if (!appSecret || !signature?.startsWith('sha256=')) {
       return false;
     }
 
-    const expected = `sha256=${createHmac('sha256', appSecret)
+    const receivedHash = signature.slice('sha256='.length);
+
+    if (!/^[a-fA-F0-9]{64}$/.test(receivedHash)) {
+      return false;
+    }
+
+    const expectedHash = createHmac('sha256', appSecret)
       .update(rawBody)
-      .digest('hex')}`;
+      .digest();
 
-    const expectedBuffer = Buffer.from(expected);
-
-    const receivedBuffer = Buffer.from(signature);
+    const receivedHashBuffer = Buffer.from(receivedHash, 'hex');
 
     return (
-      expectedBuffer.length === receivedBuffer.length &&
-      timingSafeEqual(expectedBuffer, receivedBuffer)
+      expectedHash.length === receivedHashBuffer.length &&
+      timingSafeEqual(expectedHash, receivedHashBuffer)
     );
   }
 }

@@ -65,7 +65,7 @@ export default function TermosDeUsoPage() {
             <ShieldCheck size={18} className="mt-0.5 shrink-0 text-brand-400" />
 
             <p className="text-xs leading-relaxed text-slate-300">
-              Ao utilizar o MetricsFlow AI, você declara que leu e compreendeu
+              Ao utilizar a MetricsFlow AI, você declara que leu e compreendeu
               estes Termos de Uso. A utilização da plataforma implica a
               aceitação das condições aqui estabelecidas.
             </p>
@@ -74,11 +74,11 @@ export default function TermosDeUsoPage() {
           <div className="space-y-8">
             <LegalSection
               number="1"
-              title="Sobre o MetricsFlow AI"
+              title="Sobre a MetricsFlow AI"
               icon={<FileText size={17} />}
             >
               <p>
-                O MetricsFlow AI é uma plataforma de organização e
+                A MetricsFlow AI é uma plataforma de organização e
                 acompanhamento financeiro desenvolvida para apoiar
                 microempreendedores na gestão de suas informações financeiras.
               </p>
@@ -96,7 +96,7 @@ export default function TermosDeUsoPage() {
               icon={<UserCheck size={17} />}
             >
               <p>
-                Ao criar uma conta ou utilizar os recursos do MetricsFlow AI, o
+                Ao criar uma conta ou utilizar os recursos da MetricsFlow AI, o
                 usuário concorda com estes Termos de Uso e com a Política de
                 Privacidade aplicável à plataforma.
               </p>
@@ -137,7 +137,7 @@ export default function TermosDeUsoPage() {
               icon={<Building2 size={17} />}
             >
               <p>
-                O MetricsFlow AI permite que usuários sejam vinculados a uma
+                A MetricsFlow AI permite que usuários sejam vinculados a uma
                 empresa, de acordo com os recursos disponibilizados pela
                 plataforma.
               </p>
@@ -166,7 +166,7 @@ export default function TermosDeUsoPage() {
               </p>
 
               <p>
-                O MetricsFlow AI é uma ferramenta de organização e
+                A MetricsFlow AI é uma ferramenta de organização e
                 acompanhamento financeiro. As informações apresentadas pela
                 plataforma não substituem orientação contábil, tributária,
                 jurídica ou financeira profissional.
@@ -184,7 +184,7 @@ export default function TermosDeUsoPage() {
               icon={<AlertTriangle size={17} />}
             >
               <p>
-                O usuário compromete-se a utilizar o MetricsFlow AI de acordo
+                O usuário compromete-se a utilizar a MetricsFlow AI de acordo
                 com a legislação aplicável e com estes Termos.
               </p>
 
@@ -211,7 +211,7 @@ export default function TermosDeUsoPage() {
               icon={<ShieldCheck size={17} />}
             >
               <p>
-                O MetricsFlow AI busca manter seus serviços disponíveis e
+                A MetricsFlow AI busca manter seus serviços disponíveis e
                 funcionais, mas determinados recursos podem ficar
                 temporariamente indisponíveis em razão de manutenção,
                 atualizações, falhas técnicas ou fatores externos.
@@ -230,7 +230,7 @@ export default function TermosDeUsoPage() {
             >
               <p>
                 A identidade visual, código, interfaces, textos, componentes,
-                elementos gráficos e demais elementos próprios do MetricsFlow AI
+                elementos gráficos e demais elementos próprios da MetricsFlow AI
                 são protegidos pela legislação aplicável.
               </p>
 
@@ -248,7 +248,7 @@ export default function TermosDeUsoPage() {
             >
               <p>
                 O usuário poderá solicitar o encerramento de sua conta pelos
-                canais disponibilizados pelo MetricsFlow AI.
+                canais disponibilizados pela MetricsFlow AI.
               </p>
 
               <p>

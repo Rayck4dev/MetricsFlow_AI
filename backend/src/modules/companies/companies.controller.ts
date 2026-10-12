@@ -3,37 +3,47 @@ import {
   Controller,
   Get,
   Param,
+  ParseUUIDPipe,
   Post,
   Request,
   UseGuards,
 } from '@nestjs/common';
 
-import { CompaniesService } from './companies.service';
-import { CreateCompanyDto } from './dto/create-company.dto';
 import { AuthGuard } from '../auth/auth.guard';
 
+import { CompaniesService } from './companies.service';
+import { CreateCompanyDto } from './dto/create-company.dto';
+
+interface AuthenticatedRequest {
+  user: {
+    id: string;
+  };
+}
+
 @Controller('companies')
+@UseGuards(AuthGuard)
 export class CompaniesController {
   constructor(private readonly companiesService: CompaniesService) {}
 
-  @UseGuards(AuthGuard)
   @Get()
-  async findAll(@Request() request: any) {
+  findAll(@Request() request: AuthenticatedRequest) {
     return this.companiesService.findByUser(request.user.id);
   }
 
-  @UseGuards(AuthGuard)
   @Get(':companyId/members')
-  async findMembers(
-    @Param('companyId') companyId: string,
-    @Request() request: any,
+  findMembers(
+    @Param('companyId', new ParseUUIDPipe({ version: '4' }))
+    companyId: string,
+    @Request() request: AuthenticatedRequest,
   ) {
     return this.companiesService.findMembers(companyId, request.user.id);
   }
 
-  @UseGuards(AuthGuard)
   @Post()
-  async create(@Body() dto: CreateCompanyDto, @Request() request: any) {
+  create(
+    @Body() dto: CreateCompanyDto,
+    @Request() request: AuthenticatedRequest,
+  ) {
     return this.companiesService.create(dto, request.user.id);
   }
 }

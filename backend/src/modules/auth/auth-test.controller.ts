@@ -2,16 +2,23 @@ import { Controller, Get, Request, UseGuards } from '@nestjs/common';
 
 import { AuthGuard } from './auth.guard';
 
+interface AuthenticatedRequest {
+  user: {
+    id: string;
+    email?: string;
+  };
+}
+
 @Controller('auth/test')
+@UseGuards(AuthGuard)
 export class AuthTestController {
-  @UseGuards(AuthGuard)
   @Get()
-  test(@Request() request: any) {
+  test(@Request() request: AuthenticatedRequest) {
     return {
       authenticated: true,
       user: {
         id: request.user.id,
-        email: request.user.email,
+        email: request.user.email ?? null,
       },
     };
   }

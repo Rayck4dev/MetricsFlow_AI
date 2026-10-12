@@ -1,601 +1,192 @@
 import { Injectable } from '@nestjs/common';
 
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { MessageContentService } from './services/message-content.service';
+import { MessageIntentResolverService } from './strategies/message-intent-resolver.service';
+import { MessageResponseService } from './services/message-response.service';
+import { PendingTransactionService } from './services/pending-transaction.service';
 
-import { ParserService } from '../ai/parser.service';
-import type { CompanyCategory, ParsedFinancialMessage } from '../ai/types';
-import { TranscriptionService } from '../ai/transcription.service';
-import { SupabaseService } from '../supabase.service';
-
+import { IncomingWhatsAppMessage } from './types';
+import { WhatsappConnectionsRepository } from './repositories/whatsapp-connections.repository';
+import { WhatsappMessagesRepository } from './repositories/whatsapp-messages.repository';
 import { MessageGuardService } from './message-guard.service';
-import { MetaService } from './meta.service';
-import type { IncomingWhatsAppMessage } from './types';
-
-function money(value: number | null) {
-  if (value == null) {
-    return 'Não informado';
-  }
-
-  return value.toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  });
-}
-
-function datePtBr(value: string | null) {
-  if (!value) {
-    return 'Não informada';
-  }
-
-  const [year, month, day] = value.split('-');
-
-  return `${day}/${month}/${year}`;
-}
-
-function getPaymentMethodLabel(
-  paymentMethod: ParsedFinancialMessage['paymentMethod'],
-) {
-  if (!paymentMethod) {
-    return 'Não informado';
-  }
-
-  const labels = {
-    pix: 'Pix',
-    credit_card: 'Cartão de Crédito',
-    debit_card: 'Cartão de Débito',
-    bank_slip: 'Boleto',
-    cash: 'Dinheiro',
-    transfer: 'Transferência',
-    other: 'Outro',
-  } satisfies Record<
-    NonNullable<ParsedFinancialMessage['paymentMethod']>,
-    string
-  >;
-
-  return labels[paymentMethod];
-}
-
-function normalizeMissingField(field: string) {
-  switch (field) {
-    case 'payment_method':
-      return 'paymentMethod';
-
-    case 'transaction_date':
-      return 'transactionDate';
-
-    case 'categoryId':
-      return 'category';
-
-    default:
-      return field;
-  }
-}
-
-function normalizeParsedMessage(
-  parsed: ParsedFinancialMessage,
-  messageText: string,
-  categories: CompanyCategory[],
-) {
-  parsed.missingFields = Array.from(
-    new Set(parsed.missingFields.map(normalizeMissingField)),
-  );
-
-  if (!parsed.transactionDate) {
-    parsed.transactionDate = new Date().toISOString().slice(0, 10);
-
-    parsed.missingFields = parsed.missingFields.filter(
-      (field) => field !== 'transactionDate',
-    );
-  }
-
-  if (parsed.type && !parsed.categoryId) {
-    const normalizedCategories = categories.filter(
-      (category) => category.type === parsed.type,
-    );
-
-    const fallbackCategory =
-      normalizedCategories.find((category) => /outr/i.test(category.name)) ??
-      normalizedCategories.find((category) => category.name.length > 0) ??
-      null;
-
-    if (fallbackCategory) {
-      parsed.categoryId = fallbackCategory.id;
-
-      parsed.categoryName = fallbackCategory.name;
-
-      parsed.missingFields = parsed.missingFields.filter(
-        (field) => field !== 'category',
-      );
-    }
-  }
-
-  if (
-    parsed.categoryId &&
-    !categories.some(
-      (category) =>
-        category.id === parsed.categoryId && category.type === parsed.type,
-    )
-  ) {
-    parsed.categoryId = null;
-    parsed.categoryName = null;
-
-    if (!parsed.missingFields.includes('category')) {
-      parsed.missingFields.push('category');
-    }
-  }
-
-  if (!messageText.trim()) {
-    parsed.missingFields.push('description');
-  }
-
-  parsed.missingFields = Array.from(new Set(parsed.missingFields));
-}
-
-function missingQuestion(parsed: ParsedFinancialMessage) {
-  const missing = new Set(parsed.missingFields.map(normalizeMissingField));
-
-  if (missing.has('amount')) {
-    return 'Qual foi o valor da movimentação?';
-  }
-
-  if (missing.has('type')) {
-    return 'Isso foi uma receita ou uma despesa?';
-  }
-
-  if (missing.has('description')) {
-    return 'Qual foi a descrição dessa movimentação?';
-  }
-
-  if (missing.has('category')) {
-    return 'Não consegui identificar a categoria. Pode explicar melhor do que se trata?';
-  }
-
-  if (missing.has('paymentMethod') || missing.has('payment_method')) {
-    return 'Como foi o pagamento? Pode responder: Pix, cartão de crédito, cartão de débito, boleto, dinheiro, transferência ou outro.';
-  }
-
-  if (missing.has('transactionDate')) {
-    return 'Qual foi a data dessa movimentação?';
-  }
-
-  return 'Preciso de mais informações para registrar essa movimentação. Pode explicar um pouco melhor?';
-}
-
-export function formatConfirmation(parsed: ParsedFinancialMessage) {
-  const kind = parsed.type === 'income' ? '💰 Receita' : '💸 Despesa';
-
-  return [
-    `${kind} identificada:`,
-    '',
-    `Descrição: ${parsed.description ?? 'Não informada'}`,
-    `Valor: ${money(parsed.amount)}`,
-    `Categoria: ${parsed.categoryName ?? 'Não identificada'}`,
-    `Pagamento: ${getPaymentMethodLabel(parsed.paymentMethod)}`,
-    `Data: ${datePtBr(parsed.transactionDate)}`,
-    '',
-    'Está correto?',
-    '✅ Responda: Confirmar',
-    '✏️ Responda: Corrigir',
-    '❌ Responda: Cancelar',
-  ].join('\n');
-}
+import { MessageIntentContext } from './strategies/message-intent.strategy';
 
 @Injectable()
 export class ProcessMessageService {
   constructor(
-    private readonly supabaseService: SupabaseService,
-    private readonly parserService: ParserService,
-    private readonly transcriptionService: TranscriptionService,
-    private readonly metaService: MetaService,
+    private readonly messageContentService: MessageContentService,
+    private readonly messageIntentResolver: MessageIntentResolverService,
+    private readonly pendingTransactionService: PendingTransactionService,
+    private readonly messageResponseService: MessageResponseService,
+    private readonly whatsappConnectionsRepository: WhatsappConnectionsRepository,
+    private readonly whatsappMessagesRepository: WhatsappMessagesRepository,
     private readonly guardService: MessageGuardService,
   ) {}
 
-  private getSupabase(): SupabaseClient {
-    return this.supabaseService.getClient();
-  }
-
-  private async getCategories(companyId: string) {
-    const supabase = this.getSupabase();
-
-    const { data, error } = await supabase
-      .from('categories')
-      .select('id,name,type')
-      .eq('company_id', companyId)
-      .order('sort_order', {
-        ascending: true,
-      });
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return (data ?? []) as CompanyCategory[];
-  }
-
-  private async findConnection(phoneNumber: string) {
-    const supabase = this.getSupabase();
-
-    const { data, error } = await supabase
-      .from('whatsapp_connections')
-      .select('id,user_id,company_id,phone_number,status')
-      .eq('phone_number', phoneNumber)
-      .eq('status', 'verified')
-      .maybeSingle();
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return data;
-  }
-
-  private async getLatestPending(userId: string, companyId: string) {
-    const supabase = this.getSupabase();
-
-    const { data, error } = await supabase
-      .from('pending_transactions')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('company_id', companyId)
-      .in('status', ['awaiting_information', 'awaiting_confirmation'])
-      .order('created_at', {
-        ascending: false,
-      })
-      .limit(1)
-      .maybeSingle();
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return data;
-  }
-
-  private async finalizePending(pending: Record<string, any>) {
-    const supabase = this.getSupabase();
-
-    const { data: transaction, error: transactionError } = await supabase
-      .from('transactions')
-      .insert({
-        company_id: pending.company_id,
-        category_id: pending.category_id,
-        created_by_user_id: pending.user_id,
-        type: pending.type,
-        amount: pending.amount,
-        description: pending.description,
-        payment_method: pending.payment_method,
-        transaction_date: pending.transaction_date,
-        origin: 'whatsapp',
-        raw_whatsapp_text: pending.raw_message,
-      })
-      .select('id')
-      .single();
-
-    if (transactionError) {
-      throw new Error(transactionError.message);
-    }
-
-    const { error: pendingError } = await supabase
-      .from('pending_transactions')
-      .update({
-        status: 'confirmed',
-        confirmed_at: new Date().toISOString(),
-        transaction_id: transaction.id,
-      })
-      .eq('id', pending.id);
-
-    if (pendingError) {
-      throw new Error(pendingError.message);
-    }
-
-    return transaction.id as string;
-  }
-
   async processIncomingWhatsAppMessage(message: IncomingWhatsAppMessage) {
-    const supabase = this.getSupabase();
+    // 1. Validar e verificar duplicidade
+    const { data: existingMessage } =
+      await this.whatsappMessagesRepository.findByProviderMessageId(
+        message.providerMessageId,
+      );
 
-    const { data: existing } = await supabase
-      .from('whatsapp_messages')
-      .select('id')
-      .eq('provider_message_id', message.providerMessageId)
-      .maybeSingle();
-
-    if (existing) {
+    if (existingMessage) {
       return {
-        status: 'duplicate' as const,
+        ok: true,
+        duplicated: true,
+        messageId: existingMessage.id,
       };
     }
 
-    const connection = await this.findConnection(message.phoneNumber);
+    // 2. Identificar a conexão vinculada
+    const { data: connection } =
+      await this.whatsappConnectionsRepository.findVerifiedByPhone(
+        message.phoneNumber,
+      );
 
     if (!connection) {
-      try {
-        await this.metaService.sendWhatsAppText(
-          message.phoneNumber,
-          'Este número ainda não está vinculado ao MetricsFlow. Faça a vinculação pelo painel antes de registrar movimentações.',
-        );
-      } catch (error) {
-        console.error(
-          'Não foi possível responder número não vinculado:',
-          error,
-        );
-      }
-
+      await this.messageResponseService.sendReply(
+        message.phoneNumber,
+        '⚠️ Seu número de WhatsApp ainda não está vinculado ou verificado em uma conta da MetricsFlow AI. Conecte seu número na plataforma para utilizar este recurso.',
+      );
       return {
-        status: 'unlinked' as const,
+        ok: false,
+        reason: 'unverified_connection',
       };
     }
 
-    const pending = await this.getLatestPending(
+    // 3. Obter e normalizar o conteúdo
+    const preparedContent = await this.messageContentService.prepare(
+      message.type,
+      message.text ?? null,
+      message.mediaId ?? null,
+      message.providerMessageId,
+    );
+
+    if (preparedContent.errorReply) {
+      await this.messageResponseService.sendReply(
+        message.phoneNumber,
+        preparedContent.errorReply,
+      );
+      return {
+        ok: false,
+        reason: preparedContent.errorStatus ?? 'invalid_content',
+      };
+    }
+
+    // 4. Aplicar as regras de segurança
+    const pendingData = await this.pendingTransactionService.findLatest(
       connection.user_id,
       connection.company_id,
     );
 
-    let normalizedText = message.text?.trim() ?? '';
-
-    let transcription: string | null = null;
-
-    if (message.type === 'audio') {
-      if (!message.mediaId) {
-        throw new Error('Mensagem de áudio sem mediaId.');
-      }
-
-      const media = await this.metaService.downloadWhatsAppMedia(
-        message.mediaId,
-      );
-
-      transcription = await this.transcriptionService.transcribeAudio(
-        media.bytes,
-        media.mimeType,
-        `whatsapp-${message.providerMessageId}.ogg`,
-      );
-
-      normalizedText = transcription.trim();
-    }
+    const pendingTransaction = pendingData
+      ? {
+          id: pendingData.id as string,
+          status: pendingData.status as string,
+          raw_message: pendingData.raw_message as string,
+        }
+      : null;
 
     const guardResult = this.guardService.check(
-      normalizedText,
-      pending?.status === 'awaiting_information',
+      preparedContent.normalizedText,
+      Boolean(pendingTransaction),
     );
 
     if (!guardResult.allowed) {
-      try {
-        await this.metaService.sendWhatsAppText(
-          message.phoneNumber,
-          guardResult.response,
-        );
-      } catch (error) {
-        console.error('Não foi possível enviar resposta do bloqueio:', error);
-      }
-
+      await this.messageResponseService.sendReply(
+        message.phoneNumber,
+        guardResult.response,
+      );
       return {
-        status:
-          guardResult.reason === 'sensitive_data'
-            ? ('sensitive_blocked' as const)
-            : ('off_topic' as const),
+        ok: false,
+        reason: guardResult.reason,
       };
     }
 
-    const { data: savedMessage, error: saveError } = await supabase
-      .from('whatsapp_messages')
-      .insert({
+    // 5. Registrar a mensagem recebida
+    const { data: createdMessage } =
+      await this.whatsappMessagesRepository.createInboundMessage({
         company_id: connection.company_id,
         user_id: connection.user_id,
         provider_message_id: message.providerMessageId,
         phone_number: message.phoneNumber,
-        direction: 'inbound',
         message_type: message.type,
-        message_text: message.type === 'text' ? normalizedText : null,
+        message_text: message.text ?? null,
         provider_media_id: message.mediaId ?? null,
-        transcription,
-        status: 'pending',
+        transcription: preparedContent.transcription,
         provider_payload: message.payload,
-      })
-      .select('id')
-      .single();
+      });
 
-    if (saveError) {
-      throw new Error(saveError.message);
-    }
+    const dbMessageId = createdMessage?.id;
 
-    const quickIntent = normalizedText.trim().toLowerCase();
+    // 6. Resolver a intenção usando Strategy
+    const context: MessageIntentContext = {
+      userId: connection.user_id,
+      companyId: connection.company_id,
+      messageText: preparedContent.normalizedText,
+      phoneNumber: message.phoneNumber,
+      messageId: dbMessageId ?? message.providerMessageId,
+      pendingTransaction,
+    };
 
-    if (
-      pending &&
-      /^(confirmar|confirmo|sim|ok|pode confirmar|pode registrar)$/i.test(
-        quickIntent,
-      )
-    ) {
-      if (pending.status !== 'awaiting_confirmation') {
-        await this.metaService.sendWhatsAppText(
-          message.phoneNumber,
-          'Ainda faltam informações antes da confirmação.',
+    const strategy = this.messageIntentResolver.resolve(context);
+
+    if (!strategy) {
+      const fallbackMessage =
+        'Não consegui entender sua solicitação. Envie uma movimentação financeira válida (ex: "Recebi R$ 200 de um cliente").';
+      await this.messageResponseService.sendReply(
+        message.phoneNumber,
+        fallbackMessage,
+      );
+
+      if (dbMessageId) {
+        await this.whatsappMessagesRepository.updateStatus(
+          dbMessageId,
+          'unrecognized',
         );
-
-        await supabase
-          .from('whatsapp_messages')
-          .update({
-            status: 'processed',
-          })
-          .eq('id', savedMessage.id);
-
-        return {
-          status: 'needs_information' as const,
-        };
       }
 
-      const transactionId = await this.finalizePending(pending);
-
-      await supabase
-        .from('whatsapp_messages')
-        .update({
-          status: 'processed',
-          transaction_id: transactionId,
-        })
-        .eq('id', savedMessage.id);
-
-      await this.metaService.sendWhatsAppText(
-        message.phoneNumber,
-        '✅ Movimentação registrada com sucesso no MetricsFlow.',
-      );
-
       return {
-        status: 'confirmed' as const,
-        transactionId,
+        ok: true,
+        handled: false,
       };
     }
 
-    if (pending && /^(cancelar|cancela|não|nao|desistir)$/i.test(quickIntent)) {
-      await supabase
-        .from('pending_transactions')
-        .update({
-          status: 'cancelled',
-        })
-        .eq('id', pending.id);
+    try {
+      const result = await strategy.execute(context);
 
-      await supabase
-        .from('whatsapp_messages')
-        .update({
-          status: 'processed',
-        })
-        .eq('id', savedMessage.id);
+      if (result.reply) {
+        await this.messageResponseService.sendReply(
+          message.phoneNumber,
+          result.reply,
+        );
+      }
 
-      await this.metaService.sendWhatsAppText(
-        message.phoneNumber,
-        '❌ Movimentação cancelada.',
-      );
+      if (dbMessageId) {
+        await this.whatsappMessagesRepository.updateStatus(
+          dbMessageId,
+          result.status ?? 'processed',
+        );
+      }
 
+      // 7. Retornar o resultado do processamento
       return {
-        status: 'cancelled' as const,
+        ok: true,
+        handled: result.handled,
+        status: result.status,
+        transactionId: result.transactionId,
+        pendingTransactionId: result.pendingTransactionId,
       };
+    } catch (error) {
+      if (dbMessageId) {
+        await this.whatsappMessagesRepository.updateStatus(
+          dbMessageId,
+          'failed',
+        );
+      }
+      throw error;
     }
-
-    if (pending && /^(corrigir|corrige|editar|alterar)$/i.test(quickIntent)) {
-      await this.metaService.sendWhatsAppText(
-        message.phoneNumber,
-        '✏️ Sem problema. Envie novamente a movimentação com os dados corrigidos e eu vou interpretar de novo.',
-      );
-
-      await supabase
-        .from('pending_transactions')
-        .update({
-          status: 'cancelled',
-        })
-        .eq('id', pending.id);
-
-      await supabase
-        .from('whatsapp_messages')
-        .update({
-          status: 'processed',
-        })
-        .eq('id', savedMessage.id);
-
-      return {
-        status: 'correction_requested' as const,
-      };
-    }
-
-    const categories = await this.getCategories(connection.company_id);
-
-    const messageForParsing =
-      pending?.status === 'awaiting_information'
-        ? `${String(pending.raw_message ?? '')}
-Complemento do usuário: ${normalizedText}`
-        : normalizedText;
-
-    const parsed = await this.parserService.parseWhatsAppMessage(
-      messageForParsing,
-      categories,
-    );
-
-    normalizeParsedMessage(parsed, messageForParsing, categories);
-
-    if (parsed.intent !== 'create_transaction') {
-      await supabase
-        .from('whatsapp_messages')
-        .update({
-          status: 'processed',
-        })
-        .eq('id', savedMessage.id);
-
-      await this.metaService.sendWhatsAppText(
-        message.phoneNumber,
-        'Não identifiquei uma movimentação financeira nessa mensagem.',
-      );
-
-      return {
-        status: 'unknown' as const,
-        parsed,
-      };
-    }
-
-    const pendingStatus =
-      parsed.missingFields.length > 0
-        ? 'awaiting_information'
-        : 'awaiting_confirmation';
-
-    if (pending) {
-      await supabase
-        .from('pending_transactions')
-        .update({
-          status: 'cancelled',
-        })
-        .eq('id', pending.id);
-    }
-
-    const { data: createdPending, error: pendingError } = await supabase
-      .from('pending_transactions')
-      .insert({
-        company_id: connection.company_id,
-        user_id: connection.user_id,
-        source_message_id: savedMessage.id,
-        type: parsed.type,
-        amount: parsed.amount,
-        description: parsed.description,
-        category_id: parsed.categoryId,
-        category_name: parsed.categoryName,
-        payment_method: parsed.paymentMethod,
-        transaction_date: parsed.transactionDate,
-        raw_message: messageForParsing,
-        confidence: parsed.confidence,
-        missing_fields: parsed.missingFields,
-        status: pendingStatus,
-      })
-      .select('id')
-      .single();
-
-    if (pendingError) {
-      throw new Error(pendingError.message);
-    }
-
-    await supabase
-      .from('whatsapp_messages')
-      .update({
-        status: 'processed',
-        pending_transaction_id: createdPending.id,
-      })
-      .eq('id', savedMessage.id);
-
-    if (parsed.missingFields.length > 0) {
-      const question = missingQuestion(parsed);
-
-      await this.metaService.sendWhatsAppText(message.phoneNumber, question);
-
-      return {
-        status: 'needs_information' as const,
-        parsed,
-        question,
-      };
-    }
-
-    const confirmation = formatConfirmation(parsed);
-
-    await this.metaService.sendWhatsAppText(message.phoneNumber, confirmation);
-
-    return {
-      status: 'awaiting_confirmation' as const,
-      parsed,
-      confirmation,
-    };
   }
 }
+

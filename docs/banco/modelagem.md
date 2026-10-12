@@ -270,7 +270,7 @@ Essas informações permitem personalizar o comportamento da aplicação para ca
 
 #### `companies`
 
-Representa as empresas cadastradas no MetricsFlow AI.
+Representa as empresas cadastradas na MetricsFlow AI.
 
 Principais informações:
 
@@ -697,7 +697,7 @@ A modelagem apresentada corresponde à estrutura implementada no **PostgreSQL at
 
 As entidades apresentadas no diagrama são utilizadas efetivamente pela aplicação e possuem relacionamentos implementados através de chaves primárias e estrangeiras.
 
-A estrutura permite representar o fluxo principal do MetricsFlow AI:
+A estrutura permite representar o fluxo principal da MetricsFlow AI:
 
 ```text
 Usuário
@@ -731,6 +731,6 @@ transactions
 Dashboard / DRE
 ```
 
-Portanto, a modelagem está diretamente relacionada à estrutura do banco implementado e às funcionalidades atualmente desenvolvidas no MetricsFlow AI.
+Portanto, a modelagem está diretamente relacionada à estrutura do banco implementado e às funcionalidades atualmente desenvolvidas na MetricsFlow AI.
 
 ---

@@ -179,7 +179,7 @@ function CtaDescription() {
       "
     >
       Registre suas vendas e despesas pelo WhatsApp, confirme os lançamentos e
-      acompanhe tudo organizado no MetricsFlow.
+      acompanhe tudo organizado na MetricsFlow AI.
     </p>
   );
 }

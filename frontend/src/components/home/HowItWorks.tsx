@@ -27,7 +27,7 @@ const steps = [
   },
   {
     number: "02",
-    title: "O MetricsFlow",
+    title: "A MetricsFlow AI",
     highlight: "entende",
     description:
       "A IA interpreta a mensagem e identifica valor, tipo, categoria, data e forma de pagamento.",

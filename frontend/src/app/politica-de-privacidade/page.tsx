@@ -15,7 +15,7 @@ import {
 
 export const metadata: Metadata = {
   title: "Política de Privacidade | MetricsFlow AI",
-  description: "Política de Privacidade e proteção de dados do MetricsFlow AI.",
+  description: "Política de Privacidade e proteção de dados da MetricsFlow AI.",
 };
 
 export default function PoliticaDePrivacidadePage() {
@@ -54,7 +54,7 @@ export default function PoliticaDePrivacidadePage() {
             </h1>
 
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-400">
-              Esta Política explica como o MetricsFlow AI trata dados pessoais
+              Esta Política explica como a MetricsFlow AI trata dados pessoais
               durante a utilização da plataforma.
             </p>
 
@@ -90,7 +90,7 @@ export default function PoliticaDePrivacidadePage() {
             <ShieldCheck size={18} className="mt-0.5 shrink-0 text-brand-400" />
 
             <p className="text-xs leading-relaxed text-slate-300">
-              O MetricsFlow AI busca tratar dados pessoais de forma
+              A MetricsFlow AI busca tratar dados pessoais de forma
               transparente, segura e compatível com as finalidades para as quais
               foram coletados, observando a legislação brasileira aplicável,
               incluindo a Lei nº 13.709/2018 — Lei Geral de Proteção de Dados
@@ -147,7 +147,7 @@ export default function PoliticaDePrivacidadePage() {
               icon={<UserRound size={17} />}
             >
               <p>
-                Durante a configuração inicial, o MetricsFlow AI pode registrar
+                Durante a configuração inicial, a MetricsFlow AI pode registrar
                 informações fornecidas pelo usuário para personalizar sua
                 experiência.
               </p>
@@ -219,7 +219,7 @@ export default function PoliticaDePrivacidadePage() {
               icon={<LockKeyhole size={17} />}
             >
               <p>
-                O MetricsFlow AI adota medidas técnicas e administrativas
+                A MetricsFlow AI adota medidas técnicas e administrativas
                 destinadas à proteção dos dados pessoais contra acessos não
                 autorizados, perda, alteração ou tratamento inadequado,
                 considerando a natureza dos dados e os riscos envolvidos.
@@ -259,7 +259,7 @@ export default function PoliticaDePrivacidadePage() {
               </p>
 
               <p>
-                O MetricsFlow AI não deve ser utilizado como justificativa para
+                A MetricsFlow AI não deve ser utilizada como justificativa para
                 compartilhamento indiscriminado de dados. O acesso aos dados
                 deve observar as permissões aplicáveis a cada usuário e empresa.
               </p>
@@ -282,7 +282,7 @@ export default function PoliticaDePrivacidadePage() {
               </p>
 
               <p>
-                O MetricsFlow AI não deve ser considerado um substituto para
+                A MetricsFlow AI não deve ser considerada um substituto para
                 sistemas contábeis, fiscais ou profissionais especializados.
               </p>
             </PrivacySection>

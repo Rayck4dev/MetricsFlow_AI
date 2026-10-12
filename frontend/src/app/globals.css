@@ -27,3 +27,21 @@ html {
   scrollbar-width: thin;
   scrollbar-color: #24364a #081522;
 }
+
+.chat-wallpaper {
+  background-color: #0b141a;
+  background-image:
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(42, 65, 77, 0.13) 1px,
+      transparent 1.5px
+    ),
+    radial-gradient(
+      circle at 75% 70%,
+      rgba(42, 65, 77, 0.12) 1px,
+      transparent 1.5px
+    );
+  background-size:
+    26px 26px,
+    34px 34px;
+}

@@ -82,11 +82,13 @@
 - [x] Identificação de forma de pagamento
 - [x] Identificação de data
 - [x] Validação da resposta estruturada
-- [x] Preparação para transcrição de áudio
+- [x] Transcrição de áudio para a demonstração via OpenAI
 
 ## WhatsApp
 
-- [x] Configuração final da integração Meta
+- [x] Demonstração interativa sem conexão à Meta
+- [x] Gravação de áudio no navegador e interpretação da transcrição
+- [ ] Integração oficial com Meta Cloud API
 - [ ] Webhook em ambiente público
 - [ ] Recebimento real de mensagens
 - [ ] Processamento real de mensagens
@@ -96,7 +98,7 @@
 - [ ] Registro real de movimentações via WhatsApp
 - [ ] Processamento de áudio em produção
 
-> **Observação:** a integração com WhatsApp é a principal etapa ainda pendente da V2. A arquitetura e os módulos necessários já estão preparados para essa evolução.
+> **Observação:** `/whatsapp/demo` é uma simulação interativa. Mensagens são processadas e salvas na conta autenticada; áudios são transcritos pela OpenAI; lançamentos só ocorrem após confirmação. Essa tela não usa nem valida a integração oficial da Meta.
 
 ---
 

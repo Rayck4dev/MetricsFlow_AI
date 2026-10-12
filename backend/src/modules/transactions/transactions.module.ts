@@ -1,13 +1,16 @@
 import { Module } from '@nestjs/common';
 
-import { TransactionsController } from './transactions.controller';
 import { AuthModule } from '../auth/auth.module';
+import { SupabaseModule } from '../supabase.module';
+
+import { TransactionsController } from './transactions.controller';
+import { TransactionsRepository } from './transactions.repository';
 import { TransactionsService } from './transactions.service';
-import { SupabaseService } from '../supabase.service';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, SupabaseModule],
   controllers: [TransactionsController],
-  providers: [TransactionsService, SupabaseService],
+  providers: [TransactionsService, TransactionsRepository],
+  exports: [TransactionsService],
 })
-export class TransactionsModule { }
+export class TransactionsModule {}

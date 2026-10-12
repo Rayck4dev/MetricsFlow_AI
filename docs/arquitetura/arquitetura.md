@@ -1,6 +1,6 @@
 # 🏗️ Arquitetura do projeto
 
-O MetricsFlow utiliza uma arquitetura **monorepo**, contendo frontend e backend no mesmo repositório Git.
+A MetricsFlow utiliza uma arquitetura **monorepo**, contendo frontend e backend no mesmo repositório Git.
 
 ```text
 metricsflow-ai/

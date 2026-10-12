@@ -1,12 +1,12 @@
 # 🚀 Funcionalidades — MetricsFlow AI
 
-O MetricsFlow AI é uma plataforma de gestão financeira desenvolvida para Microempreendedores Individuais (MEIs), com foco em simplificar o controle financeiro e oferecer uma visão clara da situação do negócio.
+A MetricsFlow AI é uma plataforma de gestão financeira desenvolvida para Microempreendedores Individuais (MEIs), com foco em simplificar o controle financeiro e oferecer uma visão clara da situação do negócio.
 
 ---
 
 ## 🎯 Objetivo
 
-O objetivo do MetricsFlow AI é oferecer ao MEI uma ferramenta simples, visual e acessível para:
+O objetivo da MetricsFlow AI é oferecer ao MEI uma ferramenta simples, visual e acessível para:
 
 - Registrar receitas;
 - Registrar despesas;
@@ -183,7 +183,7 @@ As preferências financeiras são persistidas no banco de dados.
 
 # 🔔 Notificações
 
-O MetricsFlow possui um sistema de notificações integrado ao banco de dados.
+A MetricsFlow possui um sistema de notificações integrado ao banco de dados.
 
 As notificações podem informar eventos relacionados às movimentações financeiras e ao funcionamento da plataforma.
 
@@ -305,7 +305,7 @@ A criação da empresa e o vínculo do usuário como proprietário são tratados
 
 # 📱 WhatsApp
 
-A integração com WhatsApp faz parte da evolução da V2 do MetricsFlow AI.
+A integração com WhatsApp faz parte da evolução da V2 da MetricsFlow AI.
 
 A proposta é permitir o registro de movimentações financeiras através de mensagens de texto ou áudio.
 

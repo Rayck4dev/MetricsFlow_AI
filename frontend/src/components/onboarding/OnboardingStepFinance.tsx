@@ -150,7 +150,7 @@ export default function OnboardingStepFinance({
         <Lightbulb size={14} className="mt-0.5 shrink-0 text-amber-400" />
 
         <p className="text-[11px] leading-relaxed text-amber-200/80">
-          O MetricsFlow centraliza essas informações em um só lugar,
+          A MetricsFlow AI centraliza essas informações em um só lugar,
           economizando seu tempo e evitando controles espalhados.
         </p>
       </motion.div>

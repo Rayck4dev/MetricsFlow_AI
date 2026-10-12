@@ -189,7 +189,7 @@ function FeaturesHeader() {
           md:text-[15px]
         "
       >
-        O MetricsFlow combina WhatsApp, inteligência artificial e indicadores
+        A MetricsFlow AI combina WhatsApp, inteligência artificial e indicadores
         financeiros para transformar tarefas complicadas em poucos segundos.
       </p>
     </motion.div>

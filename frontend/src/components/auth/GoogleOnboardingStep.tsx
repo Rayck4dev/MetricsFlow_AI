@@ -43,7 +43,7 @@ export default function GoogleOnboardingStep({
 
   function handleContinue() {
     if (!selectedType) {
-      setError("Selecione como deseja utilizar o MetricsFlow.");
+      setError("Selecione como deseja utilizar a MetricsFlow AI.");
       return;
     }
 
@@ -89,7 +89,7 @@ export default function GoogleOnboardingStep({
 
         <p className="mt-2 text-xs leading-5 text-slate-400">
           Sua conta do Google foi criada com sucesso. Agora escolha como deseja
-          utilizar o MetricsFlow AI.
+          utilizar a MetricsFlow AI.
         </p>
       </div>
 

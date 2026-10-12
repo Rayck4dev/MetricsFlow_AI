@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -12,43 +13,53 @@ import {
 } from '@nestjs/common';
 
 import { AuthGuard } from '../auth/auth.guard';
+
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { TransactionFiltersDto } from './dto/transaction-filters.dto';
-import { TransactionsService } from './transactions.service';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { TransactionsService } from './transactions.service';
+
+interface AuthenticatedRequest {
+  user: {
+    id: string;
+  };
+}
 
 @Controller('transactions')
+@UseGuards(AuthGuard)
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
-  @UseGuards(AuthGuard)
   @Get()
-  async findAll(
-    @Request() request: any,
+  findAll(
+    @Request() request: AuthenticatedRequest,
     @Query() filters: TransactionFiltersDto,
   ) {
     return this.transactionsService.findByUser(request.user.id, filters);
   }
 
-  @UseGuards(AuthGuard)
   @Post()
-  async create(@Body() dto: CreateTransactionDto, @Request() request: any) {
+  create(
+    @Body() dto: CreateTransactionDto,
+    @Request() request: AuthenticatedRequest,
+  ) {
     return this.transactionsService.create(dto, request.user.id);
   }
 
-  @UseGuards(AuthGuard)
   @Patch(':id')
-  async update(
-    @Param('id') id: string,
+  update(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() dto: UpdateTransactionDto,
-    @Request() request: any,
+    @Request() request: AuthenticatedRequest,
   ) {
     return this.transactionsService.update(id, dto, request.user.id);
   }
 
-  @UseGuards(AuthGuard)
   @Delete(':id')
-  async remove(@Param('id') id: string, @Request() request: any) {
+  remove(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Request() request: AuthenticatedRequest,
+  ) {
     return this.transactionsService.remove(id, request.user.id);
   }
 }

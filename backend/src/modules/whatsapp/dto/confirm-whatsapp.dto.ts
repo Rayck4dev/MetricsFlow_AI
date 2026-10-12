@@ -1,16 +1,11 @@
-export interface ConfirmWhatsappParsed {
-  intent: 'create_transaction' | string;
-  missingFields: string[];
-  type: 'income' | 'expense' | null;
-  amount: number | null;
-  description: string | null;
-  categoryId: string | null;
-  categoryName: string | null;
-  paymentMethod: string | null;
-  transactionDate: string | null;
-}
+import { IsOptional, IsUUID } from 'class-validator';
 
-export interface ConfirmWhatsappDto {
-  parsed?: ConfirmWhatsappParsed;
-  rawText?: string;
+export class ConfirmWhatsappDto {
+  @IsOptional()
+  @IsUUID('4')
+  pendingTransactionId?: string;
+
+  @IsOptional()
+  @IsUUID('4')
+  pending_transaction_id?: string;
 }

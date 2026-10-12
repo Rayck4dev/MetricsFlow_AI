@@ -43,6 +43,8 @@ Configure as variáveis necessárias do Supabase e da API.
 Exemplo:
 
 ```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
 NEXT_PUBLIC_API_URL=http://localhost:3001/api
 ```
 
@@ -83,9 +85,7 @@ Crie o arquivo:
 Configure as variáveis necessárias para:
 
 - Supabase;
-- OpenAI;
-- WhatsApp / Meta Cloud API;
-- Segredos de integração;
+- OpenAI (necessária para transcrever áudio; mensagens de texto podem usar o parser local);
 - Configurações da API.
 
 
@@ -93,6 +93,11 @@ Exemplo:
 
 ```env
 PORT=3001
+SUPABASE_URL=
+SUPABASE_SECRET_KEY=
+OPENAI_API_KEY=
+OPENAI_FINANCIAL_MODEL=
+OPENAI_TRANSCRIPTION_MODEL=
 ```
 
 Execute o backend:
@@ -127,9 +132,27 @@ A API possui documentação interativa utilizando Swagger / OpenAPI:
 http://localhost:3001/api/docs
 ```
 
----  
+## 5. Demonstração do WhatsApp
 
-## 5. Portas
+A demonstração interativa está disponível em:
+
+```text
+http://localhost:3002/whatsapp/demo
+```
+
+Ela requer uma sessão autenticada, uma empresa vinculada ao usuário e as
+variáveis do Supabase configuradas no frontend e no backend. O envio de texto
+usa o parser local quando `OPENAI_API_KEY` não está configurada. Para gravar e
+transcrever áudio, configure uma chave da OpenAI no backend.
+
+Esta tela simula a interface do WhatsApp Web: não conecta à Meta nem envia
+mensagens pelo WhatsApp. As mensagens da demonstração são salvas na conta
+autenticada e uma movimentação só é registrada após confirmação. Não use dados
+financeiros reais durante a apresentação.
+
+---
+
+## 6. Portas
 
 | Aplicação		            | Endereço
 |---------------------------|-------------|
@@ -144,7 +167,7 @@ O frontend utiliza a seguinte variável para localizar o backend:
 NEXT_PUBLIC_API_URL=http://localhost:3001/api
 ```
 
-### 🔐 6. Variáveis de ambiente
+### 🔐 7. Variáveis de ambiente
 
 Os arquivos de ambiente são utilizados para armazenar configurações e credenciais que não devem ser expostas no código-fonte.
 
@@ -168,11 +191,11 @@ As principais configurações podem incluir:
 - chave pública do Supabase;
 - URL da API;
 - chave da OpenAI;
-- configurações da Meta / WhatsApp;
+- configurações da Meta / WhatsApp (somente para a integração oficial, fora desta demonstração);
 - tokens e segredos de integração;
 - porta do backend.
 
-### 🌿 7. Branch utilizada na avaliação
+### 🌿 8. Branch utilizada na avaliação
 
 A versão completa utilizada durante a avaliação está disponível na branch:
 
@@ -188,7 +211,7 @@ git switch v2
 
 A branch v2 contém a versão completa utilizada como referência para a demonstração do projeto.
 
-### ⚠️ 8. Observações
+### ⚠️ 9. Observações
 
 O frontend e o backend são executados separadamente.
 
@@ -205,4 +228,4 @@ localhost:3001
    ↓
 Supabase / serviços externos
 ```
-A integração com WhatsApp e os recursos de inteligência artificial fazem parte da evolução da V2 e dependem das respectivas variáveis de ambiente e configurações dos serviços externos.
+A integração oficial com WhatsApp/Meta continua fora do escopo desta demonstração e depende de configuração própria.

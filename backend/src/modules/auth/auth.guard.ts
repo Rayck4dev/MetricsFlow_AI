@@ -4,15 +4,23 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { User } from '@supabase/supabase-js';
 
 import { AuthService } from './auth.service';
+
+interface AuthenticatedRequest {
+  headers: {
+    authorization?: string;
+  };
+  user?: User;
+}
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private readonly authService: AuthService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
 
     const authorization = request.headers.authorization;
 
@@ -20,13 +28,17 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('Token não informado.');
     }
 
-    const [type, token] = authorization.split(' ');
+    const parts = authorization.trim().split(/\s+/);
 
-    if (type !== 'Bearer' || !token) {
-      throw new UnauthorizedException('Token inválido.');
+    if (
+      parts.length !== 2 ||
+      parts[0].toLowerCase() !== 'bearer' ||
+      !parts[1]
+    ) {
+      throw new UnauthorizedException('Cabeçalho de autorização inválido.');
     }
 
-    const user = await this.authService.validateToken(token);
+    const user = await this.authService.validateToken(parts[1]);
 
     if (!user) {
       throw new UnauthorizedException('Token inválido ou expirado.');

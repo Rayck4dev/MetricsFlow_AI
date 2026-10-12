@@ -102,7 +102,7 @@ function EmptyPanel() {
       </h2>
 
       <p className="mt-2 max-w-xs text-[11px] leading-5 text-slate-600">
-        A interpretação financeira aparecerá aqui depois que o MetricsFlow
+        A interpretação financeira aparecerá aqui depois que a MetricsFlow AI
         processar sua mensagem.
       </p>
 

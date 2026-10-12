@@ -2,7 +2,7 @@
 
 ## 1. Estrutura organizacional
 
-O MetricsFlow AI é atualmente desenvolvido de forma individual, com a mesma desenvolvedora acumulando responsabilidades técnicas, de produto, UX e gestão do projeto.
+A MetricsFlow AI é atualmente desenvolvida de forma individual, com a mesma desenvolvedora acumulando responsabilidades técnicas, de produto, UX e gestão do projeto.
 
 Para um cenário de expansão e atendimento em escala nacional, propõe-se uma estrutura organizacional baseada em especialização por áreas, permitindo distribuir responsabilidades, reduzir gargalos e sustentar o crescimento do produto.
 
@@ -125,7 +125,7 @@ As responsabilidades e os limites de atuação deverão ser definidos antes da e
 
 ### 6.1 Front-end / UI Engineer
 
-**Objetivo:** desenvolver e manter a interface do MetricsFlow AI, garantindo responsividade, acessibilidade, consistência visual e integração com os serviços da plataforma.
+**Objetivo:** desenvolver e manter a interface da MetricsFlow AI, garantindo responsividade, acessibilidade, consistência visual e integração com os serviços da plataforma.
 
 **Principais responsabilidades:**
 
@@ -199,7 +199,7 @@ As responsabilidades e os limites de atuação deverão ser definidos antes da e
 
 ### 7.2 Front-end Engineer
 
-**Objetivo:** desenvolver e evoluir a interface do MetricsFlow AI de acordo com os padrões técnicos e de produto definidos pela equipe.
+**Objetivo:** desenvolver e evoluir a interface da MetricsFlow AI de acordo com os padrões técnicos e de produto definidos pela equipe.
 
 **Responsabilidades:** páginas e componentes, correção de bugs, implementação de funcionalidades, integração com APIs, testes de interface e responsividade.
 
@@ -249,7 +249,7 @@ As responsabilidades e os limites de atuação deverão ser definidos antes da e
 
 ### 7.7 AI / Automation Engineer
 
-**Objetivo:** desenvolver e manter recursos de inteligência artificial e automação do MetricsFlow AI.
+**Objetivo:** desenvolver e manter recursos de inteligência artificial e automação da MetricsFlow AI.
 
 **Responsabilidades:** pipelines de IA, prompts, structured output, validações, integração com modelos, transcrição de áudio, monitoramento das respostas e automações do WhatsApp.
 
@@ -289,7 +289,7 @@ As responsabilidades e os limites de atuação deverão ser definidos antes da e
 
 ### 7.11 Sales / Partnerships
 
-**Objetivo:** expandir comercialmente o MetricsFlow AI por meio de aquisição de clientes e parcerias estratégicas.
+**Objetivo:** expandir comercialmente a MetricsFlow AI por meio de aquisição de clientes e parcerias estratégicas.
 
 **Responsabilidades:** prospecção, apresentação do produto, negociação, gestão de parceiros e desenvolvimento de canais comerciais.
 
@@ -768,4 +768,4 @@ A estrutura proposta tem como objetivos:
 - Estabelecer critérios transparentes de progressão;
 - Apoiar a expansão nacional;
 - Garantir escalabilidade operacional;
-- Sustentar o crescimento tecnológico do MetricsFlow AI.
+- Sustentar o crescimento tecnológico da MetricsFlow AI.

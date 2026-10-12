@@ -1,7 +1,14 @@
 "use client";
 
+import { formatPhoneNumber } from "@/types/formatters";
 import { motion } from "framer-motion";
-import { CheckCircle2, MoveUpRight, ShieldCheck } from "lucide-react";
+import {
+  ArrowUpRight,
+  CheckCircle2,
+  MessageCircle,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 
 import { WhatsAppPhoneMockup } from "./WhatsAppPhoneMockup";
 
@@ -15,231 +22,117 @@ export function WhatsAppHeader({
   phoneNumber,
 }: WhatsAppHeaderProps) {
   return (
-    <section className="relative shrink-0 overflow-hidden py-4 sm:py-6 lg:h-[360px] lg:overflow-visible lg:py-0">
-      <div className="pointer-events-none absolute inset-0 overflow-visible">
-        <div
-          className="
-            absolute
-            right-[-110px]
-            top-[-120px]
-            h-[470px]
-            w-[470px]
-            rounded-full
-            bg-cyan-400/[0.035]
-            blur-[115px]
-          "
-        />
-
-        <div
-          className="
-            absolute
-            right-[10%]
-            top-[35px]
-            h-[360px]
-            w-[360px]
-            rounded-full
-            bg-emerald-400/[0.055]
-            blur-[100px]
-          "
-        />
-
-        <div
-          className="
-            absolute
-            right-[17%]
-            top-[110px]
-            h-[250px]
-            w-[250px]
-            rounded-full
-            bg-emerald-300/[0.045]
-            blur-[85px]
-          "
-        />
-
-        <motion.div
-          animate={{
-            x: [0, 28, 0],
-            opacity: [0.035, 0.09, 0.035],
-          }}
-          transition={{
-            duration: 9,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="
-            absolute
-            right-[-160px]
-            top-[220px]
-            h-px
-            w-[850px]
-            rotate-[-8deg]
-            bg-gradient-to-r
-            from-transparent
-            via-emerald-400/25
-            to-transparent
-          "
-        />
-
-        <motion.div
-          animate={{
-            x: [0, -20, 0],
-            opacity: [0.02, 0.07, 0.02],
-          }}
-          transition={{
-            duration: 11,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="
-            absolute
-            right-[-190px]
-            top-[275px]
-            h-px
-            w-[900px]
-            rotate-[-6deg]
-            bg-gradient-to-r
-            from-transparent
-            via-cyan-400/20
-            to-transparent
-          "
-        />
-
-        <div
-          className="
-            absolute
-            right-[-170px]
-            top-[205px]
-            h-[210px]
-            w-[760px]
-            rotate-[-9deg]
-            rounded-[50%]
-            border
-            border-emerald-400/[0.035]
-          "
-        />
-
-        <div
-          className="
-            absolute
-            right-[-220px]
-            top-[230px]
-            h-[280px]
-            w-[920px]
-            rotate-[-7deg]
-            rounded-[50%]
-            border
-            border-cyan-400/[0.018]
-          "
-        />
+    <section className="relative isolate overflow-hidden rounded-[30px] border border-white/[0.07] bg-[#061b2b]/75">
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute -right-24 -top-32 h-96 w-96 rounded-full bg-emerald-400/[0.09] blur-[100px]" />
+        <div className="absolute -bottom-40 left-[35%] h-80 w-80 rounded-full bg-cyan-400/[0.05] blur-[100px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(16,185,129,0.035),transparent_45%)]" />
       </div>
 
-      <div className="relative mx-auto grid h-full w-full max-w-[1500px] items-center lg:grid-cols-[minmax(0,1fr)_430px]">
-        <div className="relative z-20 max-w-[720px] lg:mb-20 lg:mt-10">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-xl border border-emerald-400/15 bg-emerald-400/[0.06] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.16em] text-emerald-300">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_9px_rgba(52,211,153,.8)]" />
-            WhatsApp + IA
+      <div className="grid items-center gap-8 px-6 py-10 sm:px-10 sm:py-12 lg:min-h-[470px] lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-5 lg:px-12 lg:py-10 xl:px-16">
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, ease: "easeOut" }}
+          className="relative z-10 max-w-2xl"
+        >
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/15 bg-emerald-400/[0.07] px-3.5 py-2 text-[11px] font-semibold tracking-wide text-emerald-300">
+            <Sparkles size={14} />
+            Seu financeiro, sem complicação
           </div>
 
-          <h1 className="max-w-[700px] font-heading text-[32px] font-bold leading-tight text-white sm:text-[42px] lg:text-[51px] lg:leading-[0.97]">
-            Seu assistente financeiro
-            <span className="block bg-gradient-to-r from-emerald-400 to-cyan-300 bg-clip-text text-transparent">
-              no WhatsApp
+          <h1 className="mt-6 max-w-xl text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl xl:text-[58px]">
+            Organize suas finanças
+            <span className="mt-2 block bg-gradient-to-r from-emerald-300 via-emerald-400 to-cyan-300 bg-clip-text pb-1 text-transparent">
+              pelo WhatsApp.
             </span>
           </h1>
 
-          <p className="mt-4 max-w-[640px] text-xs leading-6 text-slate-400 sm:text-sm">
-            Converse naturalmente sobre suas movimentações. O MetricsFlow
-            interpreta, valida e pede sua confirmação antes de registrar.
+          <p className="mt-6 max-w-lg text-sm leading-7 text-slate-400 sm:text-base sm:leading-8">
+            Registre receitas e despesas com uma mensagem. A MetricsFlow
+            organiza as informações e apresenta os dados para você conferir
+            antes de confirmar o lançamento.
           </p>
 
-          <div className="mt-5 flex flex-wrap gap-2">
-            <StatusBadge label="IA online" />
+          <div className="mt-7 flex flex-wrap gap-3">
+            <StatusBadge label="Experiência conversacional" />
+            <StatusBadge label="Confirmação antes de registrar" />
+          </div>
 
-            <StatusBadge label="Supabase" />
+          <div className="mt-7 flex items-start gap-3 border-t border-white/[0.07] pt-5">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-emerald-400/10 bg-emerald-400/[0.07] text-emerald-300">
+              <ShieldCheck size={17} />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-slate-200">
+                Você confere antes de confirmar
+              </p>
+              <p className="mt-1 max-w-md text-xs leading-5 text-slate-500">
+                Veja os dados identificados e revise as informações antes de
+                concluir um lançamento na demonstração.
+              </p>
+            </div>
+          </div>
 
-            <StatusBadge
-              label={
-                whatsappConnected
-                  ? phoneNumber || "WhatsApp conectado"
-                  : "WhatsApp não conectado"
-              }
-              muted={!whatsappConnected}
+          <div className="mt-6 flex items-center gap-2 text-xs text-slate-500">
+            <span
+              className={`h-2 w-2 rounded-full ${
+                whatsappConnected ? "bg-emerald-400" : "bg-amber-400"
+              }`}
             />
+            <span>
+              {whatsappConnected
+                ? `WhatsApp Demonstrativo Conectado${phoneNumber ? ` · ${formatPhoneNumber(phoneNumber)}` : ""}`
+                : "Conexão do WhatsApp Demonstrativo ainda não configurada"}
+            </span>
           </div>
+        </motion.div>
 
-          <div className="mt-5 flex items-center gap-2 text-[9px] text-slate-600">
-            <CheckCircle2 size={13} className="shrink-0 text-emerald-400" />
+        <div className="relative flex min-h-[340px] items-center justify-center sm:min-h-[390px] lg:min-h-[430px]">
+          <div className="pointer-events-none absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-400/[0.08] blur-[75px]" />
 
-            <span>Confirmação antes do lançamento financeiro</span>
-
-            <MoveUpRight size={11} className="text-slate-700" />
-          </div>
-        </div>
-
-        <div className="relative z-0 hidden h-full lg:block">
-          <WhatsAppPhoneMockup className="absolute right-[35px] top-[10px]" />
+          <WhatsAppPhoneMockup className="relative z-10 scale-[0.92] sm:scale-100" />
 
           <motion.div
-            initial={{
-              opacity: 0,
-              x: 15,
-            }}
-            animate={{
-              opacity: 1,
-              x: 0,
-            }}
-            transition={{
-              duration: 0.65,
-              delay: 0.45,
-            }}
-            className="absolute right-[0px] top-[44%] z-30 hidden xl:block"
+            initial={{ opacity: 0, x: 12 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="absolute bottom-5 right-0 z-20 hidden items-center gap-2 rounded-2xl border border-white/[0.08] bg-[#0a2638]/95 px-3.5 py-3 shadow-xl shadow-black/20 backdrop-blur-md sm:flex lg:-right-2"
           >
-            <div className="relative rounded-2xl border border-emerald-400/10 bg-[#082033]/90 px-4 py-3 shadow-2xl shadow-black/30 backdrop-blur-md">
-              <p className="text-[11px] font-semibold leading-5 text-white">
-                Simples,
-                <br />
-                <span className="text-emerald-300">rápido e seguro!</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-400/10 text-emerald-300">
+              <CheckCircle2 size={17} />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-white">
+                Mais praticidade
               </p>
-
-              <span className="absolute -left-8 top-1/2 h-px w-8 -translate-y-1/2 rotate-[18deg] bg-emerald-400/25" />
+              <p className="mt-0.5 text-[10px] text-slate-500">
+                Uma conversa de cada vez
+              </p>
             </div>
           </motion.div>
+        </div>
+      </div>
 
-          <div className="pointer-events-none absolute bottom-12 right-24 z-20 hidden items-center gap-1.5 text-[8px] font-medium text-slate-600 xl:flex">
-            <ShieldCheck size={11} className="text-emerald-400" />
-            Dados protegidos
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.06] bg-black/[0.08] px-6 py-4 sm:px-10 lg:px-12">
+        <div className="flex items-center gap-2 text-xs text-slate-500">
+          <MessageCircle size={15} className="text-emerald-300" />
+          Veja como seria registrar uma movimentação
+        </div>
+        <div className="flex items-center gap-1.5 text-[10px] font-medium text-slate-600">
+          Demonstração visual
+          <ArrowUpRight size={12} />
         </div>
       </div>
     </section>
   );
 }
 
-function StatusBadge({
-  label,
-  muted = false,
-}: {
-  label: string;
-  muted?: boolean;
-}) {
+function StatusBadge({ label }: { label: string }) {
   return (
-    <div
-      className={`flex max-w-[250px] items-center gap-2 rounded-xl border px-3 py-2 text-[10px] font-medium ${
-        muted
-          ? "border-slate-700/70 bg-slate-900/25 text-slate-600"
-          : "border-white/[0.06] bg-[#081d2e]/80 text-slate-400"
-      }`}
-    >
-      <span
-        className={`h-1.5 w-1.5 shrink-0 rounded-full ${
-          muted
-            ? "bg-slate-700"
-            : "bg-emerald-400 shadow-[0_0_7px_rgba(52,211,153,.65)]"
-        }`}
-      />
-
-      <span className="truncate">{label}</span>
-    </div>
+    <span className="inline-flex items-center gap-2 rounded-xl border border-white/[0.07] bg-white/[0.025] px-3 py-2 text-[11px] text-slate-400">
+      <CheckCircle2 size={13} className="shrink-0 text-emerald-400" />
+      {label}
+    </span>
   );
 }
-

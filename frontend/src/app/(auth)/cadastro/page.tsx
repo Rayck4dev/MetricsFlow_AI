@@ -39,7 +39,7 @@ export default function CadastroPage() {
               </h2>
 
               <p className="mt-5 max-w-lg text-sm leading-relaxed text-slate-400">
-                O MetricsFlow AI foi pensado para quem precisa cuidar do negócio
+                A MetricsFlow AI foi pensada para quem precisa cuidar do negócio
                 sem perder horas preenchendo planilhas.
               </p>
 

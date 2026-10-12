@@ -1,30 +1,50 @@
 "use client";
 
-import type { FormEvent } from "react";
-
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { CheckCircle2, MessageCircle } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  ClipboardCheck,
+  MessageCircle,
+  ShieldCheck,
+  Sparkles,
+  Wallet,
+} from "lucide-react";
 
 import { Sidebar } from "@/components/layout/Sidebar";
-import { WhatsAppChat } from "@/components/whatsapp/WhatsAppChat";
 import { WhatsAppHeader } from "@/components/whatsapp/WhatsAppHeader";
-import { WhatsAppResultPanel } from "@/components/whatsapp/WhatsAppResultPanel";
 
 import { useUser } from "@/contexts/UserContext";
 import { useWhatsAppConnection } from "@/hooks/whatsapp/useWhatsAppConnection";
-import { useWhatsAppDemo } from "@/hooks/whatsapp/useWhatsAppDemo";
 
-import { WHATSAPP_EXAMPLES } from "@/utils/whatsapp";
+const benefits = [
+  {
+    icon: MessageCircle,
+    number: "01",
+    title: "Fale naturalmente",
+    description:
+      "Descreva uma venda ou despesa com suas próprias palavras, como em uma conversa.",
+  },
+  {
+    icon: ClipboardCheck,
+    number: "02",
+    title: "Confira os detalhes",
+    description:
+      "Veja as informações identificadas e revise os dados antes de confirmar.",
+  },
+  {
+    icon: Wallet,
+    number: "03",
+    title: "Organize suas finanças",
+    description:
+      "Conheça a proposta de registrar suas movimentações de forma simples e prática.",
+  },
+];
 
 export default function WhatsAppPage() {
   const { user } = useUser();
-
-  const whatsapp = useWhatsAppDemo();
   const connection = useWhatsAppConnection();
-
-  function handleSubmit(event: FormEvent) {
-    void whatsapp.submitMessage(event);
-  }
 
   const whatsappConnected = connection.connection?.status === "verified";
 
@@ -33,182 +53,180 @@ export default function WhatsAppPage() {
       <div className="flex min-h-screen">
         <Sidebar userName={user?.name} companyName={user?.companyName} />
 
-        <main className="relative min-w-0 flex-1 overflow-x-hidden overflow-y-auto">
-          <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-            <div
-              className="
-                absolute
-                -right-[140px]
-                -top-[120px]
-                h-[650px]
-                w-[650px]
-                rounded-full
-                bg-cyan-400/[0.035]
-                blur-[120px]
-              "
-            />
+        <main className="relative min-w-0 flex-1 overflow-x-hidden">
+          {/* Fundo decorativo discreto */}
+          <div className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute -right-48 -top-40 h-[500px] w-[500px] rounded-full bg-emerald-400/[0.045] blur-[130px]" />
+            <div className="absolute -bottom-48 left-[15%] h-[420px] w-[420px] rounded-full bg-cyan-400/[0.025] blur-[120px]" />
 
             <div
-              className="
-                absolute
-                right-[9%]
-                top-[20px]
-                h-[460px]
-                w-[460px]
-                rounded-full
-                bg-emerald-400/[0.045]
-                blur-[105px]
-              "
-            />
-
-            <div
-              className="
-                absolute
-                right-[18%]
-                top-[125px]
-                h-[300px]
-                w-[300px]
-                rounded-full
-                bg-emerald-300/[0.04]
-                blur-[95px]
-              "
-            />
-
-            <motion.div
-              animate={{
-                x: [0, 28, 0],
-                opacity: [0.035, 0.085, 0.035],
+              className="absolute inset-0 opacity-[0.025]"
+              style={{
+                backgroundImage:
+                  "linear-gradient(rgba(255,255,255,.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.15) 1px, transparent 1px)",
+                backgroundSize: "48px 48px",
               }}
-              transition={{
-                duration: 9,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-              className="
-                absolute
-                -right-[180px]
-                top-[360px]
-                h-px
-                w-[900px]
-                rotate-[-8deg]
-                bg-gradient-to-r
-                from-transparent
-                via-emerald-400/30
-                to-transparent
-              "
-            />
-
-            <motion.div
-              animate={{
-                x: [0, -22, 0],
-                opacity: [0.025, 0.065, 0.025],
-              }}
-              transition={{
-                duration: 11,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-              className="
-                absolute
-                -right-[200px]
-                top-[425px]
-                h-px
-                w-[980px]
-                rotate-[-6deg]
-                bg-gradient-to-r
-                from-transparent
-                via-cyan-400/20
-                to-transparent
-              "
-            />
-
-            <div
-              className="
-                absolute
-                -right-[160px]
-                top-[365px]
-                h-[220px]
-                w-[760px]
-                rotate-[-9deg]
-                rounded-[50%]
-                border
-                border-emerald-400/[0.035]
-              "
-            />
-
-            <div
-              className="
-                absolute
-                -right-[220px]
-                top-[395px]
-                h-[300px]
-                w-[950px]
-                rotate-[-7deg]
-                rounded-[50%]
-                border
-                border-cyan-400/[0.018]
-              "
             />
           </div>
-          <div className="relative z-10 mx-auto flex w-full max-w-[1500px] flex-col px-4 pb-8 pt-20 sm:px-6 sm:pb-8 lg:h-screen lg:min-h-0 lg:px-8 lg:pb-0 lg:pt-0">
+
+          <div className="relative z-10 mx-auto w-full max-w-[1500px] px-4 pb-10 pt-20 sm:px-6 sm:pb-12 lg:px-8 lg:pb-14 lg:pt-8 xl:px-10">
+            {/* Título da seção */}
+            <header className="mb-7 flex flex-col gap-3 sm:mb-9 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <div className="mb-3 flex items-center gap-2 text-xs font-medium text-emerald-300">
+                  <MessageCircle size={15} />
+                  <span>METRICSFLOW / WHATSAPP</span>
+                </div>
+
+                <h2 className="font-heading text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                  Seu financeiro na conversa.
+                </h2>
+
+                <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">
+                  Uma forma mais simples de imaginar o registro de receitas e
+                  despesas pelo WhatsApp.
+                </p>
+              </div>
+
+              <div className="inline-flex w-fit items-center gap-2 rounded-xl border border-white/[0.07] bg-[#061b2b]/80 px-3.5 py-2.5">
+                <span
+                  className={`h-2 w-2 rounded-full ${
+                    connection.loading
+                      ? "animate-pulse bg-amber-400"
+                      : whatsappConnected
+                        ? "bg-emerald-400"
+                        : "bg-slate-600"
+                  }`}
+                />
+                <span className="text-xs text-slate-400">
+                  {connection.loading
+                    ? "Verificando conexão"
+                    : whatsappConnected
+                      ? "WhatsApp conectado"
+                      : "Modo demonstrativo"}
+                </span>
+              </div>
+            </header>
+
+            {/* Hero principal */}
             <WhatsAppHeader
               whatsappConnected={whatsappConnected}
               phoneNumber={connection.connection?.phoneNumber}
             />
 
-            <section className="pb-5 lg:min-h-0 lg:flex-1 lg:overflow-hidden">
-              <div className="grid gap-4 lg:h-full lg:min-h-0 lg:grid-cols-[1.08fr_0.92fr]">
-                <div className="min-h-[360px] lg:min-h-0">
-                  <WhatsAppChat
-                    text={whatsapp.text}
-                    result={whatsapp.result}
-                    loading={whatsapp.loading}
-                    examples={WHATSAPP_EXAMPLES}
-                    onTextChange={whatsapp.setText}
-                    onSubmit={handleSubmit}
-                    onUseExample={whatsapp.useExample}
-                  />
+            {/* Benefícios */}
+            <section className="mt-12 sm:mt-14">
+              <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.17em] text-emerald-300">
+                    Simples por natureza
+                  </p>
+
+                  <h2 className="mt-2 text-xl font-semibold text-white sm:text-2xl">
+                    Menos etapas. Mais clareza.
+                  </h2>
                 </div>
 
-                <div className="min-h-[360px] lg:min-h-0">
-                  <WhatsAppResultPanel
-                    result={whatsapp.result}
-                    canConfirm={whatsapp.canConfirm}
-                    confidence={whatsapp.confidence}
-                    confirming={whatsapp.confirming}
-                    success={whatsapp.success}
-                    onConfirm={() => void whatsapp.confirmTransaction()}
-                    onReset={whatsapp.reset}
-                  />
-                </div>
+                <p className="max-w-md text-xs leading-5 text-slate-500 sm:text-right">
+                  Conheça o fluxo proposto antes de experimentar a demonstração.
+                </p>
               </div>
 
-              {(whatsapp.error || whatsapp.success) && (
-                <div className="mt-2 shrink-0">
-                  {whatsapp.error && (
-                    <div className="flex items-center gap-2 rounded-xl border border-rose-400/10 bg-rose-400/[0.05] px-3 py-2 text-[10px] text-rose-300">
-                      <MessageCircle size={12} className="shrink-0" />
+              <div className="grid gap-4 md:grid-cols-3">
+                {benefits.map((benefit, index) => {
+                  const Icon = benefit.icon;
 
-                      <span className="truncate">{whatsapp.error}</span>
-                    </div>
-                  )}
+                  return (
+                    <motion.article
+                      key={benefit.number}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: 0.4,
+                        delay: index * 0.1,
+                      }}
+                      className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#061b2b]/75 p-5 transition duration-300 hover:-translate-y-1 hover:border-emerald-400/20 hover:bg-[#082033]"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-emerald-400/10 bg-emerald-400/[0.07] text-emerald-300 transition group-hover:bg-emerald-400/[0.12]">
+                          <Icon size={20} />
+                        </div>
 
-                  {whatsapp.success && (
-                    <div className="flex items-center gap-2 rounded-xl border border-emerald-400/10 bg-emerald-400/[0.05] px-3 py-2 text-[10px] text-emerald-300">
-                      <CheckCircle2 size={12} className="shrink-0" />
+                        <span className="text-xs font-medium tracking-wider text-slate-700">
+                          {benefit.number}
+                        </span>
+                      </div>
 
-                      <span className="truncate">{whatsapp.success}</span>
-                    </div>
-                  )}
-                </div>
-              )}
+                      <h3 className="mt-5 text-base font-semibold text-white">
+                        {benefit.title}
+                      </h3>
+
+                      <p className="mt-2 text-sm leading-6 text-slate-500">
+                        {benefit.description}
+                      </p>
+                    </motion.article>
+                  );
+                })}
+              </div>
             </section>
+
+            {/* Chamada para demonstração */}
+            <section className="relative mt-8 overflow-hidden rounded-[26px] border border-emerald-400/15 bg-[#061b2b]/90 sm:mt-10">
+              <div className="pointer-events-none absolute -right-20 -top-32 h-72 w-72 rounded-full bg-emerald-400/[0.07] blur-[90px]" />
+
+              <div className="relative flex flex-col gap-6 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between lg:px-10 lg:py-9">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-emerald-400/15 bg-emerald-400/[0.08] text-emerald-300">
+                    <Sparkles size={22} />
+                  </div>
+
+                  <div className="max-w-xl">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-emerald-300">
+                      Experimente
+                    </p>
+
+                    <h2 className="mt-2 text-xl font-semibold text-white sm:text-2xl">
+                      Veja o fluxo funcionando.
+                    </h2>
+
+                    <p className="mt-2 text-sm leading-6 text-slate-400">
+                      Envie uma mensagem de exemplo, confira os dados
+                      interpretados e explore a experiência demonstrativa.
+                    </p>
+                  </div>
+                </div>
+
+                <Link
+                  href="/whatsapp/demo"
+                  className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-emerald-400 px-5 py-3.5 text-sm font-bold text-[#031321] shadow-[0_10px_35px_-15px_rgba(52,211,153,.55)] transition hover:bg-emerald-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#061b2b]"
+                >
+                  Abrir demonstração
+                  <ArrowRight size={17} />
+                </Link>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-white/[0.06] px-6 py-3.5 sm:px-8 lg:px-10">
+                <span className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                  <CheckCircle2 size={13} className="text-emerald-400" />
+                  Usa a conta autenticada
+                </span>
+
+                <span className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                  <ShieldCheck size={13} className="text-emerald-400" />
+                  Confirmação antes do lançamento
+                </span>
+              </div>
+            </section>
+
+            <footer className="mt-8 flex flex-col gap-2 border-t border-white/[0.05] pt-5 text-[11px] text-slate-600 sm:flex-row sm:items-center sm:justify-between">
+              <span>MetricsFlow AI · Gestão financeira simplificada</span>
+              <span>
+                Ambiente demonstrativo · Recursos sujeitos à implementação
+              </span>
+            </footer>
           </div>
         </main>
       </div>
     </div>
   );
 }
-
-
-

@@ -121,7 +121,7 @@ export function ResetPasswordForm() {
         </h1>
 
         <p className="mt-2 text-xs leading-5 text-slate-400">
-          Escolha uma nova senha para proteger sua conta do MetricsFlow AI.
+          Escolha uma nova senha para proteger sua conta da MetricsFlow AI.
         </p>
       </div>
 

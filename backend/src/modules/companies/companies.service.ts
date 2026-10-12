@@ -2,52 +2,37 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
-import { SupabaseService } from '../supabase.service';
+
 import { CreateCompanyDto } from './dto/create-company.dto';
+import { CompaniesRepository } from './companies.repository';
 
 @Injectable()
 export class CompaniesService {
-  constructor(private readonly supabaseService: SupabaseService) {}
+  private readonly logger = new Logger(CompaniesService.name);
+
+  constructor(private readonly companiesRepository: CompaniesRepository) {}
 
   async findAll() {
-    const { data, error } = await this.supabaseService
-      .getClient()
-      .from('companies')
-      .select('*');
+    const { data, error } = await this.companiesRepository.findAll();
 
     if (error) {
-      throw new Error(error.message);
+      this.handleDatabaseError('listar empresas', error);
     }
 
-    return data;
+    return data ?? [];
   }
 
   async findByUser(userId: string) {
-    const { data, error } = await this.supabaseService
-      .getClient()
-      .from('company_members')
-      .select(
-        `
-      role,
-      companies (
-        id,
-        name,
-        document,
-        phone_number,
-        invite_code,
-        created_at,
-        updated_at
-      )
-    `,
-      )
-      .eq('user_id', userId);
+    const { data, error } = await this.companiesRepository.findByUser(userId);
 
     if (error) {
-      throw new Error(error.message);
+      this.handleDatabaseError('listar empresas do usuário', error);
     }
 
-    return data
+    return (data ?? [])
       .filter((item) => item.companies)
       .map((item) => {
         const company = Array.isArray(item.companies)
@@ -60,19 +45,13 @@ export class CompaniesService {
         };
       });
   }
-  
+
   async create(dto: CreateCompanyDto, userId: string) {
     const { data: existingOwner, error: ownerError } =
-      await this.supabaseService
-        .getClient()
-        .from('company_members')
-        .select('id')
-        .eq('user_id', userId)
-        .eq('role', 'owner')
-        .maybeSingle();
+      await this.companiesRepository.findOwnerMembership(userId);
 
     if (ownerError) {
-      throw new Error(ownerError.message);
+      this.handleDatabaseError('verificar propriedade de empresa', ownerError);
     }
 
     if (existingOwner) {
@@ -81,32 +60,24 @@ export class CompaniesService {
       );
     }
 
-    const { data: company, error: companyError } = await this.supabaseService
-      .getClient()
-      .from('companies')
-      .insert({
-        name: dto.name,
-        document: dto.document,
-        phone_number: dto.phone_number,
-      })
-      .select()
-      .single();
+    const { data: company, error: companyError } =
+      await this.companiesRepository.createCompany(dto);
 
     if (companyError) {
-      throw new Error(companyError.message);
+      this.handleDatabaseError('criar empresa', companyError);
     }
 
-    const { error: memberError } = await this.supabaseService
-      .getClient()
-      .from('company_members')
-      .insert({
-        company_id: company.id,
-        user_id: userId,
-        role: 'owner',
-      });
+    if (!company) {
+      throw new InternalServerErrorException(
+        'Não foi possível confirmar a criação da empresa.',
+      );
+    }
+
+    const { error: memberError } =
+      await this.companiesRepository.createMembership(company.id, userId);
 
     if (memberError) {
-      throw new Error(memberError.message);
+      this.handleDatabaseError('vincular proprietário à empresa', memberError);
     }
 
     return company;
@@ -114,39 +85,55 @@ export class CompaniesService {
 
   async findMembers(companyId: string, userId: string) {
     const { data: membership, error: membershipError } =
-      await this.supabaseService
-        .getClient()
-        .from('company_members')
-        .select('id')
-        .eq('company_id', companyId)
-        .eq('user_id', userId)
-        .maybeSingle();
+      await this.companiesRepository.findMembership(companyId, userId);
 
     if (membershipError) {
-      throw new Error(membershipError.message);
+      this.handleDatabaseError('validar acesso à empresa', membershipError);
     }
 
     if (!membership) {
       throw new ForbiddenException('Você não possui acesso a esta empresa.');
     }
 
-    const { data, error } = await this.supabaseService
-      .getClient()
-      .from('company_members')
-      .select(
-        `
-      id,
-      user_id,
-      role,
-      created_at
-    `,
-      )
-      .eq('company_id', companyId);
+    const { data, error } =
+      await this.companiesRepository.findMembers(companyId);
 
     if (error) {
-      throw new Error(error.message);
+      this.handleDatabaseError('listar membros da empresa', error);
     }
 
-    return data;
+    return data ?? [];
+  }
+
+  private handleDatabaseError(
+    operation: string,
+    error: { message: string; code?: string },
+  ): never {
+    this.logger.error(
+      `Falha ao ${operation}. Código: ${error.code ?? 'desconhecido'}.`,
+      error.message,
+    );
+
+    if (error.code === '23505') {
+      throw new ConflictException(
+        'Já existe um registro com os dados informados.',
+      );
+    }
+
+    if (error.code === '23503') {
+      throw new ConflictException(
+        'A operação referencia um registro inexistente ou inválido.',
+      );
+    }
+
+    if (error.code === '22P02') {
+      throw new ConflictException(
+        'Um dos identificadores ou valores informados é inválido.',
+      );
+    }
+
+    throw new InternalServerErrorException(
+      `Não foi possível ${operation}. Tente novamente mais tarde.`,
+    );
   }
 }

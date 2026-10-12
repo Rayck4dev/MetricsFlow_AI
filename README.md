@@ -26,7 +26,7 @@
 
 > **CPM — Controle e Planejamento Financeiro para MEIs**
 
-**Você conversa. O MetricsFlow organiza.**
+**Você conversa. A MetricsFlow organiza.**
 
 A **MetricsFlow AI** é uma plataforma de gestão financeira desenvolvida para **Microempreendedores Individuais (MEIs)**, com foco em simplificar o controle das movimentações financeiras e oferecer uma visão clara da saúde financeira do negócio.
 
@@ -103,9 +103,9 @@ Para consultar o passo a passo completo de instalação, configuração das vari
 
 **V1:** plataforma web de gestão financeira funcional.
 
-**V2:** frontend + backend estruturados, Supabase integrado, API REST, módulo de IA, parser financeiro, preparação para transcrição e estrutura inicial do módulo WhatsApp.
+**V2:** frontend + backend estruturados, Supabase integrado, API REST e uma demonstração interativa de conversa em `/whatsapp/demo`, com interpretação financeira de texto, gravação de áudio e transcrição via OpenAI.
 
-A integração real com WhatsApp em produção permanece em desenvolvimento.
+**Importante:** `/whatsapp/demo` simula a interface do WhatsApp Web, mas não se conecta à Meta nem envia mensagens pelo WhatsApp. As mensagens são persistidas na conta autenticada e a confirmação registra movimentações na empresa ativa; use dados fictícios na apresentação. A integração oficial com WhatsApp/Meta permanece em desenvolvimento.
 
 ## 📄 Licença
 

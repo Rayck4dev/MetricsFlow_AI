@@ -1,6 +1,6 @@
 ## 🎯 Objetivo
 
-O objetivo do MetricsFlow AI é oferecer ao MEI uma ferramenta simples, visual e acessível para:
+O objetivo da MetricsFlow AI é oferecer ao MEI uma ferramenta simples, visual e acessível para:
 
 - Registrar receitas;
 - Registrar despesas;
@@ -28,7 +28,7 @@ O objetivo do MetricsFlow AI é oferecer ao MEI uma ferramenta simples, visual e
 
 # 🧠 Visão do produto
 
-O MetricsFlow AI pretende evoluir de uma plataforma de controle financeiro para um **assistente de gestão financeira voltado para MEIs**.
+A MetricsFlow AI pretende evoluir de uma plataforma de controle financeiro para um **assistente de gestão financeira voltado para MEIs**.
 
 A evolução do produto ocorre em duas etapas:
 
@@ -74,7 +74,7 @@ A proposta é tornar o controle financeiro mais simples para empreendedores que 
 
 # 👩‍💻 Desenvolvimento individual
 
-O MetricsFlow AI é desenvolvido individualmente.
+A MetricsFlow AI é desenvolvida individualmente.
 
 Dessa forma, as responsabilidades necessárias para a construção do produto são acumuladas pela mesma desenvolvedora.
 
