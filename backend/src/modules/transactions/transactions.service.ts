@@ -13,7 +13,7 @@ import {
 } from './dto/create-transaction.dto';
 import { TransactionFiltersDto } from './dto/transaction-filters.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
-import { TransactionsRepository } from './transactions.repository';
+import { TransactionsRepository } from './repositories/transactions.repository';
 
 type TransactionCategory = {
   id: string;
@@ -35,10 +35,6 @@ export class TransactionsService {
   constructor(
     private readonly transactionsRepository: TransactionsRepository,
   ) {}
-
-  /**
-   * Cria uma movimentação financeira.
-   */
   async create(dto: CreateTransactionDto, userId: string) {
     await this.ensureCompanyAccess(dto.company_id, userId);
 
@@ -67,10 +63,6 @@ export class TransactionsService {
 
     return data;
   }
-
-  /**
-   * Lista movimentações das empresas às quais o usuário pertence.
-   */
   async findByUser(userId: string, filters: TransactionFiltersDto) {
     this.validateDateRange(filters);
 
@@ -139,10 +131,6 @@ export class TransactionsService {
     return data ?? [];
   }
 
-  /**
-   * Atualiza uma movimentação existente.
-   * Não permite alterar a empresa nem o usuário que a criou.
-   */
   async update(
     transactionId: string,
     dto: UpdateTransactionDto,
@@ -234,9 +222,6 @@ export class TransactionsService {
     return data;
   }
 
-  /**
-   * Exclui uma movimentação após validar o acesso à empresa.
-   */
   async remove(transactionId: string, userId: string) {
     this.ensureValidTransactionId(transactionId);
 
@@ -278,9 +263,6 @@ export class TransactionsService {
     };
   }
 
-  /**
-   * Verifica se o usuário pertence à empresa.
-   */
   private async ensureCompanyAccess(
     companyId: string,
     userId: string,
@@ -297,10 +279,6 @@ export class TransactionsService {
     }
   }
 
-  /**
-   * Confere se a categoria existe na empresa e corresponde
-   * ao tipo da movimentação.
-   */
   private async ensureCategoryCompatibility(
     categoryId: string,
     companyId: string,
@@ -328,9 +306,6 @@ export class TransactionsService {
     return category as TransactionCategory;
   }
 
-  /**
-   * Valida o intervalo de datas informado nos filtros.
-   */
   private validateDateRange(filters: TransactionFiltersDto): void {
     if (!filters.start_date || !filters.end_date) {
       return;
@@ -352,9 +327,6 @@ export class TransactionsService {
     }
   }
 
-  /**
-   * Valida o formato UUID versão 4 do identificador.
-   */
   private ensureValidTransactionId(transactionId: string): void {
     const uuidV4Pattern =
       /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -366,10 +338,6 @@ export class TransactionsService {
     }
   }
 
-  /**
-   * Registra detalhes técnicos no servidor sem expor
-   * mensagens internas do banco ao cliente.
-   */
   private handleDatabaseError(
     operation: string,
     error: { message: string; code?: string },

@@ -3,7 +3,11 @@
 import { motion } from "framer-motion";
 import { BarChart3, Download, Sparkles } from "lucide-react";
 
-import { DrePeriodSelector, type DrePeriod } from "./DrePeriodSelector";
+import {
+  DrePeriodSelector,
+  type DrePeriod,
+  type DreCustomRange,
+} from "./DrePeriodSelector";
 
 import { NotificationBell } from "@/components/notifications/Notification";
 
@@ -11,6 +15,8 @@ interface DreHeaderProps {
   companyName?: string;
   period: DrePeriod;
   onPeriodChange: (period: DrePeriod) => void;
+  customRange: DreCustomRange;
+  onCustomRangeChange: (range: DreCustomRange) => void;
   onExport?: () => void;
 }
 
@@ -18,6 +24,8 @@ export function DreHeader({
   companyName,
   period,
   onPeriodChange,
+  customRange,
+  onCustomRangeChange,
   onExport,
 }: DreHeaderProps) {
   return (
@@ -63,7 +71,12 @@ export function DreHeader({
         <div className="relative z-10 flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
           <NotificationBell />
 
-          <DrePeriodSelector value={period} onChange={onPeriodChange} />
+          <DrePeriodSelector
+            value={period}
+            onChange={onPeriodChange}
+            customRange={customRange}
+            onCustomRangeChange={onCustomRangeChange}
+          />
 
           <button
             type="button"
@@ -79,4 +92,3 @@ export function DreHeader({
     </motion.header>
   );
 }
-

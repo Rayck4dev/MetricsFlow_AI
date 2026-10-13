@@ -18,6 +18,7 @@ interface TransactionRowProps {
 
   onEdit?: (transaction: Movimentacao) => void;
   onDelete?: (transaction: Movimentacao) => void;
+  onManageAttachment?: (transaction: Movimentacao) => void;
 }
 
 export function TransactionRow({
@@ -25,13 +26,14 @@ export function TransactionRow({
   index,
   onEdit,
   onDelete,
+  onManageAttachment,
 }: TransactionRowProps) {
   const income = transaction.type === "income";
 
   const PaymentIcon = getPaymentIcon(transaction.paymentMethod);
   const paymentMethodLabel = getPaymentMethodLabel(transaction.paymentMethod);
 
-  const hasActions = Boolean(onEdit || onDelete);
+  const hasActions = Boolean(onEdit || onDelete || onManageAttachment);
 
   return (
     <motion.div
@@ -120,12 +122,14 @@ export function TransactionRow({
             transaction={transaction}
             onEdit={onEdit}
             onDelete={onDelete}
+            onManageAttachment={onManageAttachment}
           />
 
           <TransactionMobileActions
             transaction={transaction}
             onEdit={onEdit}
             onDelete={onDelete}
+            onManageAttachment={onManageAttachment}
           />
         </>
       )}

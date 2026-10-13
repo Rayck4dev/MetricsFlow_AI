@@ -4,7 +4,7 @@ import { AuthModule } from '../auth/auth.module';
 import { SupabaseModule } from '../supabase.module';
 
 import { CategoriesController } from './categories.controller';
-import { CategoriesRepository } from './categories.repository';
+import { CategoriesRepository } from './repositories/categories.repository';
 import { CategoriesService } from './categories.service';
 
 @Module({

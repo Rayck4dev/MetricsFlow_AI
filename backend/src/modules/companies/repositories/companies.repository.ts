@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
-import { SupabaseService } from '../supabase.service';
-import { CreateCompanyDto } from './dto/create-company.dto';
+import { SupabaseService } from '../../supabase.service';
+import { CreateCompanyDto } from '../dto/create-company.dto';
 
 @Injectable()
 export class CompaniesRepository {

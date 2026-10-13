@@ -21,6 +21,8 @@ export default function Dre({ transactions, userName, companyName }: DreProps) {
   const {
     period,
     setPeriod,
+    customRange,
+    setCustomRange,
 
     financialData,
 
@@ -39,6 +41,8 @@ export default function Dre({ transactions, userName, companyName }: DreProps) {
         companyName={companyName}
         period={period}
         onPeriodChange={setPeriod}
+        customRange={customRange}
+        onCustomRangeChange={setCustomRange}
         onExport={exportDreCsv}
       />
 

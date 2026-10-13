@@ -13,6 +13,7 @@ import { TransactionsModule } from './modules/transactions/transactions.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { WhatsappModule } from './modules/whatsapp/whatsapp.module';
 import { AiModule } from './modules/ai/ai.module';
+import { AttachmentsModule } from './modules/attachments/attachments.module';
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import { AiModule } from './modules/ai/ai.module';
     CategoriesModule,
     WhatsappModule,
     AiModule,
-  ],
+    AttachmentsModule,
+    ],
   controllers: [AppController, SupabaseTestController],
   providers: [AppService],
 })

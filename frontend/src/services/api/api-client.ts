@@ -34,7 +34,6 @@ async function getAuthToken(): Promise<string | null> {
       return null;
     }
 
-    // Se estiver expirando nos próximos 30 segundos, renova
     const expiresAt = session.expires_at;
     if (expiresAt && expiresAt * 1000 - Date.now() < 30_000) {
       const { data: refreshed } = await supabase.auth.refreshSession();
@@ -97,7 +96,6 @@ async function request<T>(
 
   if (body instanceof FormData) {
     requestBody = body;
-    // Não definir Content-Type para FormData para permitir que o navegador defina o boundary
   } else if (body !== undefined && body !== null) {
     if (!headers.has("Content-Type")) {
       headers.set("Content-Type", "application/json");

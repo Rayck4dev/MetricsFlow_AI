@@ -21,6 +21,7 @@ export default function MovimentacoesPage() {
     exportTransactionsCsv,
     toast,
     closeToast,
+    currentUserId,
   } = useMovimentacoesPage();
 
   if (loading || roleLoading) {
@@ -57,6 +58,8 @@ export default function MovimentacoesPage() {
               categories={categories}
               userName={userName}
               companyName={companyName}
+              currentUserId={currentUserId}
+              isOwner={isOwner}
               onAddIncome={handleAddTransaction}
               onAddExpense={handleAddTransaction}
               onUpdateTransaction={
@@ -81,4 +84,3 @@ export default function MovimentacoesPage() {
     </div>
   );
 }
-

@@ -13,6 +13,7 @@ interface MovimentacoesTableProps {
 
   onEdit?: (transaction: Movimentacao) => void;
   onDelete?: (transaction: Movimentacao) => void;
+  onManageAttachment?: (transaction: Movimentacao) => void;
 }
 
 export function MovimentacoesTable({
@@ -20,8 +21,9 @@ export function MovimentacoesTable({
   totalTransactions,
   onEdit,
   onDelete,
+  onManageAttachment,
 }: MovimentacoesTableProps) {
-  const hasActions = Boolean(onEdit || onDelete);
+  const hasActions = Boolean(onEdit || onDelete || onManageAttachment);
 
   return (
     <motion.section
@@ -127,7 +129,7 @@ export function MovimentacoesTable({
             </span>
 
             {hasActions && (
-              <span className="text-right text-[8px] font-bold uppercase tracking-wider text-slate-600">
+              <span className="text-center text-[8px] font-bold uppercase tracking-wider text-slate-600">
                 Ações
               </span>
             )}
@@ -141,6 +143,7 @@ export function MovimentacoesTable({
                 index={index}
                 onEdit={onEdit}
                 onDelete={onDelete}
+                onManageAttachment={onManageAttachment}
               />
             ))}
           </div>

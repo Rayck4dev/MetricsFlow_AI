@@ -38,10 +38,6 @@ export class WhatsappService {
     private readonly metaService: MetaService,
     private readonly processMessageService: ProcessMessageService,
   ) {}
-
-  /**
-   * Registra mensagens de demonstração na tabela whatsapp_messages.
-   */
   private async recordDemoMessage(params: {
     companyId: string;
     userId: string;
@@ -81,10 +77,6 @@ export class WhatsappService {
 
     return data;
   }
-
-  /**
-   * Recupera o histórico de mensagens da demonstração ou retorna a mensagem de boas-vindas padrão.
-   */
   async getDemoMessages(user: User) {
     const company = await this.getUserCompany(user.id);
     const supabase = this.supabaseService.getClient();
@@ -131,7 +123,10 @@ export class WhatsappService {
     const formattedMessages = [...(history ?? [])].reverse().map((m, index) => {
       const date = new Date(m.created_at);
       const time = !Number.isNaN(date.getTime())
-        ? date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+        ? date.toLocaleTimeString('pt-BR', {
+            hour: '2-digit',
+            minute: '2-digit',
+          })
         : '12:00';
 
       return {
@@ -177,10 +172,6 @@ export class WhatsappService {
       company: { id: company.id, name: company.name },
     };
   }
-
-  /**
-   * Processa áudio enviado pela demonstração do WhatsApp.
-   */
   async processDemoAudio(
     file: { buffer?: Buffer; mimetype?: string; originalname?: string },
     user: User,
@@ -217,11 +208,6 @@ export class WhatsappService {
       transcription: normalizedText,
     };
   }
-
-  /**
-   * Processa mensagens enviadas pela demonstração do WhatsApp Web.
-   * Não depende da API oficial da Meta.
-   */
   async processDemoMessage(
     text: string,
     user: User,
@@ -263,8 +249,6 @@ export class WhatsappService {
     }
 
     const pending = pendingLatest;
-
-    // 2. Registrar mensagem recebida do usuário
     await this.recordDemoMessage({
       companyId: company.id,
       userId: user.id,
@@ -274,8 +258,6 @@ export class WhatsappService {
       transcription: options?.transcription ?? null,
       pendingTransactionId: pending?.id ?? null,
     });
-
-    // 3. Checar intenções de comando rápido sobre proposta existente
     const isConfirmation =
       /^(confirmar|confirmo|sim|ok|pode confirmar|pode registrar|confirmado)[.! ]*$/i.test(
         normalizedText,
@@ -289,7 +271,11 @@ export class WhatsappService {
         normalizedText,
       );
 
-    if (isConfirmation && pending && pending.status === 'awaiting_confirmation') {
+    if (
+      isConfirmation &&
+      pending &&
+      pending.status === 'awaiting_confirmation'
+    ) {
       const confirmResult = await this.confirmTransaction(
         { pendingTransactionId: pending.id },
         user,
@@ -401,8 +387,6 @@ export class WhatsappService {
         reply: replyText,
       };
     }
-
-    // 4. Guard de segurança
     const guard = this.messageGuardService.check(
       normalizedText,
       Boolean(pending && pending.status === 'awaiting_information'),
@@ -565,13 +549,9 @@ export class WhatsappService {
       missingFields,
     };
   }
-
-  /**
-   * Confirma exclusivamente uma proposta salva no Supabase.
-   * Os valores financeiros não são recebidos do frontend.
-   */
   async confirmTransaction(body: ConfirmWhatsappDto, user: User) {
-    const pendingId = body?.pendingTransactionId || body?.pending_transaction_id;
+    const pendingId =
+      body?.pendingTransactionId || body?.pending_transaction_id;
 
     if (!pendingId) {
       throw new BadRequestException('Informe o identificador da proposta.');

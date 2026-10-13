@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
-import { SupabaseService } from '../supabase.service';
-import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { TransactionFiltersDto } from './dto/transaction-filters.dto';
+import { SupabaseService } from '../../supabase.service';
+import { CreateTransactionDto } from '../dto/create-transaction.dto';
+import { TransactionFiltersDto } from '../dto/transaction-filters.dto';
 
 @Injectable()
 export class TransactionsRepository {
@@ -12,19 +12,12 @@ export class TransactionsRepository {
     return this.supabaseService.getClient();
   }
 
-  /**
-   * Busca as empresas às quais o usuário pertence.
-   */
   async findCompanyIdsByUser(userId: string) {
     return this.supabase
       .from('company_members')
       .select('company_id')
       .eq('user_id', userId);
   }
-
-  /**
-   * Verifica se o usuário pertence à empresa.
-   */
   async findMembership(companyId: string, userId: string) {
     return this.supabase
       .from('company_members')
@@ -33,10 +26,6 @@ export class TransactionsRepository {
       .eq('user_id', userId)
       .maybeSingle();
   }
-
-  /**
-   * Busca uma categoria dentro de uma empresa.
-   */
   async findCategory(categoryId: string, companyId: string) {
     return this.supabase
       .from('categories')
@@ -45,11 +34,6 @@ export class TransactionsRepository {
       .eq('company_id', companyId)
       .maybeSingle();
   }
-
-  /**
-   * Busca uma categoria pelo identificador.
-   * Utilizado na validação de filtros.
-   */
   async findCategoryById(categoryId: string) {
     return this.supabase
       .from('categories')
@@ -57,10 +41,6 @@ export class TransactionsRepository {
       .eq('id', categoryId)
       .maybeSingle();
   }
-
-  /**
-   * Cria uma movimentação financeira.
-   */
   async create(dto: CreateTransactionDto, userId: string) {
     return this.supabase
       .from('transactions')
@@ -78,10 +58,6 @@ export class TransactionsRepository {
       .select()
       .single();
   }
-
-  /**
-   * Lista movimentações das empresas autorizadas.
-   */
   async findAll(companyIds: string[], filters: TransactionFiltersDto) {
     let query = this.supabase
       .from('transactions')
@@ -124,10 +100,6 @@ export class TransactionsRepository {
       ascending: false,
     });
   }
-
-  /**
-   * Busca uma movimentação pelo identificador.
-   */
   async findById(transactionId: string) {
     return this.supabase
       .from('transactions')
@@ -135,10 +107,6 @@ export class TransactionsRepository {
       .eq('id', transactionId)
       .maybeSingle();
   }
-
-  /**
-   * Atualiza uma movimentação dentro da empresa.
-   */
   async update(
     transactionId: string,
     companyId: string,
@@ -152,10 +120,6 @@ export class TransactionsRepository {
       .select()
       .maybeSingle();
   }
-
-  /**
-   * Exclui uma movimentação dentro da empresa.
-   */
   async delete(transactionId: string, companyId: string) {
     return this.supabase
       .from('transactions')

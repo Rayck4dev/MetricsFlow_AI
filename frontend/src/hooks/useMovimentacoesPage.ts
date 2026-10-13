@@ -24,6 +24,7 @@ interface ToastState {
 
 export function useMovimentacoesPage() {
   const [transactions, setTransactions] = useState<Movimentacao[]>([]);
+  const [currentUserId, setCurrentUserId] = useState("");
 
   const [transactionDatabaseDates, setTransactionDatabaseDates] = useState<
     Record<string, string>
@@ -33,9 +34,7 @@ export function useMovimentacoesPage() {
   const [companyName, setCompanyName] = useState("Empresa");
 
   const [companyId, setCompanyId] = useState<string | null>(null);
-
   const [categories, setCategories] = useState<Category[]>([]);
-
   const [loading, setLoading] = useState(true);
 
   const [toast, setToast] = useState<ToastState>({
@@ -77,7 +76,6 @@ export function useMovimentacoesPage() {
     }
 
     const today = new Date();
-
     const todayString = today.toISOString().split("T")[0];
 
     if (date === todayString) {
@@ -85,7 +83,6 @@ export function useMovimentacoesPage() {
     }
 
     const yesterday = new Date();
-
     yesterday.setDate(yesterday.getDate() - 1);
 
     const yesterdayString = yesterday.toISOString().split("T")[0];
@@ -110,7 +107,6 @@ export function useMovimentacoesPage() {
 
     if (date.toLowerCase().startsWith("ontem")) {
       const yesterday = new Date();
-
       yesterday.setDate(yesterday.getDate() - 1);
 
       return yesterday.toISOString().split("T")[0];
@@ -138,6 +134,8 @@ export function useMovimentacoesPage() {
     if (!user) {
       throw new Error("Usuário não autenticado.");
     }
+
+    setCurrentUserId(user.id);
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
@@ -272,7 +270,6 @@ export function useMovimentacoesPage() {
 
       const escapeCsvValue = (value: string | number | null | undefined) => {
         const normalized = String(value ?? "");
-
         return `"${normalized.replace(/"/g, '""')}"`;
       };
 
@@ -345,9 +342,7 @@ export function useMovimentacoesPage() {
       });
 
       const url = URL.createObjectURL(blob);
-
       const link = document.createElement("a");
-
       const now = new Date();
 
       const year = now.getFullYear();
@@ -542,5 +537,7 @@ export function useMovimentacoesPage() {
 
     toast,
     closeToast,
+
+    currentUserId,
   };
 }

@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans, Geist } from "next/font/google";
 
 import "./globals.css";
 import { UserProvider } from "@/contexts/UserContext";
+import { cn } from "@/lib/utils";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -28,7 +26,7 @@ export default function RootLayout({
     <html
       lang="pt-BR"
       data-scroll-behavior="smooth"
-      className={`${inter.variable} ${jakarta.variable}`}
+      className={cn(jakarta.variable, "font-sans", geist.variable)}
     >
       <body className="bg-surface-main antialiased selection:bg-brand-500 selection:text-white">
         <UserProvider>{children}</UserProvider>

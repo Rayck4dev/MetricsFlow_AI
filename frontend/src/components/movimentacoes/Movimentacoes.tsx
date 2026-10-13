@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { AnimatePresence, motion } from "framer-motion";
 
 import { MovimentacoesHeader } from "./MovimentacoesHeader";
@@ -13,6 +15,7 @@ import { ReceitaModal } from "./ReceitaModal";
 import { DespesaModal } from "./DespesaModal";
 import { TransactionEditModal } from "./transactions/TransactionEditModal";
 import { TransactionDeleteDialog } from "./transactions/TransactionDeleteDialog";
+import { TransactionAttachmentsModal } from "./transactions/TransactionAttachmentsModal";
 
 import { useMovimentacoes } from "@/hooks/useMovimentacoes";
 
@@ -30,6 +33,9 @@ export interface MovimentacoesProps {
 
   userName?: string;
   companyName?: string;
+
+  currentUserId?: string;
+  isOwner?: boolean;
 
   onAddIncome?: (transaction: Omit<Movimentacao, "id">) => void | Promise<void>;
 
@@ -52,6 +58,8 @@ export function Movimentacoes({
   categories: externalCategories = [],
   userName,
   companyName,
+  currentUserId,
+  isOwner,
   onAddIncome,
   onAddExpense,
   onUpdateTransaction,
@@ -104,6 +112,17 @@ export function Movimentacoes({
     onUpdateTransaction,
     onDeleteTransaction,
   });
+
+  const [attachmentTransaction, setAttachmentTransaction] =
+    useState<Movimentacao | null>(null);
+
+  function openAttachment(transaction: Movimentacao) {
+    setAttachmentTransaction(transaction);
+  }
+
+  function closeAttachment() {
+    setAttachmentTransaction(null);
+  }
 
   const incomeCategories = externalCategories
     .filter((c) => c.type === "income")
@@ -206,6 +225,7 @@ export function Movimentacoes({
           totalTransactions={transactions.length}
           onEdit={onUpdateTransaction ? openEdit : undefined}
           onDelete={onDeleteTransaction ? openDelete : undefined}
+          onManageAttachment={openAttachment}
         />
       </div>
 
@@ -231,10 +251,7 @@ export function Movimentacoes({
             transaction={editingTransaction}
             onClose={closeEdit}
             onSubmit={handleEdit}
-            categories={[
-              ...incomeCategories,
-              ...expenseCategories,
-            ]}
+            categories={[...incomeCategories, ...expenseCategories]}
           />
         )}
 
@@ -243,6 +260,15 @@ export function Movimentacoes({
             transaction={deletingTransaction}
             onClose={closeDelete}
             onConfirm={handleDelete}
+          />
+        )}
+
+        {attachmentTransaction && (
+          <TransactionAttachmentsModal
+            transaction={attachmentTransaction}
+            onClose={closeAttachment}
+            currentUserId={currentUserId ?? ""}
+            isOwner={isOwner ?? false}
           />
         )}
       </AnimatePresence>

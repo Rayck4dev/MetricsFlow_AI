@@ -2,46 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  scroll-behavior: smooth;
+@layer base {
+  .theme {
+    --font-heading: var(--font-sans);
+    --font-sans: var(--font-sans);
+  }
+
+  :root {
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary: oklch(0.205 0 0);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.205 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.708 0 0);
+    --radius: 0.625rem;
+  }
+
+  .dark {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.922 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply bg-[#001D39] text-white;
+  }
+
+  html {
+    @apply font-sans;
+  }
 }
 
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #081522;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #24364a;
-  border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #31506a;
-}
-
-html {
+.dre-period-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: #24364a #081522;
+  scrollbar-color: #334e70 transparent;
 }
 
-.chat-wallpaper {
-  background-color: #0b141a;
-  background-image:
-    radial-gradient(
-      circle at 20% 20%,
-      rgba(42, 65, 77, 0.13) 1px,
-      transparent 1.5px
-    ),
-    radial-gradient(
-      circle at 75% 70%,
-      rgba(42, 65, 77, 0.12) 1px,
-      transparent 1.5px
-    );
-  background-size:
-    26px 26px,
-    34px 34px;
+.dre-period-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dre-period-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dre-period-scrollbar::-webkit-scrollbar-thumb {
+  background: #334e70;
+  border-radius: 999px;
+}
+
+.dre-period-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #4b6f99;
 }

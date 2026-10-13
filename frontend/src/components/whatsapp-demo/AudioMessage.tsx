@@ -8,7 +8,6 @@ import { formatDuration } from "@/lib/whatsapp-demo/audio";
 const SPEEDS = [1, 1.5, 2];
 let activeAudio: HTMLAudioElement | null = null;
 
-/** Áudio enviado pela pessoa (o bot nunca envia áudio). */
 export function AudioMessage({ audio }: { audio: DemoAudio }) {
   const ref = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);

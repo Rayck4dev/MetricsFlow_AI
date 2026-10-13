@@ -10,7 +10,6 @@ export function nowTime() {
   });
 }
 
-/** Reduz os picos capturados na gravação para `bars` barras normalizadas (0.12 a 1). */
 export function resampleWave(levels: number[], bars = 34): number[] {
   if (!levels.length) return Array.from({ length: bars }, () => 0.2);
   const max = Math.max(...levels, 0.01);

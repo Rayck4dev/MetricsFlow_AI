@@ -54,7 +54,6 @@ export default function WhatsAppPage() {
         <Sidebar userName={user?.name} companyName={user?.companyName} />
 
         <main className="relative min-w-0 flex-1 overflow-x-hidden">
-          {/* Fundo decorativo discreto */}
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
             <div className="absolute -right-48 -top-40 h-[500px] w-[500px] rounded-full bg-emerald-400/[0.045] blur-[130px]" />
             <div className="absolute -bottom-48 left-[15%] h-[420px] w-[420px] rounded-full bg-cyan-400/[0.025] blur-[120px]" />
@@ -70,7 +69,6 @@ export default function WhatsAppPage() {
           </div>
 
           <div className="relative z-10 mx-auto w-full max-w-[1500px] px-4 pb-10 pt-20 sm:px-6 sm:pb-12 lg:px-8 lg:pb-14 lg:pt-8 xl:px-10">
-            {/* Título da seção */}
             <header className="mb-7 flex flex-col gap-3 sm:mb-9 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <div className="mb-3 flex items-center gap-2 text-xs font-medium text-emerald-300">
@@ -108,13 +106,11 @@ export default function WhatsAppPage() {
               </div>
             </header>
 
-            {/* Hero principal */}
             <WhatsAppHeader
               whatsappConnected={whatsappConnected}
               phoneNumber={connection.connection?.phoneNumber}
             />
 
-            {/* Benefícios */}
             <section className="mt-12 sm:mt-14">
               <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                 <div>
@@ -170,7 +166,6 @@ export default function WhatsAppPage() {
               </div>
             </section>
 
-            {/* Chamada para demonstração */}
             <section className="relative mt-8 overflow-hidden rounded-[26px] border border-emerald-400/15 bg-[#061b2b]/90 sm:mt-10">
               <div className="pointer-events-none absolute -right-20 -top-32 h-72 w-72 rounded-full bg-emerald-400/[0.07] blur-[90px]" />
 

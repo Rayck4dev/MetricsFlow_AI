@@ -2,7 +2,10 @@
 
 import { useMemo, useState } from "react";
 
-import type { DrePeriod } from "@/components/dre/DrePeriodSelector";
+import type {
+  DreCustomRange,
+  DrePeriod,
+} from "@/components/dre/DrePeriodSelector";
 
 export interface DreTransaction {
   id: string;
@@ -61,7 +64,6 @@ function startOfWeek(date: Date) {
   const result = new Date(date);
 
   const day = result.getDay();
-
   const diff = day === 0 ? -6 : 1 - day;
 
   result.setDate(result.getDate() + diff);
@@ -78,10 +80,8 @@ function endOfMonth(date: Date) {
   return new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
 }
 
-function startOfQuarter(date: Date) {
-  const quarterStartMonth = Math.floor(date.getMonth() / 3) * 3;
-
-  return new Date(date.getFullYear(), quarterStartMonth, 1);
+function startOfLastThreeMonths(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth() - 2, 1);
 }
 
 function startOfYear(date: Date) {
@@ -92,13 +92,40 @@ function endOfYear(date: Date) {
   return new Date(date.getFullYear(), 11, 31, 23, 59, 59, 999);
 }
 
+function toDateInputValue(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
 function parseTransactionDate(date: string) {
-  const [year, month, day] = date.split("-").map(Number);
+  if (!date || typeof date !== "string") {
+    return new Date(NaN);
+  }
+
+  const datePart = date.slice(0, 10);
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(datePart);
+
+  if (!match) {
+    return new Date(NaN);
+  }
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+
+  const maxDay = new Date(year, month, 0).getDate();
+
+  if (!year || month < 1 || month > 12 || day < 1 || day > maxDay) {
+    return new Date(NaN);
+  }
 
   return new Date(year, month - 1, day);
 }
 
-function getPeriodRange(period: DrePeriod) {
+function getPeriodRange(period: DrePeriod, customRange: DreCustomRange) {
   const now = new Date();
 
   switch (period) {
@@ -131,7 +158,7 @@ function getPeriodRange(period: DrePeriod) {
 
     case "quarter":
       return {
-        start: startOfQuarter(now),
+        start: startOfLastThreeMonths(now),
         end: endOfDay(now),
       };
 
@@ -141,11 +168,26 @@ function getPeriodRange(period: DrePeriod) {
         end: endOfYear(now),
       };
 
-    case "custom":
+    case "custom": {
+      const customStart = parseTransactionDate(customRange.start);
+      const customEnd = parseTransactionDate(customRange.end);
+
+      if (
+        Number.isNaN(customStart.getTime()) ||
+        Number.isNaN(customEnd.getTime()) ||
+        customStart > customEnd
+      ) {
+        return {
+          start: new Date(NaN),
+          end: new Date(NaN),
+        };
+      }
+
       return {
-        start: startOfMonth(now),
-        end: endOfMonth(now),
+        start: startOfDay(customStart),
+        end: endOfDay(customEnd),
       };
+    }
 
     default:
       return {
@@ -194,6 +236,10 @@ function buildChartData(transactions: DreTransaction[]): DreChartItem[] {
   transactions.forEach((transaction) => {
     const date = parseTransactionDate(transaction.date);
 
+    if (Number.isNaN(date.getTime())) {
+      return;
+    }
+
     const year = date.getFullYear();
     const month = date.getMonth();
 
@@ -236,7 +282,15 @@ function buildChartData(transactions: DreTransaction[]): DreChartItem[] {
     }));
 }
 
-function getPeriodLabel(period: DrePeriod) {
+function formatDate(date: Date) {
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return date.toLocaleDateString("pt-BR");
+}
+
+function getPeriodLabel(period: DrePeriod, customRange: DreCustomRange) {
   const now = new Date();
 
   switch (period) {
@@ -244,7 +298,7 @@ function getPeriodLabel(period: DrePeriod) {
       return now.toLocaleDateString("pt-BR");
 
     case "week":
-      return "Semana atual";
+      return `Semana de ${formatDate(startOfWeek(now))} a ${formatDate(now)}`;
 
     case "month":
       return now.toLocaleDateString("pt-BR", {
@@ -262,13 +316,25 @@ function getPeriodLabel(period: DrePeriod) {
     }
 
     case "quarter":
-      return "Trimestre atual";
+      return `${formatDate(startOfLastThreeMonths(now))} a ${formatDate(now)}`;
 
     case "year":
       return String(now.getFullYear());
 
-    case "custom":
-      return "Período personalizado";
+    case "custom": {
+      const start = parseTransactionDate(customRange.start);
+      const end = parseTransactionDate(customRange.end);
+
+      if (
+        Number.isNaN(start.getTime()) ||
+        Number.isNaN(end.getTime()) ||
+        start > end
+      ) {
+        return "Período personalizado inválido";
+      }
+
+      return `${formatDate(start)} a ${formatDate(end)}`;
+    }
 
     default:
       return "";
@@ -298,15 +364,32 @@ function escapeCsvValue(value: string | number | null | undefined) {
 export function useDre(transactions: DreTransaction[]) {
   const [period, setPeriod] = useState<DrePeriod>("month");
 
+  const [customRange, setCustomRange] = useState<DreCustomRange>(() => {
+    const today = new Date();
+
+    return {
+      start: toDateInputValue(startOfMonth(today)),
+      end: toDateInputValue(today),
+    };
+  });
+
   const periodTransactions = useMemo(() => {
-    const { start, end } = getPeriodRange(period);
+    const { start, end } = getPeriodRange(period, customRange);
+
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+      return [];
+    }
 
     return transactions.filter((transaction) => {
       const transactionDate = parseTransactionDate(transaction.date);
 
-      return transactionDate >= start && transactionDate <= end;
+      return (
+        !Number.isNaN(transactionDate.getTime()) &&
+        transactionDate >= start &&
+        transactionDate <= end
+      );
     });
-  }, [transactions, period]);
+  }, [transactions, period, customRange]);
 
   const financialData = useMemo<DreFinancialData>(() => {
     const revenue = periodTransactions
@@ -376,7 +459,7 @@ export function useDre(transactions: DreTransaction[]) {
         ? (financialData.result / financialData.revenue) * 100
         : 0;
 
-    const periodLabel = getPeriodLabel(period);
+    const periodLabel = getPeriodLabel(period, customRange);
 
     const lines: string[] = [];
 
@@ -479,9 +562,7 @@ export function useDre(transactions: DreTransaction[]) {
     }
 
     addBreakdownRows("Receitas", revenueItems);
-
     addBreakdownRows("Custos", costItems);
-
     addBreakdownRows("Despesas", expenseItems);
 
     if (!chartData.length) {
@@ -507,7 +588,6 @@ export function useDre(transactions: DreTransaction[]) {
     }
 
     const csv = lines.join("\r\n");
-
     const csvWithBom = `\uFEFF${csv}`;
 
     const blob = new Blob([csvWithBom], {
@@ -515,9 +595,7 @@ export function useDre(transactions: DreTransaction[]) {
     });
 
     const url = URL.createObjectURL(blob);
-
     const link = document.createElement("a");
-
     const now = new Date();
 
     const year = now.getFullYear();
@@ -530,12 +608,16 @@ export function useDre(transactions: DreTransaction[]) {
     link.click();
     document.body.removeChild(link);
 
-    URL.revokeObjectURL(url);
+    // Revoga a URL depois que o navegador tiver iniciado o download.
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
   return {
     period,
     setPeriod,
+
+    customRange,
+    setCustomRange,
 
     periodTransactions,
 

@@ -4,7 +4,7 @@ import { AuthModule } from '../auth/auth.module';
 import { SupabaseModule } from '../supabase.module';
 
 import { TransactionsController } from './transactions.controller';
-import { TransactionsRepository } from './transactions.repository';
+import { TransactionsRepository } from './repositories/transactions.repository';
 import { TransactionsService } from './transactions.service';
 
 @Module({

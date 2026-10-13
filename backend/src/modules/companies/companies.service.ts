@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 
 import { CreateCompanyDto } from './dto/create-company.dto';
-import { CompaniesRepository } from './companies.repository';
+import { CompaniesRepository } from './repositories/companies.repository';
 
 @Injectable()
 export class CompaniesService {
