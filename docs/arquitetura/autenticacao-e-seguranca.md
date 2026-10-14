@@ -1,21 +1,20 @@
 # 🔐 Autenticação
 
-O sistema utiliza **Supabase Auth** para autenticação e gerenciamento de sessões.
+O sistema utiliza o **Supabase Auth** para autenticação de usuários e gerenciamento de sessões.
 
-A estrutura contempla:
+A estrutura da aplicação contempla os seguintes fluxos e recursos:
 
 - Login;
 - Cadastro;
 - Login com Google;
 - Callback de autenticação;
-- Recuperação de senha;
-- Redefinição de senha;
+- Recuperação e redefinição de senha;
 - Persistência da sessão;
 - Identificação do usuário autenticado;
 - Identificação da empresa vinculada;
-- Controle de acesso por papel.
+- Controle de acesso baseado em papéis (_roles_).
 
-O vínculo entre usuário e empresa é estabelecido através da tabela:
+O relacionamento entre usuários e empresas é estabelecido por meio das tabelas `auth.users`, `company_members` e `companies`.
 
 ```text
 auth.users
@@ -31,68 +30,67 @@ companies
 
 # 👥 Controle de acesso
 
-O acesso às funcionalidades é determinado pelo papel do usuário dentro da empresa.
+O acesso às funcionalidades é definido pelo papel do usuário no contexto da empresa.
 
 ```text
-                    Usuário autenticado
-                            │
-                            ▼
-                    company_members
-                            │
-                 ┌──────────┴──────────┐
-                 ▼                     ▼
-              owner              collaborator
-                 │                     │
-                 ▼                     ▼
-        Acesso administrativo    Acesso financeiro
+                Usuário autenticado
+                        │
+                        ▼
+                 company_members
+                        │
+              ┌─────────┴─────────┐
+              ▼                   ▼
+            owner             collaborator
+              │                   │
+              ▼                   ▼
+      Acesso administrativo  Acesso financeiro
 ```
 
-## Proprietário
+## Proprietário (`owner`)
 
-Possui acesso a:
+O proprietário possui acesso às funcionalidades administrativas e financeiras previstas para o seu papel, incluindo:
 
 - Dashboard;
 - Movimentações;
 - DRE;
 - Perfil;
 - Empresa;
-- Membros;
+- Gerenciamento de membros;
 - Preferências;
-- Operações administrativas.
+- Operações administrativas autorizadas.
 
-## Colaborador
+## Colaborador (`collaborator`)
 
-Possui acesso a:
+O colaborador possui acesso às funcionalidades disponibilizadas para o seu papel, incluindo:
 
 - Dashboard;
 - Movimentações;
 - Perfil;
 - Preferências.
 
-Operações administrativas e ações restritas são controladas de acordo com o papel do usuário.
+As operações administrativas e as ações restritas devem respeitar as permissões definidas pela aplicação e validadas no backend.
 
 ---
 
 # 🔒 Segurança
 
-A arquitetura utiliza múltiplas camadas de proteção.
+A arquitetura adota diferentes mecanismos para autenticação, autorização e proteção dos dados.
 
-São utilizados:
+Entre os recursos utilizados ou previstos na estrutura do sistema estão:
 
 - Supabase Auth;
-- Controle de sessão;
-- Controle de membros;
-- Papéis de acesso;
-- Row Level Security;
+- Gerenciamento de sessões;
+- Controle de membros por empresa;
+- Papéis de acesso (_roles_);
+- Row Level Security (RLS);
 - Validação de dados;
 - Integridade referencial;
-- Funções PostgreSQL;
-- Triggers;
-- Validação no backend;
+- Funções e triggers PostgreSQL;
+- Validação de requisições no backend;
 - Separação de variáveis de ambiente;
-- Segredos mantidos no backend.
+- Proteção de credenciais e segredos no ambiente do servidor.
 
-A relação de autorização principal é:
+A relação de autorização dos dados segue o vínculo entre o usuário autenticado e a empresa à qual ele pertence:
 
 ```text
 auth.uid()
@@ -101,14 +99,16 @@ company_members
     ↓
 company_id
     ↓
-dados autorizados
+Dados autorizados
 ```
 
-Dessa forma, o usuário somente deve acessar dados das empresas às quais está vinculado.
+Esse modelo tem como objetivo garantir que cada usuário acesse somente os dados permitidos para sua associação à empresa e para o seu papel no sistema.
 
 ---
 
 # 🔐 Arquitetura de autenticação
+
+O fluxo geral de autenticação e autorização é representado abaixo:
 
 ```text
 Usuário
@@ -119,15 +119,17 @@ Supabase Auth
    ↓
 Sessão autenticada
    ↓
-Usuário
+Identificação do usuário
    ↓
 company_members
    ↓
 Empresa + Role
    ↓
-Permissões
+Permissões de acesso
 ```
 
-Quando necessário, o backend valida o token de autenticação antes de executar operações protegidas.
+Nas operações protegidas, o backend valida o token de autenticação e aplica as verificações de autorização pertinentes antes de executar a operação solicitada.
 
 ---
+
+> **Nota:** esta seção descreve a arquitetura de autenticação e controle de acesso do projeto. A disponibilidade de cada fluxo e a aplicação efetiva dos mecanismos de segurança devem ser verificadas na implementação correspondente.

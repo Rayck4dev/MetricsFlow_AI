@@ -1,44 +1,3 @@
-# 📌 Status atual do projeto
-
-## V1 — Plataforma Financeira
-
-### Frontend
-
-- [x] Landing Page
-- [x] Área de demonstração
-- [x] Dashboard
-- [x] Cards financeiros
-- [x] Gráficos
-- [x] Resumo financeiro
-- [x] Transações recentes
-- [x] Ações rápidas
-- [x] Movimentações
-- [x] Cadastro de receitas
-- [x] Cadastro de despesas
-- [x] Edição de transações
-- [x] Exclusão de transações
-- [x] Busca
-- [x] Filtros financeiros
-- [x] Histórico
-- [x] Exportação CSV
-- [x] DRE
-- [x] Exportação da DRE
-- [x] Perfil
-- [x] Empresa
-- [x] Preferências
-- [x] Onboarding
-- [x] Login
-- [x] Cadastro
-- [x] Login com Google
-- [x] Recuperação de senha
-- [x] Redefinição de senha
-- [x] Controle de acesso por papel
-- [x] Sistema de notificações
-- [x] Feedback visual de operações
-- [x] Estrutura visual do WhatsApp
-
----
-
 # 🚀 Status da V2
 
 ## Arquitetura
@@ -71,121 +30,91 @@
 
 ## Inteligência Artificial
 
-- [x] Serviço de interpretação
+- [x] Serviço de interpretação financeira
 - [x] Estrutura de tipos financeiros
 - [x] Structured Output
 - [x] Identificação de intenção
-- [x] Identificação de tipo
+- [x] Identificação de tipo de movimentação
 - [x] Identificação de valor
 - [x] Identificação de descrição
 - [x] Identificação de categoria
 - [x] Identificação de forma de pagamento
 - [x] Identificação de data
 - [x] Validação da resposta estruturada
-- [x] Transcrição de áudio para a demonstração via OpenAI
+- [x] Transcrição de áudio via Whisper para a demonstração
+- [x] Integração do fluxo de interpretação à demonstração
+- [x] Confirmação antes do registro de lançamentos na demonstração
 
-## WhatsApp
+## WhatsApp Demo
 
 - [x] Demonstração interativa sem conexão à Meta
-- [x] Gravação de áudio no navegador e interpretação da transcrição
-- [ ] Integração oficial com Meta Cloud API
-- [ ] Webhook em ambiente público
-- [ ] Recebimento real de mensagens
-- [ ] Processamento real de mensagens
-- [ ] Identificação do usuário através do WhatsApp
-- [ ] Identificação da empresa
-- [ ] Confirmação via WhatsApp
-- [ ] Registro real de movimentações via WhatsApp
-- [ ] Processamento de áudio em produção
+- [x] Gravação de áudio no navegador
+- [x] Transcrição de áudio via OpenAI na demonstração
+- [x] Interpretação da transcrição pelo parser financeiro
+- [x] Fluxo de confirmação de lançamentos na demonstração
 
-> **Observação:** `/whatsapp/demo` é uma simulação interativa. Mensagens são processadas e salvas na conta autenticada; áudios são transcritos pela OpenAI; lançamentos só ocorrem após confirmação. Essa tela não usa nem valida a integração oficial da Meta.
+> **Observação:** `/whatsapp/demo` é uma simulação interativa. As mensagens são processadas e salvas na conta autenticada; os áudios são transcritos pelo Whisper; e os lançamentos só ocorrem após confirmação. Essa tela não utiliza nem valida a integração oficial da Meta.
 
 ---
 
-# 🗺️ Roadmap
+# 🔮 Próxima etapa — Evolução do WhatsApp Demo
 
-```text
-                    METRICSFLOW AI
-                          │
-              ┌───────────┴───────────┐
-              │                       │
-             V1                      V2
-              │                       │
-     Gestão financeira        Automação + IA
-              │                       │
-       ┌──────┼──────┐          ┌─────┼─────┐
-       │      │      │          │     │     │
-      Auth   DB    Frontend     API   IA  WhatsApp
-       │      │      │          │     │     │
-       └──────┴──────┘          │     │     │
-              │                 │     │     └── Pendente
-              ▼                 ▼     ▼
-         Plataforma         Backend  Parser
-         financeira            │
-                               ▼
-                            Integração
+A próxima etapa do desenvolvimento é aprimorar o **WhatsApp Demo da MetricsFlow AI**, evoluindo o fluxo de demonstração de mensagens e áudios integrado ao backend NestJS e ao módulo de inteligência artificial já desenvolvido.
+
+**O escopo desta etapa é exclusivamente a demonstração. Não será implementada a integração oficial com a Meta Cloud API, nem o recebimento de mensagens reais pelo WhatsApp.**
+
+## Fluxo planejado
+
+```mermaid
+flowchart TD
+    A["Usuário acessa /whatsapp/demo"] --> B{"Tipo de entrada"}
+
+    B -->|Texto| C["Receber mensagem"]
+    B -->|Áudio| D["Gravar áudio no navegador"]
+    D --> E["Transcrever áudio via Whisper"]
+
+    C --> F["Enviar texto para o backend NestJS"]
+    E --> F
+
+    F --> G["Interpretar com o módulo de IA"]
+    G --> H["Gerar dados estruturados"]
+    H --> I["Validar os dados financeiros"]
+    I --> J["Apresentar lançamento para confirmação"]
+
+    J --> K{"Usuário confirmou?"}
+
+    K -->|Não| L["Cancelar ou manter sem lançamento"]
+    K -->|Sim| M["Validar autenticação e permissões"]
+    M --> N["Registrar transação no Supabase"]
+    N --> O["Consultar movimentação no dashboard"]
 ```
 
----
+## Etapas de implementação
 
-# 🗺️ Roadmap
+- [ ] Aprimorar a interface e a experiência do WhatsApp Demo.
+- [ ] Refinar o envio e o processamento de mensagens de texto.
+- [ ] Aprimorar a gravação e o processamento de áudios no navegador.
+- [ ] Validar a transcrição de áudio via OpenAI.
+- [ ] Integrar e validar o fluxo de interpretação financeira pelo backend NestJS.
+- [ ] Tratar mensagens que não contenham informações financeiras suficientes.
+- [ ] Validar os dados retornados pelo parser financeiro.
+- [ ] Aprimorar a apresentação dos dados antes da confirmação.
+- [ ] Garantir que nenhum lançamento seja criado sem confirmação.
+- [ ] Validar autenticação, empresa vinculada e permissões antes do registro.
+- [ ] Tratar erros de transcrição, interpretação e persistência.
+- [ ] Testar o fluxo completo de demonstração, do envio à consulta da transação.
+- [ ] Documentar o funcionamento e as limitações do WhatsApp Demo.
 
-```text
-                    METRICSFLOW AI
-                          │
-              ┌───────────┴───────────┐
-              │                       │
-             V1                      V2
-              │                       │
-     Gestão financeira        Automação + IA
-              │                       │
-       ┌──────┼──────┐          ┌─────┼─────┐
-       │      │      │          │     │     │
-      Auth   DB    Frontend     API   IA  WhatsApp
-       │      │      │          │     │     │
-       └──────┴──────┘          │     │     │
-              │                 │     │     └── Pendente
-              ▼                 ▼     ▼
-         Plataforma         Backend  Parser
-         financeira            │
-                               ▼
-                            Integração
-```
+## Escopo e limitações
 
----
+O WhatsApp Demo continuará funcionando dentro da própria plataforma, por meio da rota `/whatsapp/demo`.
 
-# 🔮 Próxima etapa
+- **Entrada:** texto digitado ou áudio gravado no navegador.
+- **Transcrição:** OpenAI, para a demonstração de áudio.
+- **Interpretação:** módulo de IA e parser financeiro do backend.
+- **Confirmação:** realizada na interface da demonstração.
+- **Persistência:** transações confirmadas são registradas no Supabase, conforme as validações e permissões implementadas.
+- **Integração com a Meta:** fora do escopo desta etapa.
+- **Mensagens reais do WhatsApp:** não serão recebidas nem enviadas por uma integração oficial nesta fase.
 
-A próxima etapa de desenvolvimento é concluir a integração real com o WhatsApp.
-
-O objetivo é finalizar o fluxo:
-
-```text
-WhatsApp
-    ↓
-Meta Cloud API
-    ↓
-Webhook NestJS
-    ↓
-Identificação do usuário
-    ↓
-Identificação da empresa
-    ↓
-Texto / Áudio
-    ↓
-Interpretação
-    ↓
-Validação
-    ↓
-Confirmação
-    ↓
-Supabase
-    ↓
-Transação
-    ↓
-Dashboard
-```
-
-A integração deverá respeitar as regras de segurança e confirmação antes de qualquer lançamento financeiro.
-
----
+O objetivo é consolidar e testar a experiência de automação financeira simulada antes de decidir sobre uma eventual integração com serviços externos.

@@ -85,9 +85,8 @@ Crie o arquivo:
 Configure as variáveis necessárias para:
 
 - Supabase;
-- OpenAI (necessária para transcrever áudio; mensagens de texto podem usar o parser local);
+- Groq (necessário para transcrever áudio; mensagens de texto podem usar o parser local);
 - Configurações da API.
-
 
 Exemplo:
 
@@ -95,9 +94,10 @@ Exemplo:
 PORT=3001
 SUPABASE_URL=
 SUPABASE_SECRET_KEY=
-OPENAI_API_KEY=
-OPENAI_FINANCIAL_MODEL=
-OPENAI_TRANSCRIPTION_MODEL=
+
+GROQ_API_KEY=
+GROQ_FINANCIAL_MODEL=
+GROQ_TRANSCRIPTION_MODEL=
 ```
 
 Execute o backend:
@@ -142,7 +142,7 @@ http://localhost:3002/whatsapp/demo
 
 Ela requer uma sessão autenticada, uma empresa vinculada ao usuário e as
 variáveis do Supabase configuradas no frontend e no backend. O envio de texto
-usa o parser local quando `OPENAI_API_KEY` não está configurada. Para gravar e
+usa o parser local quando `GROQ_API_KEY` não está configurada. Para gravar e
 transcrever áudio, configure uma chave da OpenAI no backend.
 
 Esta tela simula a interface do WhatsApp Web: não conecta à Meta nem envia
@@ -154,12 +154,12 @@ financeiros reais durante a apresentação.
 
 ## 6. Portas
 
-| Aplicação		            | Endereço
-|---------------------------|-------------|
-| Frontend Next.js	        | http://localhost:3002
-| Backend NestJS	        | http://localhost:3001
-| Health Check	            | http://localhost:3001/api/health
-| Swagger	                | http://localhost:3001/api/docs
+| Aplicação        | Endereço                         |
+| ---------------- | -------------------------------- |
+| Frontend Next.js | http://localhost:3002            |
+| Backend NestJS   | http://localhost:3001            |
+| Health Check     | http://localhost:3001/api/health |
+| Swagger          | http://localhost:3001/api/docs   |
 
 O frontend utiliza a seguinte variável para localizar o backend:
 
@@ -190,7 +190,7 @@ As principais configurações podem incluir:
 - URL do Supabase;
 - chave pública do Supabase;
 - URL da API;
-- chave da OpenAI;
+- chave do Groq;
 - configurações da Meta / WhatsApp (somente para a integração oficial, fora desta demonstração);
 - tokens e segredos de integração;
 - porta do backend.
@@ -228,4 +228,5 @@ localhost:3001
    ↓
 Supabase / serviços externos
 ```
+
 A integração oficial com WhatsApp/Meta continua fora do escopo desta demonstração e depende de configuração própria.

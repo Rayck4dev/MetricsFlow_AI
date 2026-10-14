@@ -1,28 +1,38 @@
 # 🧠 Inteligência Artificial
 
-A V2 introduz uma camada de inteligência artificial preparada para interpretar mensagens financeiras.
+O MetricsFlow AI utiliza uma camada de inteligência artificial para auxiliar na interpretação de mensagens financeiras e na extração de informações necessárias para o registro de movimentações.
 
-A responsabilidade da IA é **interpretar informações**, e não executar diretamente operações no banco.
+A integração com a **Groq** é utilizada para disponibilizar os modelos de linguagem e transcrição de áudio, permitindo processar mensagens em texto ou áudio e transformar essas informações em dados estruturados que podem ser validados pelo backend.
 
-Fluxo conceitual:
+## Modelos utilizados
 
-```text
-Mensagem
-   ↓
-IA
-   ↓
-JSON estruturado
-   ↓
-Validação do Backend
-   ↓
-Regras de negócio
-   ↓
-Confirmação
-   ↓
-Banco de dados
+Os modelos são configurados por variáveis de ambiente, permitindo alterar as versões utilizadas sem precisar modificar diretamente a lógica de negócio.
+
+| Variável                     | Finalidade                                                                     |
+| ---------------------------- | ------------------------------------------------------------------------------ |
+| `GROQ_FINANCIAL_MODEL`     | Define o modelo utilizado na interpretação de mensagens financeiras pela Groq. |
+| `GROQ_TRANSCRIPTION_MODEL` | Define o modelo utilizado na transcrição de áudios pela Groq.                  |
+
+**Configuração prevista:**
+
+```env
+GROQ_FINANCIAL_MODEL=SEU_MODELO_FINANCEIRO_GROQ
+GROQ_TRANSCRIPTION_MODEL=SEU_MODELO_TRANSCRICAO_GROQ
 ```
 
-A estrutura de interpretação contempla informações como:
+## Interpretação de mensagens financeiras
+
+A camada de inteligência artificial pode interpretar mensagens em linguagem natural para identificar informações relevantes de uma movimentação, como:
+
+- Tipo de movimentação: receita ou despesa.
+- Valor informado.
+- Descrição da movimentação.
+- Categoria, quando identificada.
+- Forma de pagamento, quando informada.
+- Data da movimentação, quando identificada.
+- Campos ausentes que precisam ser preenchidos.
+
+Exemplo conceitual de dados estruturados:
 
 ```json
 {
@@ -39,104 +49,50 @@ A estrutura de interpretação contempla informações como:
 }
 ```
 
-A aplicação deve validar a resposta antes de qualquer persistência.
+O exemplo é ilustrativo. A estrutura definitiva depende do contrato implementado pelo backend.
 
-A IA não deve:
+## Transcrição de áudio
 
-- Criar categorias inexistentes;
-- Inventar informações;
-- Registrar uma movimentação sem confirmação;
-- Ignorar campos obrigatórios;
-- Bypassar as regras de autorização.
+A aplicação prevê o envio de mensagens de áudio para transcrição utilizando o modelo `whisper-large-v3-turbo`, disponibilizado pela Groq.
 
----
+Após a transcrição, o texto pode seguir para a etapa de interpretação financeira. Dessa forma, mensagens de áudio podem ser convertidas em informações estruturadas para posterior validação.
 
-# 📱 WhatsApp
+O processamento depende da configuração correta das credenciais, do modelo e do serviço de transcrição no backend.
 
-A aplicação inclui uma demonstração interativa da experiência de conversa em
-`/whatsapp/demo`. Ela processa mensagens de texto pelo backend, permite gravar
-áudio no navegador e usa o serviço de transcrição da OpenAI antes de interpretar
-a mensagem.
+## Regras de processamento
 
-> **A demonstração não é uma conexão com o WhatsApp nem com a Meta Cloud API.**
-> As mensagens são salvas na conta autenticada e a confirmação registra a
-> movimentação na empresa ativa. Áudios enviados são encaminhados à OpenAI
-> para transcrição. Use dados fictícios ao apresentar a demonstração.
+A inteligência artificial atua como uma camada de interpretação, não como substituta das regras de negócio da aplicação.
 
-Mensagens de texto podem usar o parser local quando `OPENAI_API_KEY` não está
-configurada. O envio e a transcrição de áudio requerem essa chave no backend.
+O fluxo previsto é:
 
-A integração de produção com a Meta é uma etapa separada e permanece pendente.
-Ela envolve webhook público, verificação da conexão e entrega de mensagens
-reais, não cobertas pela demonstração.
+1. Receber uma mensagem em texto ou áudio.
+2. Transcrever o áudio, quando necessário.
+3. Interpretar a mensagem e extrair os dados financeiros.
+4. Validar os campos e as regras de negócio no backend.
+5. Solicitar confirmação quando aplicável.
+6. Registrar a movimentação após a confirmação necessária.
 
-### Fluxo da demonstração
+A aplicação deve evitar registros baseados em informações inventadas, categorias inexistentes, campos obrigatórios ausentes ou dados que não tenham passado pelas validações necessárias.
 
-```text
-          Interface demonstrativa
-                     │
-                     ▼
-             NestJS Backend
-                     │
-                     ▼
-             Identificação
-             do usuário
-                     │
-                     ▼
-          Identificação da empresa
-                     │
-                     ▼
-          Processamento da mensagem
-                     │
-              ┌──────┴──────┐
-              ▼             ▼
-            Texto          Áudio
-              │          OpenAI
-              │       Transcrição
-              │             │
-              └──────┬──────┘
-                     ▼
-               IA / Parser
-                     │
-                     ▼
-             Dados estruturados
-                     │
-                     ▼
-               Validação
-                     │
-                     ▼
-              Confirmação
-                     │
-              ┌──────┴──────┐
-              ▼             ▼
-          Confirmar       Corrigir/
-              │           Cancelar
-              ▼
-            Supabase
-              │
-              ▼
-          Transação
-              │
-              ▼
-          Dashboard
-```
+## Demonstração do WhatsApp
 
-### Regra principal
+O projeto possui uma interface de demonstração para simular o fluxo de envio e processamento de mensagens financeiras.
 
-Nenhuma movimentação deverá ser registrada apenas porque a IA interpretou uma mensagem.
+A demonstração permite explorar o processamento de mensagens sem depender de uma conexão de produção com a plataforma WhatsApp.
 
-O fluxo previsto exige:
+**Importante:** a demonstração não representa, por si só, uma integração oficial ativa com a WhatsApp Business Platform ou com a Meta Cloud API. A integração de produção depende da implementação e configuração dos mecanismos oficiais de conexão, recebimento e envio de mensagens.
 
-```text
-Interpretar
-    ↓
-Validar
-    ↓
-Solicitar confirmação
-    ↓
-Usuário confirma
-    ↓
-Registrar
-```
+Durante apresentações e testes, recomenda-se utilizar dados financeiros fictícios.
 
----
+## Responsabilidades da arquitetura
+
+A divisão de responsabilidades segue o princípio de manter a inteligência artificial separada das regras de negócio:
+
+- **Interface:** coleta a mensagem e apresenta o resultado ao usuário.
+- **Serviços de IA:** realizam a transcrição e a interpretação dos dados.
+- **Backend:** valida as informações, aplica as regras de negócio e controla o fluxo de confirmação.
+- **Banco de dados:** armazena as movimentações autorizadas após o processamento necessário.
+
+## Evolução da integração
+
+A configuração dos modelos, os contratos de dados e o fluxo de processamento podem evoluir durante o desenvolvimento da versão atual do projeto. Esta documentação deve ser atualizada conforme os serviços de inteligência artificial e a integração oficial com o WhatsApp forem implementados e validados.

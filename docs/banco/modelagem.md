@@ -1,14 +1,12 @@
 # 🗄️ Modelagem do Banco de Dados
 
-## 🗄️ Modelagem do Banco de Dados
-
 O banco de dados do **MetricsFlow AI** utiliza **PostgreSQL através do Supabase**.
 
-A modelagem é organizada em torno das principais entidades do sistema, incluindo usuários, perfis, empresas, membros, categorias, transações e os recursos relacionados à integração com WhatsApp.
+A modelagem é organizada em torno das principais entidades do sistema, incluindo usuários, perfis, empresas, membros, categorias, transações, notificações, anexos e recursos relacionados à integração com WhatsApp.
 
 A autenticação dos usuários é realizada pelo **Supabase Auth**, cuja tabela `auth.users` é utilizada como referência para os dados relacionados aos usuários da aplicação.
 
-### Diagrama Entidade-Relacionamento
+## Diagrama Entidade-Relacionamento
 
 ```mermaid
 erDiagram
@@ -96,6 +94,11 @@ erDiagram
         timestamp updated_at
     }
 
+    ATTACHMENTS {
+        uuid id PK
+        uuid transaction_id FK
+    }
+
     NOTIFICATIONS {
         uuid id PK
         uuid user_id FK
@@ -160,132 +163,118 @@ erDiagram
         timestamp updated_at
     }
 
-
     AUTH_USERS ||--|| PROFILES : "possui"
-
     AUTH_USERS ||--|| USER_ONBOARDING : "possui"
-
     AUTH_USERS ||--|| USER_PREFERENCES : "possui"
 
     AUTH_USERS ||--o{ COMPANY_MEMBERS : "participa"
-
     COMPANIES ||--o{ COMPANY_MEMBERS : "possui membros"
 
     COMPANIES ||--o{ CATEGORIES : "possui"
-
     COMPANIES ||--o{ TRANSACTIONS : "possui"
 
     CATEGORIES ||--o{ TRANSACTIONS : "classifica"
-
     AUTH_USERS ||--o{ TRANSACTIONS : "cria"
 
-    AUTH_USERS ||--o{ NOTIFICATIONS : "recebe"
+    TRANSACTIONS ||--o{ ATTACHMENTS : "possui anexos"
 
+    AUTH_USERS ||--o{ NOTIFICATIONS : "recebe"
     COMPANIES ||--o{ NOTIFICATIONS : "relaciona"
 
-    AUTH_USERS ||--o{ NOTIFICATIONS : "gera"
-
     AUTH_USERS ||--o{ WHATSAPP_CONNECTIONS : "possui"
-
     COMPANIES ||--o{ WHATSAPP_CONNECTIONS : "possui"
 
     COMPANIES ||--o{ WHATSAPP_MESSAGES : "possui"
-
     AUTH_USERS ||--o{ WHATSAPP_MESSAGES : "envia"
 
     PENDING_TRANSACTIONS ||--o{ WHATSAPP_MESSAGES : "relaciona"
-
     TRANSACTIONS ||--o{ WHATSAPP_MESSAGES : "relaciona"
 
     COMPANIES ||--o{ PENDING_TRANSACTIONS : "possui"
-
     AUTH_USERS ||--o{ PENDING_TRANSACTIONS : "cria"
-
     TRANSACTIONS ||--o{ PENDING_TRANSACTIONS : "confirma"
-
     CATEGORIES ||--o{ PENDING_TRANSACTIONS : "classifica"
-
     WHATSAPP_MESSAGES ||--o{ PENDING_TRANSACTIONS : "origina"
 ```
-      
-### Principais entidades
 
-#### `auth.users`
+> **Nota:** o diagrama representa a estrutura lógica documentada. Os campos de `attachments` devem ser complementados conforme o schema real do banco de dados.
 
-Tabela gerenciada pelo **Supabase Auth**, responsável pelo armazenamento dos usuários autenticados da plataforma.
+## Principais entidades
+
+### `auth.users`
+
+Tabela gerenciada pelo Supabase Auth, responsável pelo armazenamento dos usuários autenticados da plataforma.
 
 A chave `id` identifica o usuário no sistema e é utilizada como referência nas demais tabelas relacionadas à autenticação.
 
 ---
 
-#### `profiles`
+### `profiles`
 
 Armazena os dados complementares do usuário.
 
 Principais informações:
 
-* Nome;
-* E-mail;
-* Telefone;
-* Data de criação;
-* Data de atualização.
+- Nome;
+- E-mail;
+- Telefone;
+- Data de criação;
+- Data de atualização.
 
 A chave primária `id` também funciona como chave estrangeira para `auth.users`.
 
 ---
 
-#### `user_onboarding`
+### `user_onboarding`
 
 Armazena as informações coletadas durante o processo inicial de configuração do usuário.
 
 Entre os dados registrados estão:
 
-* Objetivo;
-* Método de controle financeiro;
-* Principal desafio;
-* Métricas selecionadas;
-* Frequência;
-* Status de conclusão.
+- Objetivo;
+- Método de controle financeiro;
+- Principal desafio;
+- Métricas selecionadas;
+- Frequência;
+- Status de conclusão.
 
 A entidade é vinculada diretamente ao usuário autenticado.
 
 ---
 
-#### `user_preferences`
+### `user_preferences`
 
-Armazena as preferências individuais do usuário.
+Armazena as preferências individuais do usuário, incluindo:
 
-Entre elas estão:
-
-* Tema;
-* Notificações por e-mail;
-* Notificações de movimentações;
-* Notificações do WhatsApp;
-* Período financeiro padrão;
-* Moeda.
+- Tema;
+- Notificações por e-mail;
+- Notificações de movimentações;
+- Notificações do WhatsApp;
+- Período financeiro padrão;
+- Moeda.
 
 Essas informações permitem personalizar o comportamento da aplicação para cada usuário.
 
 ---
 
-#### `companies`
+### `companies`
 
-Representa as empresas cadastradas na MetricsFlow AI.
+Representa as empresas cadastradas no MetricsFlow AI.
 
 Principais informações:
 
-* Nome;
-* Documento;
-* Telefone;
-* Código de convite;
-* Data de criação;
-* Data de atualização.
+- Nome;
+- Documento;
+- Telefone;
+- Código de convite;
+- Data de criação;
+- Data de atualização.
 
 Uma empresa pode possuir diversos membros, categorias, transações, notificações e dados relacionados ao WhatsApp.
 
 ---
 
-#### `company_members`
+### `company_members`
 
 É a entidade responsável pelo relacionamento entre usuários e empresas.
 
@@ -293,114 +282,117 @@ Ela permite que diferentes usuários participem de uma mesma empresa e define o 
 
 Os principais papéis utilizados pelo sistema são:
 
-* `owner`;
-* `collaborator`.
+- `owner`;
+- `collaborator`.
 
 Esse relacionamento também é utilizado no controle de permissões da aplicação.
 
 ---
 
-#### `categories`
+### `categories`
 
 Representa as categorias financeiras utilizadas para classificar as movimentações.
 
 Cada categoria pertence a uma empresa e possui um tipo:
 
-* Receita;
-* Despesa.
+- Receita;
+- Despesa.
 
-Também são armazenadas informações como:
-
-* Nome;
-* Cor;
-* Identificação de categoria padrão;
-* Ordem de exibição.
+Também são armazenadas informações como nome, cor, identificação de categoria padrão e ordem de exibição.
 
 ---
 
-#### `transactions`
+### `transactions`
 
 Representa as movimentações financeiras registradas no sistema.
 
 Cada movimentação possui informações como:
 
-* Empresa;
-* Categoria;
-* Usuário responsável pelo registro;
-* Tipo;
-* Valor;
-* Descrição;
-* Forma de pagamento;
-* Data da movimentação;
-* Origem;
-* Texto original do WhatsApp, quando aplicável.
+- Empresa;
+- Categoria;
+- Usuário responsável pelo registro;
+- Tipo;
+- Valor;
+- Descrição;
+- Forma de pagamento;
+- Data da movimentação;
+- Origem;
+- Texto original do WhatsApp, quando aplicável.
 
-A origem permite identificar se a movimentação foi criada pela aplicação web ou por uma integração externa, como o WhatsApp.
+A origem permite identificar se a movimentação foi criada pela aplicação web ou por outra origem prevista na implementação.
 
 ---
 
-#### `notifications`
+### `attachments`
+
+Representa os anexos associados às movimentações financeiras do MetricsFlow AI.
+
+A entidade mantém o relacionamento entre os arquivos e as respectivas transações, permitindo consultar os anexos de uma movimentação específica.
+
+Os anexos são disponibilizados pelo backend através do endpoint:
+
+`GET /api/transactions/:id/attachments`
+
+Esse endpoint utiliza o identificador da transação para consultar os anexos relacionados, respeitando as regras de autenticação e autorização implementadas no backend.
+
+Os metadados armazenados nessa tabela devem ser documentados de acordo com as colunas efetivamente existentes no banco.
+
+**Observação:** os arquivos podem ser armazenados no Supabase Storage, enquanto a tabela `attachments` mantém as referências e os metadados relacionados. A configuração do bucket é descrita na documentação de arquitetura.
+
+---
+
+### `notifications`
 
 Armazena as notificações apresentadas aos usuários.
 
-Uma notificação pode estar relacionada a:
-
-* Uma empresa;
-* Um usuário;
-* Uma movimentação;
-* Uma ação realizada por outro usuário.
+Uma notificação pode estar relacionada a uma empresa, a um usuário, a uma movimentação ou a uma ação realizada por outro usuário.
 
 A coluna `actor_user_id` permite identificar o usuário responsável pela ação que originou a notificação.
 
-A coluna `read` controla se a notificação já foi visualizada e `dismissed` permite controlar se ela foi dispensada pelo usuário.
+A coluna `read` controla se a notificação já foi visualizada, enquanto `dismissed` permite registrar se ela foi dispensada.
 
 ---
 
-#### `whatsapp_connections`
+### `whatsapp_connections`
 
-Representa a conexão de um usuário e de uma empresa com o WhatsApp.
+Representa os dados de conexão de um usuário e de uma empresa relacionados ao WhatsApp.
 
-A entidade armazena informações como:
+A entidade armazena informações como usuário, empresa, número de telefone, status de verificação e datas de criação e atualização.
 
-* Usuário;
-* Empresa;
-* Número de telefone;
-* Status de verificação;
-* Data de verificação;
-* Datas de criação e atualização.
+A existência dessa tabela não significa que a integração oficial com a Meta esteja ativa em produção.
 
 ---
 
-#### `whatsapp_messages`
+### `whatsapp_messages`
 
-Armazena as mensagens recebidas e processadas pela integração com WhatsApp.
+Armazena as mensagens relacionadas ao processamento da integração com WhatsApp.
 
-Entre os dados armazenados estão:
+Entre os dados representados estão:
 
-* Identificador da mensagem no provedor;
-* Número de telefone;
-* Direção da mensagem;
-* Tipo da mensagem;
-* Texto;
-* Identificador de mídia;
-* Transcrição;
-* Status;
-* Transação relacionada;
-* Transação pendente relacionada;
-* Payload original recebido do provedor;
-* Data de criação.
+- Identificador da mensagem no provedor;
+- Número de telefone;
+- Direção da mensagem;
+- Tipo da mensagem;
+- Texto;
+- Identificador de mídia;
+- Transcrição;
+- Status;
+- Transação relacionada;
+- Transação pendente relacionada;
+- Payload recebido do provedor;
+- Data de criação.
 
-O `provider_message_id` permite identificar a mensagem originalmente recebida do provedor e auxiliar no controle de mensagens duplicadas.
+O campo `provider_message_id` permite identificar a mensagem no provedor e pode auxiliar no controle de mensagens duplicadas.
 
 ---
 
-#### `pending_transactions`
+### `pending_transactions`
 
-Representa uma movimentação financeira que foi interpretada pelo sistema, mas ainda não foi confirmada pelo usuário.
+Representa uma movimentação financeira interpretada pelo sistema, mas ainda sujeita à confirmação do usuário.
 
-Essa entidade é utilizada principalmente no fluxo de integração com WhatsApp.
+Essa entidade está relacionada ao fluxo de processamento de mensagens financeiras, especialmente no contexto do WhatsApp.
 
-O processo segue a seguinte lógica:
+O processo lógico é:
 
 ```text
 Mensagem do usuário
@@ -413,22 +405,16 @@ Criação da transação pendente
         ↓
 Solicitação de confirmação
         ↓
-Usuário confirma
+Confirmação do usuário
         ↓
-Transação registrada
+Registro da transação
 ```
 
-Dessa forma, uma interpretação realizada pela inteligência artificial não gera automaticamente uma movimentação definitiva.
+A transação pendente representa os dados provisórios extraídos da mensagem. A efetivação da movimentação depende das validações e do fluxo de confirmação implementados no backend.
 
-A confirmação do usuário é necessária antes da persistência definitiva da operação financeira.
+## Principais relacionamentos
 
----
-
-### 🔗 Principais relacionamentos
-
-Os principais relacionamentos existentes na modelagem são:
-
-#### Usuários e perfis
+### Usuários e perfis
 
 ```text
 auth.users
@@ -440,9 +426,7 @@ profiles
 
 Cada usuário autenticado possui um perfil complementar.
 
----
-
-#### Usuários e empresas
+### Usuários e empresas
 
 ```text
 auth.users
@@ -460,9 +444,7 @@ Um usuário pode participar de uma ou mais empresas, enquanto uma empresa pode p
 
 A tabela `company_members` funciona como entidade de associação entre usuários e empresas.
 
----
-
-#### Empresas e categorias
+### Empresas e categorias
 
 ```text
 companies
@@ -474,9 +456,7 @@ categories
 
 Uma empresa pode possuir diversas categorias financeiras.
 
----
-
-#### Empresas e transações
+### Empresas e transações
 
 ```text
 companies
@@ -488,9 +468,7 @@ transactions
 
 Cada movimentação financeira pertence a uma empresa.
 
----
-
-#### Categorias e transações
+### Categorias e transações
 
 ```text
 categories
@@ -500,13 +478,9 @@ categories
 transactions
 ```
 
-Uma categoria pode ser utilizada por várias movimentações.
+Uma categoria pode ser utilizada por várias movimentações. A obrigatoriedade de uma categoria em cada transação depende das constraints e regras efetivamente implementadas.
 
-Cada transação possui uma categoria associada.
-
----
-
-#### Usuários e transações
+### Usuários e transações
 
 ```text
 auth.users
@@ -516,11 +490,21 @@ auth.users
 transactions
 ```
 
-O usuário responsável pelo registro da movimentação é armazenado através da relação com `created_by_user_id`.
+O campo `created_by_user_id` identifica o usuário responsável pelo registro da movimentação.
 
----
+### Transações e anexos
 
-#### Empresas e notificações
+```text
+transactions
+     │
+     │ 1 : N
+     ▼
+attachments
+```
+
+Uma transação pode possuir vários anexos associados. O relacionamento permite consultar os arquivos vinculados a uma movimentação financeira específica.
+
+### Empresas e notificações
 
 ```text
 companies
@@ -532,9 +516,7 @@ notifications
 
 Uma empresa pode possuir diversas notificações relacionadas às suas atividades.
 
----
-
-#### Usuários e notificações
+### Usuários e notificações
 
 ```text
 auth.users
@@ -544,13 +526,9 @@ auth.users
 notifications
 ```
 
-Um usuário pode receber diversas notificações.
+Um usuário pode receber diversas notificações. A relação `actor_user_id` permite identificar o usuário responsável pela ação que originou uma notificação.
 
-A relação `actor_user_id` também permite identificar qual usuário originou determinada ação.
-
----
-
-#### Empresas e integração com WhatsApp
+### Empresas e integração com WhatsApp
 
 ```text
 companies
@@ -560,25 +538,21 @@ companies
      └──────────────► whatsapp_messages
 ```
 
-A empresa pode possuir uma conexão com o WhatsApp e diversas mensagens associadas à integração.
+As entidades representam os dados relacionados às conexões e às mensagens associadas às empresas.
 
----
-
-#### WhatsApp e transações pendentes
+### WhatsApp e transações pendentes
 
 ```text
 whatsapp_messages
         │
-        │ 1 : N
+        │ relacionamento por mensagem de origem
         ▼
 pending_transactions
 ```
 
-Uma mensagem pode originar uma ou mais informações relacionadas ao processamento de uma transação pendente.
+Uma mensagem pode originar informações utilizadas no processamento de uma transação pendente, conforme as regras de negócio implementadas.
 
----
-
-#### Transações pendentes e transações definitivas
+### Transações pendentes e transações definitivas
 
 ```text
 pending_transactions
@@ -588,149 +562,125 @@ pending_transactions
 transactions
 ```
 
-A transação pendente representa o resultado provisório da interpretação.
+A transação pendente representa o resultado provisório da interpretação. Após a confirmação e as validações necessárias, os dados podem resultar em uma transação financeira definitiva.
 
-Após a confirmação do usuário, os dados podem resultar em uma transação financeira definitiva.
+## Organização lógica do modelo
 
----
+De forma simplificada, o modelo pode ser dividido em quatro grupos.
 
-### 🏗️ Organização lógica do modelo
-
-De forma simplificada, o modelo pode ser dividido em quatro grupos:
+### Autenticação e personalização
 
 ```text
-┌──────────────────────────────────────────────┐
-│                 AUTENTICAÇÃO                 │
-│                                              │
-│  auth.users                                  │
-│       │                                      │
-│       ├── profiles                           │
-│       ├── user_onboarding                    │
-│       └── user_preferences                   │
-└──────────────────────────────────────────────┘
-
-
-┌──────────────────────────────────────────────┐
-│                 ORGANIZAÇÃO                  │
-│                                              │
-│  companies                                   │
-│       │                                      │
-│       ├── company_members                    │
-│       └── categories                         │
-└──────────────────────────────────────────────┘
-
-
-┌──────────────────────────────────────────────┐
-│             GESTÃO FINANCEIRA                │
-│                                              │
-│  companies                                   │
-│       │                                      │
-│       └── transactions                       │
-│               │                              │
-│               └── categories                 │
-└──────────────────────────────────────────────┘
-
-
-┌──────────────────────────────────────────────┐
-│               WHATSAPP / IA                  │
-│                                              │
-│  whatsapp_connections                        │
-│              │                               │
-│  whatsapp_messages                           │
-│              │                               │
-│  pending_transactions                        │
-│              │                               │
-│  transactions                                │
-└──────────────────────────────────────────────┘
+auth.users
+    │
+    ├── profiles
+    ├── user_onboarding
+    └── user_preferences
 ```
 
-### 🔐 Segurança e integridade
+### Organização empresarial
+
+```text
+companies
+    │
+    └── company_members
+```
+
+### Gestão financeira
+
+```text
+companies
+    ├── categories
+    └── transactions
+            │
+            └── attachments
+```
+
+### WhatsApp e processamento por IA
+
+```text
+whatsapp_connections
+
+whatsapp_messages
+        │
+        ▼
+pending_transactions
+        │
+        ▼
+transactions
+```
+
+## 🔐 Segurança e integridade
 
 A modelagem do banco trabalha em conjunto com as políticas de segurança do Supabase e com as regras de negócio implementadas no backend.
 
-Os principais mecanismos utilizados são:
+Os mecanismos de segurança e integridade podem incluir:
 
-* Autenticação através do Supabase Auth;
-* Relacionamento entre usuários e empresas;
-* Controle de papéis através de `company_members`;
-* Foreign Keys;
-* Constraints;
-* Row Level Security (RLS);
-* Validação das operações no backend;
-* Funções e triggers do banco;
-* Controle de acesso por empresa.
+- Autenticação através do Supabase Auth;
+- Relacionamento entre usuários e empresas;
+- Controle de papéis através de `company_members`;
+- Chaves primárias e estrangeiras;
+- Constraints;
+- Row Level Security (RLS);
+- Validação das operações no backend;
+- Funções e triggers do banco;
+- Controle de acesso por empresa.
 
-O **Row Level Security (RLS)** é responsável por restringir o acesso aos registros conforme o usuário autenticado e sua relação com a empresa.
+O **Row Level Security (RLS)** permite restringir o acesso aos registros de acordo com as políticas configuradas no banco.
 
-Dessa forma, mesmo que um usuário tente acessar diretamente o banco através da API do Supabase, as políticas de segurança impedem o acesso indevido aos dados de outras empresas.
+Para anexos, o acesso deve considerar tanto a autorização para consultar a transação associada quanto as políticas aplicáveis ao arquivo armazenado no Supabase Storage.
 
-As regras de negócio mais críticas também são protegidas no backend. O frontend realiza validações relacionadas à experiência de utilização, enquanto o backend e o banco garantem as regras que não podem ser confiadas apenas à interface.
+A configuração efetiva dessas políticas deve ser verificada no banco e no Storage, evitando assumir que a autorização do endpoint, isoladamente, protege o acesso direto aos arquivos.
 
----
+## ⚙️ Persistência e recuperação dos dados
 
-### ⚙️ Persistência e recuperação dos dados
+O PostgreSQL é utilizado pela aplicação para operações de criação, consulta, atualização, exclusão, filtragem e relacionamento entre entidades.
 
-O banco de dados é utilizado efetivamente pela aplicação para realizar operações de:
+As movimentações financeiras são persistidas na tabela `transactions` e utilizadas nas áreas da aplicação que consomem esses dados, como:
 
-* Criação;
-* Consulta;
-* Atualização;
-* Exclusão;
-* Filtragem;
-* Relacionamento entre entidades.
+- Dashboard;
+- Movimentações;
+- DRE;
+- Notificações;
+- Funcionalidades relacionadas ao WhatsApp.
 
-As movimentações financeiras são persistidas na tabela `transactions` e posteriormente recuperadas para utilização em diferentes áreas da aplicação, como:
+Os anexos são associados às movimentações por meio da tabela `attachments`. Quando os arquivos são armazenados no Supabase Storage, o banco mantém as referências necessárias para relacioná-los aos registros financeiros.
 
-* Dashboard;
-* Movimentações;
-* DRE;
-* Notificações;
-* Integração com WhatsApp.
+As informações de usuários, empresas, categorias e preferências também são persistidas e utilizadas conforme o contexto do usuário autenticado.
 
-As informações de usuários, empresas, categorias e preferências também são persistidas no banco e utilizadas pela aplicação conforme o contexto do usuário autenticado.
+## 📌 Coerência entre modelagem e implementação
 
----
+Este documento descreve a estrutura lógica do banco de dados do MetricsFlow AI. Para manter a documentação sincronizada com a implementação, os nomes, tipos, constraints e relacionamentos devem corresponder ao schema efetivamente configurado no PostgreSQL.
 
-### 📌 Coerência entre modelagem e implementação
-
-A modelagem apresentada corresponde à estrutura implementada no **PostgreSQL através do Supabase**.
-
-As entidades apresentadas no diagrama são utilizadas efetivamente pela aplicação e possuem relacionamentos implementados através de chaves primárias e estrangeiras.
-
-A estrutura permite representar o fluxo principal da MetricsFlow AI:
+O fluxo financeiro principal pode ser representado da seguinte forma:
 
 ```text
 Usuário
    ↓
 Empresa
    ↓
-Membro
-   ↓
 Categorias
    ↓
 Transações
+   ├── Anexos
    ↓
 Dashboard / DRE
 ```
 
-Além disso, a arquitetura suporta o fluxo planejado de integração com WhatsApp:
+O fluxo de processamento de mensagens financeiras relacionadas ao WhatsApp pode ser representado assim:
 
 ```text
-WhatsApp
-   ↓
-whatsapp_messages
+Mensagem
    ↓
 Interpretação
    ↓
 pending_transactions
    ↓
-Confirmação do usuário
+Validação e confirmação
    ↓
 transactions
    ↓
 Dashboard / DRE
 ```
 
-Portanto, a modelagem está diretamente relacionada à estrutura do banco implementado e às funcionalidades atualmente desenvolvidas na MetricsFlow AI.
-
----
+A tabela `attachments` complementa o modelo financeiro ao associar arquivos às transações. A configuração do armazenamento físico, incluindo o bucket do Supabase Storage, deve ser detalhada separadamente na documentação de arquitetura.

@@ -11,9 +11,9 @@
   <img src="https://img.shields.io/badge/Lucide-React-000000?style=for-the-badge&logo=lucide&logoColor=white" alt="Lucide" />
   <img src="https://img.shields.io/badge/Recharts-FFC436?style=for-the-badge&logo=recharts&logoColor=black" alt="Recharts" />
   <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="WhatsApp" />
+  <img src="https://img.shields.io/badge/WhatsApp Demo-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="WhatsApp Demo" />
   <img src="https://img.shields.io/badge/Google-OAuth-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Google OAuth" />
-  <img src="https://img.shields.io/badge/OpenAI-000000?style=for-the-badge&logo=openai&logoColor=white" alt="OpenAI" />
+  <img src="https://img.shields.io/badge/Groq-000000?style=for-the-badge&logo=groq&logoColor=white" alt="Groq" />
   <img src="https://img.shields.io/badge/REST-API-000000?style=for-the-badge&logo=rest-api&logoColor=white" alt="REST API" />
   <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" />
   <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white" alt="Git" />
@@ -70,13 +70,14 @@ Frontend e backend permanecem no mesmo repositório Git, mas são aplicações s
 
 - [Visão do produto](./docs/projeto/visao-do-produto.md)
 - [Funcionalidades](./docs/produto/funcionalidades.md)
+- [API](./docs/api/endpoints.md)
 - [Organização e plano de carreira](./docs/projeto/organizacao-e-carreira.md)
 - [Documentação acadêmica](./docs/projeto/documentacao-academica.md)
 - [Arquitetura](./docs/arquitetura/arquitetura.md)
 - [Autenticação e segurança](./docs/arquitetura/autenticacao-e-seguranca.md)
 - [IA e WhatsApp](./docs/arquitetura/ia-e-whatsapp.md)
+- [Armazenamento de arquivos](./docs/arquitetura/armazenamento-de-arquivos.md)
 - [Modelagem do banco](./docs/banco/modelagem.md)
-- [API](./docs/api/endpoints.md)
 - [Diagramas UML](./docs/diagramas/uml.md)
 - [C4 Model](./docs/diagramas/c4.md)
 - [Status e roadmap](./docs/produto/status-e-roadmap.md)
