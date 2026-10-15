@@ -7,7 +7,7 @@ export interface DemoResponse {
   originalText: string;
   parsed: ParsedFinancialMessage;
   confirmation: string | null;
-  mode: "openai" | "local-fallback";
+  mode: "groq" | "local-fallback";
 }
 
 export interface WhatsAppExample {

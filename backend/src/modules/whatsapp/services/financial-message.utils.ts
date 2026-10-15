@@ -89,6 +89,20 @@ export function normalizeParsedMessage(
     new Set((parsed.missingFields ?? []).map(normalizeMissingField)),
   );
 
+  if (parsed.description) {
+    parsed.description = parsed.description
+      .replace(/Informação complementar:.*/gi, '')
+      .replace(/^(com|de|do|da|dos|das|no|na|nos|nas|em|para|por|via)\s+/i, '')
+      .replace(/\s+(com|de|do|da|dos|das|no|na|nos|nas|em|para|por|via)$/i, '')
+      .trim();
+
+    if (parsed.description.length > 0) {
+      parsed.description =
+        parsed.description.charAt(0).toUpperCase() +
+        parsed.description.slice(1);
+    }
+  }
+
   if (!parsed.description?.trim()) {
     parsed.description = null;
 

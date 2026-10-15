@@ -49,7 +49,7 @@
 
 - [x] Demonstração interativa sem conexão à Meta
 - [x] Gravação de áudio no navegador
-- [x] Transcrição de áudio via OpenAI na demonstração
+- [x] Transcrição de áudio via Whisper na demonstração
 - [x] Interpretação da transcrição pelo parser financeiro
 - [x] Fluxo de confirmação de lançamentos na demonstração
 
@@ -94,7 +94,7 @@ flowchart TD
 - [ ] Aprimorar a interface e a experiência do WhatsApp Demo.
 - [ ] Refinar o envio e o processamento de mensagens de texto.
 - [ ] Aprimorar a gravação e o processamento de áudios no navegador.
-- [ ] Validar a transcrição de áudio via OpenAI.
+- [ ] Validar a transcrição de áudio via Whisper.
 - [ ] Integrar e validar o fluxo de interpretação financeira pelo backend NestJS.
 - [ ] Tratar mensagens que não contenham informações financeiras suficientes.
 - [ ] Validar os dados retornados pelo parser financeiro.
@@ -110,7 +110,7 @@ flowchart TD
 O WhatsApp Demo continuará funcionando dentro da própria plataforma, por meio da rota `/whatsapp/demo`.
 
 - **Entrada:** texto digitado ou áudio gravado no navegador.
-- **Transcrição:** OpenAI, para a demonstração de áudio.
+- **Transcrição:** whisper, para a demonstração de áudio.
 - **Interpretação:** módulo de IA e parser financeiro do backend.
 - **Confirmação:** realizada na interface da demonstração.
 - **Persistência:** transações confirmadas são registradas no Supabase, conforme as validações e permissões implementadas.

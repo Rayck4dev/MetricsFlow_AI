@@ -153,7 +153,6 @@ export function bestCategory(
     return null;
   }
 
-  // Se houver empate, não escolhemos uma categoria arbitrariamente.
   if (candidates.length > 1 && candidates[0].score === candidates[1].score) {
     return null;
   }

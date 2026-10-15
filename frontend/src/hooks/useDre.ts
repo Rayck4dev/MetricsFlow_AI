@@ -608,7 +608,6 @@ export function useDre(transactions: DreTransaction[]) {
     link.click();
     document.body.removeChild(link);
 
-    // Revoga a URL depois que o navegador tiver iniciado o download.
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 

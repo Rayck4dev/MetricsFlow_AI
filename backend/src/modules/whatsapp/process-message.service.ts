@@ -24,7 +24,6 @@ export class ProcessMessageService {
   ) {}
 
   async processIncomingWhatsAppMessage(message: IncomingWhatsAppMessage) {
-    // 1. Validar e verificar duplicidade
     const { data: existingMessage } =
       await this.whatsappMessagesRepository.findByProviderMessageId(
         message.providerMessageId,
@@ -38,7 +37,6 @@ export class ProcessMessageService {
       };
     }
 
-    // 2. Identificar a conexão vinculada
     const { data: connection } =
       await this.whatsappConnectionsRepository.findVerifiedByPhone(
         message.phoneNumber,
@@ -55,7 +53,6 @@ export class ProcessMessageService {
       };
     }
 
-    // 3. Obter e normalizar o conteúdo
     const preparedContent = await this.messageContentService.prepare(
       message.type,
       message.text ?? null,
@@ -74,7 +71,6 @@ export class ProcessMessageService {
       };
     }
 
-    // 4. Aplicar as regras de segurança
     const pendingData = await this.pendingTransactionService.findLatest(
       connection.user_id,
       connection.company_id,
@@ -104,7 +100,6 @@ export class ProcessMessageService {
       };
     }
 
-    // 5. Registrar a mensagem recebida
     const { data: createdMessage } =
       await this.whatsappMessagesRepository.createInboundMessage({
         company_id: connection.company_id,
@@ -120,7 +115,6 @@ export class ProcessMessageService {
 
     const dbMessageId = createdMessage?.id;
 
-    // 6. Resolver a intenção usando Strategy
     const context: MessageIntentContext = {
       userId: connection.user_id,
       companyId: connection.company_id,
@@ -170,7 +164,6 @@ export class ProcessMessageService {
         );
       }
 
-      // 7. Retornar o resultado do processamento
       return {
         ok: true,
         handled: result.handled,
@@ -189,4 +182,3 @@ export class ProcessMessageService {
     }
   }
 }
-

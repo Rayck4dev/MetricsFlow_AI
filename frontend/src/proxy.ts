@@ -44,7 +44,7 @@ export async function proxy(request: NextRequest) {
         },
 
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
+          cookiesToSet.forEach(({ name, value }) => {
             request.cookies.set(name, value);
           });
 
@@ -53,7 +53,7 @@ export async function proxy(request: NextRequest) {
           });
 
           cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options); //path, maxAge, httpOnly, sameSite
+            response.cookies.set(name, value, options);
           });
         },
       },
@@ -70,8 +70,6 @@ export async function proxy(request: NextRequest) {
 
     loginUrl.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
 
-    //  /dashboard vira /login?next=%2Fdashboard
-    
     return NextResponse.redirect(loginUrl);
   }
 

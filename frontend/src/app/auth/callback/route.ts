@@ -5,7 +5,6 @@ import { cookies } from "next/headers";
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
 
-  //https://metricflow.com/auth/callback?code=ABC123
   const code = requestUrl.searchParams.get("code");
 
   if (!code) {

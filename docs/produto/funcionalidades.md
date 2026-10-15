@@ -430,7 +430,7 @@ flowchart TD
 
     B -->|Texto| C["Digitar mensagem na interface"]
     B -->|Áudio| D["Gravar áudio no navegador"]
-    D --> E["Transcrever áudio via OpenAI"]
+    D --> E["Transcrever áudio via Whisper"]
 
     C --> F["Enviar conteúdo ao backend NestJS"]
     E --> F
@@ -450,7 +450,7 @@ flowchart TD
 ### 13.2. Escopo e limitações
 
 - **Disponível:** demonstração de processamento de mensagens de texto na plataforma.
-- **Disponível:** gravação de áudio no navegador e transcrição via OpenAI no fluxo de demonstração.
+- **Disponível:** gravação de áudio no navegador e transcrição via Whisper no fluxo de demonstração.
 - **Disponível:** interpretação de informações financeiras e apresentação para confirmação.
 - **Disponível:** registro da movimentação após a confirmação, respeitando as validações e permissões implementadas.
 - **Não implementado:** integração oficial com a Meta Cloud API.

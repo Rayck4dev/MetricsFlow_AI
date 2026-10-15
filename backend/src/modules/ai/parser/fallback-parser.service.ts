@@ -195,25 +195,20 @@ export class FallbackParserService {
   private buildDescription(text: string): string | null {
     let description = text.trim();
 
-    // Remove valores monetários
     description = description.replace(/R\$\s*\d[\d.]*(?:,\d{1,2})?/gi, ' ');
 
-    // Remove datas
     description = description.replace(
       /\b\d{1,2}[/-]\d{1,2}(?:[/-]\d{2,4})?\b/g,
       ' ',
     );
 
-    // Remove referências temporais
     description = description.replace(/\b(hoje|ontem|anteontem)\b/gi, ' ');
 
-    // Remove formas de pagamento
     description = description.replace(
       /\b(cart[aã]o\s+de\s+cr[eé]dito|cart[aã]o\s+de\s+d[eé]bito|cr[eé]dito|d[eé]bito|pix|boleto|dinheiro|esp[eé]cie|transfer[eê]ncia|transferi)\b/gi,
       ' ',
     );
 
-    // Extrai o motivo antes de remover palavras genéricas
     const normalized = description.replace(/\s+/g, ' ').trim();
 
     const patterns = [
@@ -232,7 +227,6 @@ export class FallbackParserService {
       }
     }
 
-    // Remove verbos de registro, preservando o restante
     description = normalized
       .replace(
         /^(?:recebi|entrou|faturei|vendi|ganhei|pagaram|faturamento|gastei|paguei|comprei|descontaram)\b\s*/i,

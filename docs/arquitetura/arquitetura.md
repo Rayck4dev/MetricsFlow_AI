@@ -186,7 +186,7 @@ A integração direta com a API oficial da Meta não foi viabilizada nesta etapa
 
 O backend mantém módulos e serviços relacionados ao processamento de mensagens e à integração com a Meta. Entretanto, a presença desses componentes na estrutura do código não significa que a integração oficial esteja operacional em produção.
 
-A abordagem adotada nesta etapa utiliza recursos de Inteligência Artificial no processamento das interações, incluindo a transcrição de áudio por meio da OpenAI.
+A abordagem adotada nesta etapa utiliza recursos de Inteligência Artificial no processamento das interações, incluindo a transcrição de áudio por meio do Whisper.
 
 ## Evolução da arquitetura
 

@@ -38,6 +38,7 @@ export class WhatsappService {
     private readonly metaService: MetaService,
     private readonly processMessageService: ProcessMessageService,
   ) {}
+
   private async recordDemoMessage(params: {
     companyId: string;
     userId: string;
@@ -77,6 +78,7 @@ export class WhatsappService {
 
     return data;
   }
+
   async getDemoMessages(user: User) {
     const company = await this.getUserCompany(user.id);
     const supabase = this.supabaseService.getClient();
@@ -143,7 +145,18 @@ export class WhatsappService {
       };
     });
 
-    if (formattedMessages.length === 0) {
+    const seenBotMessages = new Set<string>();
+    const uniqueMessages = formattedMessages.filter((m) => {
+      if (m.mine) return true;
+      const normalizedText = m.text.trim();
+      if (seenBotMessages.has(normalizedText)) {
+        return false;
+      }
+      seenBotMessages.add(normalizedText);
+      return true;
+    });
+
+    if (uniqueMessages.length === 0) {
       return {
         welcomeMessage: welcomeText,
         messages: [
@@ -167,11 +180,12 @@ export class WhatsappService {
 
     return {
       welcomeMessage: welcomeText,
-      messages: formattedMessages,
+      messages: uniqueMessages,
       pending: pending ?? null,
       company: { id: company.id, name: company.name },
     };
   }
+
   async processDemoAudio(
     file: { buffer?: Buffer; mimetype?: string; originalname?: string },
     user: User,
@@ -208,6 +222,7 @@ export class WhatsappService {
       transcription: normalizedText,
     };
   }
+
   async processDemoMessage(
     text: string,
     user: User,
@@ -228,7 +243,6 @@ export class WhatsappService {
     const company = await this.getUserCompany(user.id);
     const supabase = this.supabaseService.getClient();
 
-    // 1. Procura uma proposta ativa deste usuário e desta empresa
     const { data: pendingLatest, error: pendingError } = await supabase
       .from('pending_transactions')
       .select(
@@ -258,6 +272,12 @@ export class WhatsappService {
       transcription: options?.transcription ?? null,
       pendingTransactionId: pending?.id ?? null,
     });
+
+    const categories = await this.categoriesService.findByCompany(
+      { company_id: company.id },
+      user.id,
+    );
+
     const isConfirmation =
       /^(confirmar|confirmo|sim|ok|pode confirmar|pode registrar|confirmado)[.! ]*$/i.test(
         normalizedText,
@@ -266,7 +286,7 @@ export class WhatsappService {
       /^(cancelar|cancela|cancele|não|nao|desistir|deixa pra lá|deixa para lá)[.! ]*$/i.test(
         normalizedText,
       );
-    const isCorrection =
+    const isGenericCorrection =
       /^(corrigir|corrige|editar|alterar|quero corrigir|quero alterar)[.! ]*$/i.test(
         normalizedText,
       );
@@ -346,7 +366,109 @@ export class WhatsappService {
       };
     }
 
-    if (isCorrection && pending) {
+    const isSpecificCorrection =
+      pending &&
+      /^(corrigir|corrige|alterar|mudar|muda)\s+(o|a)?\s*(descrição|descricao|valor|categoria|pagamento|data)/i.test(
+        normalizedText,
+      );
+
+    if (isSpecificCorrection && pending) {
+      const fieldMatch = normalizedText.match(
+        /(descrição|descricao|valor|categoria|pagamento|data)/i,
+      );
+      const fieldKey = fieldMatch ? fieldMatch[1].toLowerCase() : '';
+
+      const parts = normalizedText.split(/\s+(?:para|em|como)\s+|\s*=\s*/i);
+      const newValue = parts.length > 1 ? parts[parts.length - 1].trim() : '';
+
+      if (newValue) {
+        const updatedParsed = {
+          intent: 'create_transaction' as const,
+          type: pending.type as 'income' | 'expense' | null,
+          amount: pending.amount,
+          description: pending.description,
+          categoryId: pending.category_id,
+          categoryName: pending.category_name,
+          paymentMethod: pending.payment_method,
+          transactionDate: pending.transaction_date,
+          confidence: 1,
+          missingFields: pending.missing_fields ?? [],
+        };
+
+        if (fieldKey.includes('descri')) {
+          updatedParsed.description = newValue.replace(/[.]$/, '').trim();
+        } else if (fieldKey.includes('valor')) {
+          const numericValue = parseFloat(
+            newValue.replace(/[^\d,]/g, '').replace(',', '.'),
+          );
+          if (!Number.isNaN(numericValue)) {
+            updatedParsed.amount = numericValue;
+          }
+        } else if (fieldKey.includes('pagamento')) {
+          updatedParsed.paymentMethod = newValue.toLowerCase() as any;
+        } else if (fieldKey.includes('data')) {
+          updatedParsed.transactionDate = newValue;
+        }
+
+        normalizeParsedMessage(updatedParsed, pending.raw_message, categories);
+
+        const newStatus =
+          updatedParsed.missingFields.length > 0
+            ? 'awaiting_information'
+            : 'awaiting_confirmation';
+
+        const { data: updatedPending, error: updateError } = await supabase
+          .from('pending_transactions')
+          .update({
+            type: updatedParsed.type,
+            amount: updatedParsed.amount,
+            description: updatedParsed.description,
+            category_id: updatedParsed.categoryId,
+            category_name: updatedParsed.categoryName,
+            payment_method: updatedParsed.paymentMethod,
+            transaction_date: updatedParsed.transactionDate,
+            missing_fields: updatedParsed.missingFields,
+            status: newStatus,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', pending.id)
+          .select('id,status,expires_at')
+          .maybeSingle();
+
+        if (!updateError && updatedPending) {
+          const replyText =
+            updatedPending.status === 'awaiting_confirmation'
+              ? formatConfirmation(updatedParsed)
+              : missingQuestion(updatedParsed);
+
+          await this.recordDemoMessage({
+            companyId: company.id,
+            userId: user.id,
+            direction: 'outbound',
+            messageType: 'text',
+            text: replyText,
+            pendingTransactionId: updatedPending.id,
+          });
+
+          return {
+            ok: true,
+            pendingTransactionId: updatedPending.id,
+            status: updatedPending.status,
+            expiresAt: updatedPending.expires_at,
+            message: replyText,
+            reply: replyText,
+            canConfirm: updatedPending.status === 'awaiting_confirmation',
+            companyId: company.id,
+            companyName: company.name,
+            categories,
+            parsed: updatedParsed,
+            missingFields: updatedParsed.missingFields,
+          };
+        }
+      }
+    }
+
+    if (isGenericCorrection && pending) {
       const { data: cancelled, error: cancelError } = await supabase
         .from('pending_transactions')
         .update({ status: 'cancelled', updated_at: new Date().toISOString() })
@@ -387,6 +509,7 @@ export class WhatsappService {
         reply: replyText,
       };
     }
+
     const guard = this.messageGuardService.check(
       normalizedText,
       Boolean(pending && pending.status === 'awaiting_information'),
@@ -409,11 +532,6 @@ export class WhatsappService {
         reply: guard.response,
       };
     }
-
-    const categories = await this.categoriesService.findByCompany(
-      { company_id: company.id },
-      user.id,
-    );
 
     const isCompletingInfo =
       pending && pending.status === 'awaiting_information';
@@ -549,6 +667,7 @@ export class WhatsappService {
       missingFields,
     };
   }
+
   async confirmTransaction(body: ConfirmWhatsappDto, user: User) {
     const pendingId =
       body?.pendingTransactionId || body?.pending_transaction_id;

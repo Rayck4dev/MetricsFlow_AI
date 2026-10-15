@@ -37,7 +37,11 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
   headers.set("Authorization", `Bearer ${token}`);
 
-  if (options.body && !headers.has("Content-Type")) {
+  if (
+    options.body &&
+    !(options.body instanceof FormData) &&
+    !headers.has("Content-Type")
+  ) {
     headers.set("Content-Type", "application/json");
   }
 
@@ -77,7 +81,20 @@ export async function processWhatsAppDemo(text: string): Promise<DemoResponse> {
     method: "POST",
     body: JSON.stringify({
       text,
+      clientTimestamp: new Date().toISOString(),
     }),
+  });
+}
+export async function processWhatsAppAudioDemo(
+  audioBlob: Blob,
+): Promise<DemoResponse> {
+  const formData = new FormData();
+  formData.append("file", audioBlob, "whatsapp-demo.webm");
+  formData.append("clientTimestamp", new Date().toISOString());
+
+  return request<DemoResponse>("/whatsapp/demo/audio", {
+    method: "POST",
+    body: formData,
   });
 }
 
@@ -92,7 +109,7 @@ export async function confirmWhatsAppTransaction(body: {
 }
 
 export async function getWhatsAppConnection() {
-  return request("/whatsapp/connection", {
+  return request<WhatsAppConnection>("/whatsapp/connection", {
     method: "GET",
   });
 }

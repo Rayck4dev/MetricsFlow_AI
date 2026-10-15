@@ -143,7 +143,7 @@ http://localhost:3002/whatsapp/demo
 Ela requer uma sessão autenticada, uma empresa vinculada ao usuário e as
 variáveis do Supabase configuradas no frontend e no backend. O envio de texto
 usa o parser local quando `GROQ_API_KEY` não está configurada. Para gravar e
-transcrever áudio, configure uma chave da OpenAI no backend.
+transcrever áudio, configure uma chave da Groq no backend.
 
 Esta tela simula a interface do WhatsApp Web: não conecta à Meta nem envia
 mensagens pelo WhatsApp. As mensagens da demonstração são salvas na conta

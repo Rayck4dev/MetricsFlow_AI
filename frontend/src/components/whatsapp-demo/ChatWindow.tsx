@@ -108,7 +108,7 @@ export function ChatWindow({
             </span>
             <span className="mb-2 max-w-[540px] self-center rounded-lg bg-[#2b2a1d] px-3 py-2 text-center text-[12.5px] text-[#e6cf8f] shadow">
               Demonstração: não conecta à Meta. As mensagens são processadas e
-              salvas na sua conta; áudios são enviados à OpenAI para
+              salvas na sua conta; áudios são enviados ao Whisper para
               transcrição. Confirme apenas dados de demonstração.
             </span>
             {messages.map((m, i) => (

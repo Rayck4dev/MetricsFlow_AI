@@ -8,7 +8,7 @@ import type {
 
 import { currentLocalDate } from './parser/financial-normalizer';
 import { FallbackParserService } from './parser/fallback-parser.service';
-import { OpenAIParserService } from './parser/openai-parser.service';
+import { GroqParserService } from './parser/groq-parser.service';
 
 const MAX_MESSAGE_LENGTH = 10_000;
 
@@ -18,7 +18,7 @@ export class ParserService {
 
   constructor(
     private readonly fallbackParser: FallbackParserService,
-    private readonly openAIParser: OpenAIParserService,
+    private readonly groqParser: GroqParserService,
   ) {}
 
   private emptyResult(
@@ -52,14 +52,14 @@ export class ParserService {
       return this.emptyResult();
     }
 
-    if (!process.env.OPENAI_API_KEY?.trim()) {
-      this.logger.debug('OPENAI_API_KEY não configurada. Usando parser local.');
+    if (!process.env.GROQ_API_KEY?.trim()) {
+      this.logger.debug('GROQ_API_KEY não configurada. Usando parser local.');
 
       return this.fallbackParser.parse(normalizedMessage, categories);
     }
 
     try {
-      return await this.openAIParser.parse(normalizedMessage, categories);
+      return await this.groqParser.parse(normalizedMessage, categories);
     } catch (error: unknown) {
       this.logger.warn(
         `Falha na interpretação por IA: ${

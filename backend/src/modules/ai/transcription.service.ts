@@ -83,10 +83,12 @@ export class TranscriptionService {
       throw new BadRequestException('O nome do arquivo de áudio é inválido.');
     }
 
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY;
+    const baseUrl =
+      process.env.GROQ_BASE_URL?.trim() || 'https://api.groq.com/openai/v1';
 
     if (!apiKey?.trim()) {
-      this.logger.error('OPENAI_API_KEY não está configurada.');
+      this.logger.error('GROQ_API_KEY não está configurada.');
 
       throw new InternalServerErrorException(
         'O serviço de transcrição não está configurado.',
@@ -94,7 +96,7 @@ export class TranscriptionService {
     }
 
     const model =
-      process.env.OPENAI_TRANSCRIPTION_MODEL?.trim() || 'gpt-4o-transcribe';
+      process.env.GROQ_TRANSCRIPTION_MODEL?.trim() || 'whisper-large-v3-turbo';
 
     const form = new FormData();
 
@@ -110,7 +112,7 @@ export class TranscriptionService {
     let response: Response;
 
     try {
-      response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      response = await fetch(`${baseUrl}/audio/transcriptions`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${apiKey}`,

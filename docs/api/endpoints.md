@@ -57,7 +57,7 @@ Todos os endpoints da API utilizam o prefixo `/api`.
 
 Nesta etapa do projeto, não foi possível viabilizar a integração direta com a API oficial da Meta. Como alternativa, foi adotada uma abordagem baseada em um **ambiente de demonstração interativa**, permitindo apresentar e validar o fluxo de utilização sem depender de uma conexão ativa com a plataforma.
 
-A demonstração utiliza recursos de Inteligência Artificial no processamento das interações, incluindo a transcrição de mensagens de áudio por meio da OpenAI. Essa abordagem permite demonstrar os fluxos previstos para a solução, sem representar uma conexão efetiva com a infraestrutura oficial do WhatsApp.
+A demonstração utiliza recursos de Inteligência Artificial no processamento das interações, incluindo a transcrição de mensagens de áudio por meio da Whisper. Essa abordagem permite demonstrar os fluxos previstos para a solução, sem representar uma conexão efetiva com a infraestrutura oficial do WhatsApp.
 
 A estratégia de integração poderá ser reavaliada em etapas futuras, conforme a evolução do projeto e a viabilidade técnica.
 

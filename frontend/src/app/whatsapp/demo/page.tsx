@@ -119,8 +119,6 @@ export default function WhatsAppDemoPage() {
       );
 
       setMessages((currentMessages) => {
-        // Preserva mensagens locais que ainda não apareceram no histórico
-        // retornado pelo backend.
         const serverTexts = new Set(
           serverMessages.map(
             (item) => `${item.mine ? "user" : "bot"}:${item.text}`,
@@ -164,14 +162,14 @@ export default function WhatsAppDemoPage() {
     () =>
       initialConversations.map((conversation) => ({
         ...conversation,
-        name: companyName,
+        name: "Metrics",
         preview:
           messages.length > 0
             ? messages[messages.length - 1].text || "Mensagem recebida"
             : welcomeMessage,
         time: messages[messages.length - 1]?.time ?? "",
       })),
-    [companyName, messages, welcomeMessage],
+    [messages, welcomeMessage],
   );
 
   const filteredConversations = useMemo(
@@ -227,7 +225,6 @@ export default function WhatsAppDemoPage() {
       status: "sent",
     };
 
-    // Exibe a mensagem imediatamente, sem esperar a API.
     setMessages((previous) => [...previous, optimisticMessage]);
     setMessage("");
 
@@ -242,19 +239,7 @@ export default function WhatsAppDemoPage() {
     void askBot(() => sendAudioToBot(audio.blob, audio.duration));
   }
 
-  // A saudação permanece visível durante toda a conversa.
-  const welcomeAsMessage: DemoMessage = {
-    id: -1_000_000,
-    mine: false,
-    messageType: "text",
-    time: "",
-    text: welcomeMessage,
-  };
-
-  const displayedMessages = [
-    welcomeAsMessage,
-    ...messages.filter((item) => item.id !== -1_000_000),
-  ];
+  const displayedMessages = messages;
 
   return (
     <main className="h-[100dvh] overflow-hidden bg-[#161717] text-[#e9edef]">
