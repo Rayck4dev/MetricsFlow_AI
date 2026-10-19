@@ -100,7 +100,7 @@ export default function WhatsAppPage() {
                   {connection.loading
                     ? "Verificando conexão"
                     : whatsappConnected
-                      ? "WhatsApp conectado"
+                      ? "WhatsApp Demo conectado"
                       : "Modo demonstrativo"}
                 </span>
               </div>

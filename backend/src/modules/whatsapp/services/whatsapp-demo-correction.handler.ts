@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { CompanyCategory, ParsedFinancialMessage } from '../../ai/types';
 import { PendingTransactionsRepository } from '../repositories/pending-transactions.repository';
-import {
-  formatConfirmation,
-  missingQuestion,
-} from './financial-message.utils';
+import { formatConfirmation, missingQuestion } from './financial-message.utils';
 import { normalizeParsedMessage } from './normalizers/financial-message.normalizer';
 
 export interface PendingProposalState {
@@ -31,7 +28,7 @@ export interface CorrectionResult {
 @Injectable()
 export class WhatsappDemoCorrectionHandler {
   private readonly correctionPattern =
-    /^(corrigir|corrige|alterar|mudar|muda)\s+(o|a)?\s*(descrição|descricao|valor|categoria|pagamento|data)/i;
+    /^(corrigir|corrige|alterar|mudar|muda|mude|colocar|coloque)\s+(o|a)?\s*(descrição|descricao|valor|categoria|pagamento|data)/i;
 
   constructor(
     private readonly pendingRepository: PendingTransactionsRepository,
@@ -84,6 +81,21 @@ export class WhatsappDemoCorrectionHandler {
       updatedParsed.paymentMethod = newValue.toLowerCase() as any;
     } else if (fieldKey.includes('data')) {
       updatedParsed.transactionDate = newValue;
+    } else if (fieldKey.includes('categoria')) {
+      const normalizedSearch = newValue.toLowerCase();
+      const matchedCategory = categories.find((c) => {
+        const catName = c.name.toLowerCase();
+        return (
+          catName === normalizedSearch ||
+          catName.includes(normalizedSearch) ||
+          normalizedSearch.includes(catName)
+        );
+      });
+
+      if (matchedCategory) {
+        updatedParsed.categoryId = matchedCategory.id;
+        updatedParsed.categoryName = matchedCategory.name;
+      }
     }
 
     normalizeParsedMessage(updatedParsed, pending.raw_message, categories);

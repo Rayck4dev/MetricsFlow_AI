@@ -61,8 +61,6 @@ function toDemoMessage(item: BackendMessage, index: number): DemoMessage {
         })
       : "");
 
-  // Audio from server never has a real URL — we keep the object for type detection
-  // but use null url so AudioMessage skips the <audio> element (avoids src="" error)
   const audioObj = isAudio
     ? {
         url: null as unknown as string,
@@ -134,8 +132,6 @@ export default function WhatsAppDemoPage() {
       );
 
       setMessages((currentMessages) => {
-        // Build dedup keys: for text messages use direction+text, for audio use direction+type
-        // This prevents optimistic audio messages from being cloned when server returns same msg
         const serverKeys = new Set(
           serverMessages.map((item) => {
             const dir = item.mine ? "user" : "bot";
@@ -216,14 +212,10 @@ export default function WhatsAppDemoPage() {
     setTyping(true);
 
     try {
-      // request() returns the bot reply string from extractReply.
-      // If the backend response doesn't include reply/message (e.g. confirm endpoint),
-      // extractReply throws — we catch that below and show a generic success message.
       let botReply: string;
       try {
         botReply = await request();
       } catch {
-        // Backend responded but without a parseable reply text — treat as success
         botReply = "✅ Operação concluída com sucesso!";
       }
 

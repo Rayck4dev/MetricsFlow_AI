@@ -95,6 +95,10 @@ const FINANCIAL_PATTERNS: RegExp[] = [
   /\bcombustível\b/i,
   /\bcombustivel\b/i,
   /\bfolha de pagamento\b/i,
+  /\bcategoria\b/i,
+  /\bmudar\b/i,
+  /\balterar\b/i,
+  /\bcorrigir\b/i,
   /\br\$\s*\d/i,
   /\b\d+(?:[.,]\d{1,2})?\s*(?:reais|real)\b/i,
 ];
@@ -102,7 +106,7 @@ const FINANCIAL_PATTERNS: RegExp[] = [
 const SHORT_RESPONSE_PATTERNS: RegExp[] = [
   /^(?:confirmar|confirmo|sim|s|ok|okay|pode confirmar|pode registrar|confirmado)[.! ]*$/i,
   /^(?:cancelar|cancela|cancele|não|nao|n|desistir|deixa pra lá|deixa para lá)[.! ]*$/i,
-  /^(?:corrigir|corrige|editar|alterar|quero corrigir|quero alterar)[.! ]*$/i,
+  /^(?:corrigir|corrige|editar|alterar|mudar|quero corrigir|quero alterar)[.! ]*$/i,
 ];
 
 const SENSITIVE_PATTERNS: RegExp[] = [
@@ -131,7 +135,11 @@ const SENSITIVE_PATTERNS: RegExp[] = [
 
 @Injectable()
 export class MessageGuardService {
-  check(text: unknown, hasPendingInformation = false): MessageGuardResult {
+  check(
+    text: unknown,
+    hasPendingInformation = false,
+    hasPendingProposal = false,
+  ): MessageGuardResult {
     if (typeof text !== 'string') {
       return this.reject('invalid_input', RESPONSES.invalidInput);
     }
@@ -154,7 +162,7 @@ export class MessageGuardService {
       return this.allow(normalizedText);
     }
 
-    if (hasPendingInformation) {
+    if (hasPendingInformation || hasPendingProposal) {
       return this.allow(normalizedText);
     }
 

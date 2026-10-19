@@ -190,6 +190,15 @@ export function useWhatsAppDemo() {
   }
 
   function handleQuickReply(replyText: string): void {
+    const userActionMessage: ChatMessage = {
+      id: `${Date.now()}-user-action`,
+      mine: true,
+      text: replyText,
+      time: getLocalTime(),
+      status: "sent",
+    };
+    setMessages((prev) => [...prev, userActionMessage]);
+
     if (replyText === "Confirmar") {
       void confirmTransaction();
       return;
