@@ -19,6 +19,14 @@ import { WhatsappMessagesRepository } from './repositories/whatsapp-messages.rep
 import { MessageContentService } from './services/message-content.service';
 import { MessageResponseService } from './services/message-response.service';
 import { PendingTransactionService } from './services/pending-transaction.service';
+import { WhatsappConnectionService } from './services/whatsapp-connection.service';
+import { WhatsappDemoActionHandler } from './services/whatsapp-demo-action.handler';
+import { WhatsappDemoCorrectionHandler } from './services/whatsapp-demo-correction.handler';
+import { WhatsappDemoHistoryService } from './services/whatsapp-demo-history.service';
+import { WhatsappDemoProposalHandler } from './services/whatsapp-demo-proposal.handler';
+import { WhatsappDemoService } from './services/whatsapp-demo.service';
+import { WhatsappMediaService } from './services/whatsapp-media.service';
+import { WhatsappWebhookService } from './services/whatsapp-webhook.service';
 
 import { CancelTransactionStrategy } from './strategies/cancel-transaction.strategy';
 import { ConfirmTransactionStrategy } from './strategies/confirm-transaction.strategy';
@@ -38,6 +46,14 @@ import { MESSAGE_INTENT_STRATEGIES } from './strategies/message-intent.strategy'
   controllers: [WhatsappController],
   providers: [
     WhatsappService,
+    WhatsappConnectionService,
+    WhatsappDemoService,
+    WhatsappDemoActionHandler,
+    WhatsappDemoHistoryService,
+    WhatsappDemoProposalHandler,
+    WhatsappDemoCorrectionHandler,
+    WhatsappMediaService,
+    WhatsappWebhookService,
     MetaService,
     ProcessMessageService,
     MessageGuardService,
@@ -71,7 +87,6 @@ import { MESSAGE_INTENT_STRATEGIES } from './strategies/message-intent.strategy'
       ],
     },
   ],
-  exports: [MetaService],
+  exports: [WhatsappService, MetaService],
 })
 export class WhatsappModule {}
-

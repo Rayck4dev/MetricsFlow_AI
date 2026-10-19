@@ -37,7 +37,7 @@ export class MessageContentService {
         normalizedText: '',
         transcription: null,
         errorReply:
-          'No momento, consigo processar apenas mensagens de texto e áudio.',
+          'Ops! No momento, consigo processar apenas mensagens de texto e áudio.',
       };
     }
 
@@ -47,7 +47,7 @@ export class MessageContentService {
         transcription: null,
         errorStatus: 'transcription_failed',
         errorReply:
-          'Não consegui acessar o áudio enviado. Tente enviá-lo novamente ou escreva a transação por texto.',
+          'Ops! Não consegui acessar o arquivo de áudio. Poderia enviar novamente ou digitar por texto?',
       };
     }
 
@@ -60,7 +60,7 @@ export class MessageContentService {
           transcription: null,
           errorStatus: 'transcription_failed',
           errorReply:
-            'Não consegui acessar o áudio enviado. Tente enviá-lo novamente.',
+            'Ops! Não consegui acessar o arquivo de áudio. Poderia enviar novamente ou digitar por texto?',
         };
       }
 
@@ -78,7 +78,7 @@ export class MessageContentService {
           transcription: null,
           errorStatus: 'empty_transcription',
           errorReply:
-            'Não consegui entender o áudio. Tente gravá-lo novamente ou envie a transação por texto.',
+            'Desculpe, o áudio ficou um pouco abafado 😅. Tente gravar novamente ou envie por texto.',
         };
       }
 
@@ -97,7 +97,7 @@ export class MessageContentService {
         transcription: null,
         errorStatus: 'transcription_failed',
         errorReply:
-          'Não consegui transcrever seu áudio. Tente novamente ou envie a transação por texto.',
+          'Ops! Tive um probleminha ao transcrever o áudio 🎙️. Tente gravar novamente ou enviar a mensagem por texto.',
       };
     }
   }

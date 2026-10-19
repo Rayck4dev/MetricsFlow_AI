@@ -24,15 +24,15 @@ const MAX_MESSAGE_LENGTH = 4000;
 
 const RESPONSES = {
   invalidInput:
-    'Não consegui ler sua mensagem. Envie um texto com a movimentação financeira que deseja registrar.',
+    'Desculpe, não consegui ler sua mensagem. Por favor, envie um texto com a movimentação financeira que deseja registrar.',
   emptyMessage:
-    'Sua mensagem está vazia. Conte uma receita ou despesa do seu negócio para começarmos.',
+    'Ops! Parece que sua mensagem veio vazia. Me conte uma receita ou despesa do seu negócio para começarmos!',
   messageTooLong:
-    'Sua mensagem ficou muito longa. Envie uma versão resumida, com até 4.000 caracteres, para eu identificar a movimentação.',
+    'Ops! Sua mensagem ficou um pouco longa demais para eu processar de uma vez 😅. Envie uma versão resumida (com até 4.000 caracteres) para eu identificar os valores.',
   sensitiveData:
-    '🔒 Por segurança, não envie senhas, tokens, códigos de autenticação, CPF, CNPJ ou dados completos de cartão. Para registrar uma movimentação, preciso apenas das informações financeiras necessárias, como valor, descrição e forma de pagamento.',
+    '🔒 Desculpe, mas por razões de segurança não posso processar dados sensíveis (como senhas, dados de cartão, CPF ou CNPJ). Para registrar a movimentação, preciso apenas do valor, descrição e forma de pagamento!',
   offTopic:
-    'Oi! 👋 Sou o assistente financeiro da MetricsFlow AI. Posso ajudar a registrar receitas e despesas do seu negócio. Por exemplo: "Recebi R$ 350 por uma venda via Pix". Vamos registrar sua próxima movimentação?',
+    'Desculpe, mas no momento só consigo ajudar com a gestão financeira do seu negócio! 📊 Posso registrar suas receitas e despesas. Por exemplo: "Recebi R$ 350 por uma venda no Pix". Vamos registrar sua próxima movimentação?',
 } as const;
 
 const FINANCIAL_PATTERNS: RegExp[] = [

@@ -58,7 +58,7 @@ export class CreateTransactionStrategy implements MessageIntentStrategy {
         handled: true,
         status: 'unrecognized',
         reply:
-          'Não consegui identificar uma movimentação financeira válida. Informe uma receita ou despesa, por exemplo: "Gastei R$ 150 com materiais via Pix".',
+          'Desculpe, não encontrei os detalhes da movimentação. Informe o valor e se foi uma receita ou despesa.',
       };
     }
 
@@ -118,4 +118,3 @@ export class CreateTransactionStrategy implements MessageIntentStrategy {
     };
   }
 }
-

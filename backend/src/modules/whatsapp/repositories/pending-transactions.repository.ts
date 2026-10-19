@@ -134,4 +134,39 @@ export class PendingTransactionsRepository {
       p_company_id: companyId,
     });
   }
+
+  async findLatestActivePending(userId: string, companyId: string) {
+    return this.supabase
+      .from('pending_transactions')
+      .select(
+        'id,type,amount,description,category_id,category_name,payment_method,transaction_date,raw_message,missing_fields,status,expires_at',
+      )
+      .eq('user_id', userId)
+      .eq('company_id', companyId)
+      .in('status', ['awaiting_information', 'awaiting_confirmation'])
+      .gt('expires_at', new Date().toISOString())
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+  }
+
+  async updateActivePending(
+    pendingId: string,
+    userId: string,
+    companyId: string,
+    data: Record<string, unknown>,
+  ) {
+    return this.supabase
+      .from('pending_transactions')
+      .update({
+        ...data,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', pendingId)
+      .eq('user_id', userId)
+      .eq('company_id', companyId)
+      .in('status', ['awaiting_information', 'awaiting_confirmation'])
+      .select('id, status, expires_at')
+      .maybeSingle();
+  }
 }

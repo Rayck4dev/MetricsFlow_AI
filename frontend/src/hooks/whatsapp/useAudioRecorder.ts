@@ -8,6 +8,7 @@ export type RecordedAudio = {
   blob: Blob;
   duration: number;
   wave: number[];
+  url: string;
 };
 
 const MIME_CANDIDATES = [
@@ -129,8 +130,9 @@ export function useAudioRecorder() {
     const blob = new Blob(chunks.current, {
       type: rec.mimeType || "audio/webm",
     });
+    const url = URL.createObjectURL(blob);
     release();
-    return { blob, duration, wave };
+    return { blob, duration, wave, url };
   }, [release]);
 
   const cancel = useCallback(() => {

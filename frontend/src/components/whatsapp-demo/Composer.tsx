@@ -59,54 +59,71 @@ export function Composer({
   }
 
   return (
-    <div className="z-10 flex items-center gap-1.5 px-3.5 pb-2.5 pt-2">
+    <div className="z-10 flex w-full items-center gap-1.5 px-2 pb-2.5 pt-2 sm:px-3.5">
       {recording ? (
-        <div className="flex h-[42px] flex-1 items-center justify-end gap-3 rounded-full bg-[#242626] pl-4 pr-2">
+        <div className="flex h-[42px] min-w-0 flex-1 items-center justify-between gap-1.5 rounded-full bg-[#242626] pl-2.5 pr-1.5 sm:gap-3 sm:pl-4 sm:pr-2">
           <button
             onClick={rec.cancel}
             aria-label="Cancelar"
-            className="group relative flex h-10 w-10 items-center justify-center rounded-full text-[#e9edef] ring-[#21c063] hover:ring-2"
+            className="group relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#e9edef] ring-[#21c063] hover:ring-2 sm:h-10 sm:w-10"
           >
-            <Trash2 size={21} />
+            <Trash2 size={19} className="sm:hidden" />
+            <Trash2 size={21} className="hidden sm:block" />
             <span className="pointer-events-none absolute bottom-12 hidden whitespace-nowrap rounded-lg bg-[#e9edef] px-2.5 py-1.5 text-[13px] text-[#111] group-hover:block">
               Cancelar
             </span>
           </button>
-          <span
-            className={`h-2.5 w-2.5 rounded-full bg-[#f15c6d] ${rec.state === "recording" ? "animate-pulse" : "opacity-50"}`}
-          />
-          <span className="min-w-[44px] text-base tabular-nums">
-            {formatDuration(rec.seconds)}
-          </span>
-          <div className="ml-6 flex h-7 w-28 items-center justify-end gap-[2px] overflow-hidden">
-            {rec.levels.map((l, i) => (
+
+          <div className="flex shrink-0 items-center gap-1.5">
+            <span
+              className={`h-2 w-2 shrink-0 rounded-full bg-[#f15c6d] ${rec.state === "recording" ? "animate-pulse" : "opacity-50"}`}
+            />
+            <span className="text-sm tabular-nums sm:text-base">
+              {formatDuration(rec.seconds)}
+            </span>
+          </div>
+
+          <div className="flex h-7 min-w-0 flex-1 items-center justify-center gap-[2px] overflow-hidden px-1">
+            {rec.levels.slice(-18).map((l, i) => (
               <span
                 key={i}
                 className="w-[2px] shrink-0 rounded-full bg-[#9aa4a7]"
-                style={{ height: 3 + l * 22 }}
+                style={{ height: Math.max(3, l * 22) }}
               />
             ))}
           </div>
+
           <button
             onClick={rec.state === "recording" ? rec.pause : rec.resume}
             aria-label={
               rec.state === "recording" ? "Pausar gravação" : "Retomar gravação"
             }
-            className={`${round} text-[#f15c6d]`}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#f15c6d] hover:bg-white/[0.07] sm:h-10 sm:w-10"
           >
             {rec.state === "recording" ? (
-              <Pause size={20} fill="currentColor" />
+              <Pause size={19} fill="currentColor" />
             ) : (
-              <Mic size={20} strokeWidth={2} />
+              <Mic size={19} strokeWidth={2} />
             )}
           </button>
-          <span className={`relative ${round}`} title="Visualização única">
-            <CircleDashed size={26} strokeWidth={1.6} />
-            <span className="absolute text-[10px] font-semibold">1</span>
+
+          <span
+            className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#c8cfd1] sm:h-10 sm:w-10"
+            title="Visualização única"
+          >
+            <CircleDashed size={22} strokeWidth={1.6} className="sm:hidden" />
+            <CircleDashed
+              size={26}
+              strokeWidth={1.6}
+              className="hidden sm:block"
+            />
+            <span className="absolute text-[9px] font-semibold sm:text-[10px]">
+              1
+            </span>
           </span>
         </div>
       ) : (
-        <div className="flex min-h-[42px] flex-1 items-center gap-0.5 rounded-full bg-[#242626] px-1.5">
+        <div className="flex min-h-[42px] min-w-0 flex-1 items-center gap-0.5 rounded-full bg-[#242626] px-1.5">
           <button className={round} aria-label="Emojis" disabled={disabled}>
             <Smile size={24} />
           </button>

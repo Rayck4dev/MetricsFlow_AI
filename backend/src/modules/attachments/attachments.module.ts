@@ -4,6 +4,8 @@ import { SupabaseModule } from '../supabase.module';
 import { AttachmentsController } from './attachments.controller';
 import { AttachmentsRepository } from './repositories/attachments.repository';
 import { AttachmentsService } from './attachments.service';
+import { AttachmentFileValidatorService } from './services/attachment-file-validator.service';
+import { AttachmentStorageService } from './services/attachment-storage.service';
 import { AttachmentPermissionService } from './strategies/attachment-permission.service';
 import { OwnerPermissionStrategy } from './strategies/owner-permission.strategy';
 import { CollaboratorPermissionStrategy } from './strategies/collaborator-permission.strategy';
@@ -14,6 +16,8 @@ import { CollaboratorPermissionStrategy } from './strategies/collaborator-permis
   providers: [
     AttachmentsService,
     AttachmentsRepository,
+    AttachmentFileValidatorService,
+    AttachmentStorageService,
     AttachmentPermissionService,
     OwnerPermissionStrategy,
     CollaboratorPermissionStrategy,

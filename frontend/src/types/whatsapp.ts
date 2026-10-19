@@ -7,6 +7,8 @@ export interface DemoResponse {
   originalText: string;
   parsed: ParsedFinancialMessage;
   confirmation: string | null;
+  message: string | null;
+  reply: string | null;
   mode: "groq" | "local-fallback";
 }
 

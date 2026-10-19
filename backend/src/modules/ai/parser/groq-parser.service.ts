@@ -123,10 +123,51 @@ Interprete a mensagem em português brasileiro e retorne estritamente um JSON v�
 Data atual de referência: ${today}.
 Categorias disponíveis: ${JSON.stringify(allowedCategories)}
 
+REGRAS RÍGIDAS DE INTENT:
+1. 'intent':
+   - Qualquer frase informando valores, vendas, recebimentos, pagamentos ou gastos DEVE ser classificada como "create_transaction". NUNCA use "unknown" para frases financeiras.
+   - Use "unknown" apenas para conversas sem nenhuma relação com finanças (ex: "olá", "bom dia").
+
+2. 'type':
+   - Termos como "recebi", "vendi", "ganhei", "faturei", "entrada" -> OBRIGATORIAMENTE "income".
+   - Termos como "paguei", "gastei", "comprei", "saída" -> OBRIGATORIAMENTE "expense".
+
+3. 'paymentMethod':
+   - "boleto" -> "bank_slip"
+   - "pix" -> "pix"
+   - "cartao de credito", "credito" -> "credit_card"
+   - "cartao de debito", "debito" -> "debit_card"
+   - "dinheiro" -> "cash"
+   - "transferencia" -> "transfer"
+
+4. 'transactionDate':
+   - Caso não seja especificado outro dia na frase, utilize SEMPRE a data atual: ${today}.
+
+5. 'categoryId' (Mapeamento de Categoria):
+   - Analise obrigatoriamente a lista de 'Categorias disponíveis' fornecida acima.
+   - O campo 'categoryId' DEVE ser preenchido com o 'id' exato da categoria que melhor se alinha com o tipo ("income"/"expense") e com o contexto da mensagem (ex: se for venda de produtos, selecione o ID da categoria correspondente a "Vendas / Produtos"). NUNCA deixe como null se houver uma categoria compatível na lista.
+
+6. 'confidence':
+   - Retorne sempre um valor maior ou igual a 0.95 quando os campos principais forem identificados.
+
 REGRAS OBRIGATÓRIAS PARA 'description':
-1. Extraia APENAS o nome do produto, serviço ou objeto (ex: "Materiais de escritório").
-2. NUNCA inclua preposições, artigos ou palavras de ligação no início ou no fim (remova "com", "de", "do", "da", "no", "na", "para", "em", etc.).
-3. NUNCA inclua palavras relativas ao meio de pagamento ou marcas de contexto do sistema como "Informação complementar:". Ignore completamente essas expressões e foque apenas no conteúdo útil.
+1. Extraia APENAS o resumo do item, produto, serviço ou pessoa referente à movimentação.
+2. NUNCA inclua valores monetários ou termos como "220 reais" na descrição.
+
+EXEMPLO DE FUNCIONAMENTO:
+- Entrada: "Recebi 220 reais de uma venda de produtos para o Cliente Marcelo via Boleto"
+- Saída JSON esperada:
+{
+  "intent": "create_transaction",
+  "type": "income",
+  "amount": 220,
+  "description": "Venda de produtos para o Cliente Marcelo",
+  "categoryId": "ID_CORRESPONDENTE_DA_LISTA_DE_VENDAS",
+  "paymentMethod": "bank_slip",
+  "transactionDate": "${today}",
+  "confidence": 0.98,
+  "missingFields": []
+}
 `;
 
     let response: Response;
@@ -147,6 +188,7 @@ REGRAS OBRIGATÓRIAS PARA 'description':
           response_format: {
             type: 'json_object',
           },
+          temperature: 0.1,
         }),
         signal: AbortSignal.timeout(30_000),
       });

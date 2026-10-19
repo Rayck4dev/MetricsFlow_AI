@@ -7,6 +7,8 @@ import {
 import { AttachmentsService } from './attachments.service';
 import { SupabaseService } from '../supabase.service';
 import { AttachmentsRepository } from './repositories/attachments.repository';
+import { AttachmentFileValidatorService } from './services/attachment-file-validator.service';
+import { AttachmentStorageService } from './services/attachment-storage.service';
 import { AttachmentPermissionService } from './strategies/attachment-permission.service';
 
 describe('AttachmentsService', () => {
@@ -125,10 +127,16 @@ describe('AttachmentsService', () => {
       }),
     };
 
-    service = new AttachmentsService(
+    const storageService = new AttachmentStorageService(
       supabaseService as unknown as SupabaseService,
+    );
+    const validatorService = new AttachmentFileValidatorService();
+
+    service = new AttachmentsService(
       repository as unknown as AttachmentsRepository,
       permissionService as unknown as AttachmentPermissionService,
+      validatorService,
+      storageService,
     );
   });
 

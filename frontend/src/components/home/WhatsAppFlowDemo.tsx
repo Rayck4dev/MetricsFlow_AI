@@ -99,7 +99,6 @@ export function WhatsAppFlowDemo() {
         </div>
 
         <div className="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
-
           <div className="relative overflow-hidden border-b border-white/[0.06] bg-[#071d2c] p-5 lg:border-b-0 lg:border-r lg:p-7">
             <div className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-emerald-500/[0.08] blur-3xl" />
 
@@ -167,15 +166,15 @@ export function WhatsAppFlowDemo() {
                     </p>
 
                     <p className="mt-1.5 text-[9px] leading-4 text-slate-400">
-                      Entendi uma
+                      Entendi uma{" "}
                       <span className="font-semibold text-emerald-400">
                         receita
-                      </span>
-                      de
+                      </span>{" "}
+                      de{" "}
                       <span className="font-semibold text-white">
                         R$ 250,00
-                      </span>
-                      em
+                      </span>{" "}
+                      em{" "}
                       <span className="text-brand-400">Vendas de produtos</span>
                       .
                     </p>
@@ -247,7 +246,6 @@ export function WhatsAppFlowDemo() {
               </motion.div>
             </div>
           </div>
-
 
           <div className="relative bg-surface-sidebar p-5 lg:p-7">
             <div className="pointer-events-none absolute -right-28 -top-28 h-64 w-64 rounded-full bg-brand-500/[0.06] blur-3xl" />

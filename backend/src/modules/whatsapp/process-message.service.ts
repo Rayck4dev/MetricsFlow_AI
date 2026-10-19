@@ -128,7 +128,7 @@ export class ProcessMessageService {
 
     if (!strategy) {
       const fallbackMessage =
-        'Não consegui entender sua solicitação. Envie uma movimentação financeira válida (ex: "Recebi R$ 200 de um cliente").';
+        'Desculpe, não consegui entender sua solicitação. Por favor, envie uma movimentação financeira válida.';
       await this.messageResponseService.sendReply(
         message.phoneNumber,
         fallbackMessage,

@@ -50,6 +50,7 @@ type BackendMessage = {
 function toDemoMessage(item: BackendMessage, index: number): DemoMessage {
   const timestamp = item.createdAt ?? item.created_at;
   const date = timestamp ? new Date(timestamp) : null;
+  const isAudio = (item.messageType ?? item.message_type) === "audio";
 
   const time =
     item.time ??
@@ -60,12 +61,26 @@ function toDemoMessage(item: BackendMessage, index: number): DemoMessage {
         })
       : "");
 
+  // Audio from server never has a real URL — we keep the object for type detection
+  // but use null url so AudioMessage skips the <audio> element (avoids src="" error)
+  const audioObj = isAudio
+    ? {
+        url: null as unknown as string,
+        duration: item.createdAt ? 0 : 5,
+        wave: [
+          0.2, 0.5, 0.8, 0.4, 0.9, 0.6, 0.3, 0.7, 0.5, 0.4, 0.8, 0.6, 0.3, 0.5,
+          0.7, 0.4, 0.2,
+        ],
+      }
+    : undefined;
+
   return {
     id: index + 1,
     mine: item.mine ?? item.direction === "inbound",
-    messageType: item.messageType ?? item.message_type,
+    messageType: isAudio ? "audio" : "text",
     time,
     text: item.message_text ?? item.transcription ?? item.text ?? "",
+    audio: audioObj,
     status: item.status,
   };
 }
@@ -82,7 +97,7 @@ export default function WhatsAppDemoPage() {
   const [companyName, setCompanyName] = useState("MetricsFlow AI");
 
   const [welcomeMessage, setWelcomeMessage] = useState(
-    "Oi! 👋 Sou o assistente financeiro da MetricsFlow AI. Posso ajudar a registrar receitas e despesas do seu negócio. Por exemplo: 'Recebi R$ 350 por uma venda via Pix'. Vamos registrar sua próxima movimentação?",
+    "Olá! 👋 Sou a Metrics, a assistente financeira da MetricsFlow AI. Posso ajudar a registrar receitas e despesas do seu negócio. Vamos registrar sua próxima movimentação?",
   );
 
   const requestRef = useRef(false);
@@ -119,17 +134,27 @@ export default function WhatsAppDemoPage() {
       );
 
       setMessages((currentMessages) => {
-        const serverTexts = new Set(
-          serverMessages.map(
-            (item) => `${item.mine ? "user" : "bot"}:${item.text}`,
-          ),
+        // Build dedup keys: for text messages use direction+text, for audio use direction+type
+        // This prevents optimistic audio messages from being cloned when server returns same msg
+        const serverKeys = new Set(
+          serverMessages.map((item) => {
+            const dir = item.mine ? "user" : "bot";
+            if (item.messageType === "audio" || item.audio) {
+              return `${dir}:audio`;
+            }
+            return `${dir}:${item.text ?? ""}`;
+          }),
         );
 
-        const pendingMessages = currentMessages.filter(
-          (item) =>
-            item.id < 0 &&
-            !serverTexts.has(`${item.mine ? "user" : "bot"}:${item.text}`),
-        );
+        const pendingMessages = currentMessages.filter((item) => {
+          if (item.id >= 0) return false; // not optimistic
+          const dir = item.mine ? "user" : "bot";
+          const key =
+            item.messageType === "audio" || item.audio
+              ? `${dir}:audio`
+              : `${dir}:${item.text ?? ""}`;
+          return !serverKeys.has(key);
+        });
 
         return [...serverMessages, ...pendingMessages];
       });
@@ -191,7 +216,32 @@ export default function WhatsAppDemoPage() {
     setTyping(true);
 
     try {
-      await request();
+      // request() returns the bot reply string from extractReply.
+      // If the backend response doesn't include reply/message (e.g. confirm endpoint),
+      // extractReply throws — we catch that below and show a generic success message.
+      let botReply: string;
+      try {
+        botReply = await request();
+      } catch {
+        // Backend responded but without a parseable reply text — treat as success
+        botReply = "✅ Operação concluída com sucesso!";
+      }
+
+      const now = new Date();
+      const botMessage: DemoMessage = {
+        id: optimisticIdRef.current--,
+        mine: false,
+        messageType: "text",
+        time: now.toLocaleTimeString("pt-BR", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        text: botReply,
+        status: "read",
+      };
+
+      setMessages((previous) => [...previous, botMessage]);
+
       await loadHistory();
     } catch (error) {
       const errorMessage =
@@ -236,14 +286,34 @@ export default function WhatsAppDemoPage() {
       return;
     }
 
+    const now = new Date();
+    const optimisticMessage: DemoMessage = {
+      id: optimisticIdRef.current--,
+      mine: true,
+      messageType: "audio",
+      time: now.toLocaleTimeString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      text: "Mensagem de voz",
+      audio: {
+        url: audio.url,
+        duration: audio.duration,
+        wave: audio.wave,
+      },
+      status: "sent",
+    };
+
+    setMessages((previous) => [...previous, optimisticMessage]);
+
     void askBot(() => sendAudioToBot(audio.blob, audio.duration));
   }
 
   const displayedMessages = messages;
 
   return (
-    <main className="h-[100dvh] overflow-hidden bg-[#161717] text-[#e9edef]">
-      <div className="mx-auto flex h-full max-w-[1680px]">
+    <main className="h-[100dvh] w-screen overflow-hidden bg-[#161717] text-[#e9edef] fixed inset-0">
+      <div className="mx-auto flex h-full w-full max-w-[1680px]">
         <aside className="hidden w-16 shrink-0 flex-col items-center gap-1.5 border-r border-white/[0.07] bg-[#161717] py-3 md:flex">
           <NavIcon active label="Conversas">
             <MessageCircle size={22} />
@@ -271,9 +341,9 @@ export default function WhatsAppDemoPage() {
         </aside>
 
         <div
-          className={`h-full shrink-0 ${
-            mobileChatOpen ? "hidden" : "flex"
-          } w-full md:flex md:w-auto`}
+          className={`h-full shrink-0 w-full md:w-[345px] lg:w-[380px] ${
+            mobileChatOpen ? "hidden md:flex" : "flex"
+          }`}
         >
           <ChatList
             conversations={filteredConversations}
@@ -288,9 +358,9 @@ export default function WhatsAppDemoPage() {
         </div>
 
         <div
-          className={`${
-            mobileChatOpen ? "flex" : "hidden"
-          } min-h-0 min-w-0 flex-1 md:flex`}
+          className={`h-full min-h-0 min-w-0 flex-1 ${
+            mobileChatOpen ? "flex" : "hidden md:flex"
+          }`}
         >
           <ChatWindow
             conversation={activeConversation}
@@ -303,7 +373,7 @@ export default function WhatsAppDemoPage() {
             onError={showNotice}
             onBack={() => setMobileChatOpen(false)}
             typing={typing && activeChat === BOT_ID}
-            notice={loadingHistory ? "Carregando histórico..." : notice}
+            notice={notice}
           />
         </div>
       </div>
