@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
-import { createPortal } from "react-dom";
-import { Check, ChevronDown } from "lucide-react";
+import { TransactionSelectMenu } from "./transaction-select/TransactionSelectMenu";
+import { TransactionSelectTrigger } from "./transaction-select/TransactionSelectTrigger";
 
 interface TransactionSelectOption {
   value: string;
@@ -163,101 +163,29 @@ export function TransactionSelect({
 
   return (
     <div className="space-y-2">
-      <label className="block text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">
-        {label}
-      </label>
-
-      <button
-        ref={triggerRef}
-        type="button"
+      <TransactionSelectTrigger
+        label={label}
         disabled={disabled}
         onClick={handleToggle}
         onKeyDown={handleKeyDown}
-        className={`flex h-11 w-full items-center justify-between rounded-xl border bg-surface-sidebar px-3.5 text-left outline-none transition-all ${
-          error
-            ? "border-rose-500/50"
-            : open
-              ? "border-brand-500/60 bg-surface-main ring-2 ring-brand-500/10"
-              : "border-surface-border hover:border-slate-600 focus:border-brand-500/60 focus:bg-surface-main focus:ring-2 focus:ring-brand-500/10"
-        } ${disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-      >
-        <span
-          className={
-            selectedOption
-              ? "truncate text-xs font-medium text-slate-200"
-              : "text-xs font-medium text-slate-500"
-          }
-        >
-          {selectedOption?.label ?? placeholder}
-        </span>
+        error={error}
+        open={open}
+        selectedLabel={selectedOption?.label}
+        placeholder={placeholder}
+        triggerRef={triggerRef}
+      />
 
-        <ChevronDown
-          size={15}
-          className={`shrink-0 text-slate-500 transition-transform duration-200 ${
-            open ? "rotate-180 text-slate-300" : ""
-          }`}
-        />
-      </button>
-
-      {mounted &&
-        open &&
-        menuPosition &&
-        !disabled &&
-        createPortal(
-          <div
-            ref={menuRef}
-            role="listbox"
-            className="fixed z-[9999] overflow-hidden rounded-xl border border-surface-border bg-surface-panel/98 p-1.5 shadow-2xl shadow-black/40 backdrop-blur-xl"
-            style={{
-              top: menuPosition.top,
-              left: menuPosition.left,
-              width: menuPosition.width,
-            }}
-          >
-            <div
-              className="overflow-y-auto pr-0.5"
-              style={{
-                maxHeight: MENU_MAX_HEIGHT,
-              }}
-            >
-              {options.length > 0 ? (
-                options.map((option) => {
-                  const selected = option.value === value;
-
-                  return (
-                    <button
-                      key={option.value}
-                      type="button"
-                      role="option"
-                      aria-selected={selected}
-                      onClick={() => handleSelect(option.value)}
-                      className={`flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left transition-colors ${
-                        selected
-                          ? "bg-brand-500/10 text-brand-300"
-                          : "text-slate-300 hover:bg-surface-sidebar hover:text-white"
-                      }`}
-                    >
-                      <span className="min-w-0 truncate text-xs font-medium">
-                        {option.label}
-                      </span>
-
-                      {selected && (
-                        <Check size={15} className="shrink-0 text-brand-400" />
-                      )}
-                    </button>
-                  );
-                })
-              ) : (
-                <div className="px-3 py-3 text-xs text-slate-600">
-                  Nenhuma opção disponível.
-                </div>
-              )}
-            </div>
-          </div>,
-          document.body,
-        )}
+      <TransactionSelectMenu
+        mounted={mounted}
+        open={open}
+        disabled={disabled}
+        options={options}
+        value={value}
+        menuPosition={menuPosition}
+        menuRef={menuRef}
+        handleSelect={handleSelect}
+        maxHeight={MENU_MAX_HEIGHT}
+      />
 
       {error && (
         <p className="text-[10px] font-medium text-rose-400">{error}</p>

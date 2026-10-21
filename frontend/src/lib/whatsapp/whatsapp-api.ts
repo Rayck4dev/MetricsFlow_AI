@@ -1,3 +1,4 @@
+import { ConfirmTransactionResponse } from "@/hooks/whatsapp/useWhatsAppDemo";
 import { createClient } from "@/lib/supabase/client";
 import type { DemoResponse, WhatsAppConnection } from "@/types/whatsapp";
 
@@ -101,8 +102,8 @@ export async function processWhatsAppAudioDemo(
 export async function confirmWhatsAppTransaction(body: {
   parsed: unknown;
   rawText: string;
-}): Promise<{ transactionId: string }> {
-  return request<{ transactionId: string }>("/whatsapp/confirm", {
+}): Promise<ConfirmTransactionResponse> {
+  return request<ConfirmTransactionResponse>("/whatsapp/confirm", {
     method: "POST",
     body: JSON.stringify(body),
   });

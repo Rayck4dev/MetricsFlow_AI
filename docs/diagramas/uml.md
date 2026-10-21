@@ -1,6 +1,6 @@
 # 📐 Diagramas UML — MetricsFlow AI
 
-Este documento reúne os diagramas UML do MetricsFlow AI, representando os principais atores, entidades e fluxos da aplicação.
+Este documento reúne os diagramas UML da MetricsFlow AI, representando os principais atores, entidades e fluxos da aplicação.
 
 Os diagramas devem ser mantidos alinhados ao código do frontend, backend e banco de dados. Funcionalidades ainda não implementadas são identificadas como planejadas.
 

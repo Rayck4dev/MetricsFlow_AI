@@ -3,6 +3,10 @@
 import { useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
+import {
+  GoogleOnboardingSelection,
+  OnboardingLoadingState,
+} from "./onboarding-page/OnboardingPageStates";
 
 import OnboardingLayout from "@/components/onboarding/OnboardingLayout";
 import OnboardingProgress from "@/components/onboarding/OnboardingProgress";
@@ -14,7 +18,6 @@ import OnboardingStepMetrics from "@/components/onboarding/OnboardingStepMetrics
 import OnboardingStepFrequency from "@/components/onboarding/OnboardingStepFrequency";
 import OnboardingComplete from "@/components/onboarding/OnboardingComplete";
 
-import GoogleOnboardingStep from "@/components/auth/GoogleOnboardingStep";
 import GoogleJoinCompany from "@/components/auth/GoogleJoinCompany";
 
 import OnboardingNavigation from "@/components/onboarding/OnboardingNavigation";
@@ -29,31 +32,22 @@ export default function OnboardingPageContent() {
 
   const {
     totalSteps,
-
     currentStep,
     setCurrentStep,
-
     formData,
     setFormData,
-
     registrationType,
-
     setRegistrationType,
-
     companyName,
-
     isLoadingRegistration,
     isSubmitting,
-
     error,
     setError,
-
     canProceed,
     handleNext,
     handleBack,
     handleToggleMetric,
     handleFinish,
-
     handleGoogleRegistrationType,
     handleGoogleJoinSuccess,
   } = useOnboarding({
@@ -79,29 +73,9 @@ export default function OnboardingPageContent() {
     }),
   };
 
-  if (isLoadingRegistration) {
-    return (
-      <OnboardingLayout>
-        <div className="flex min-h-[300px] items-center justify-center">
-          <div className="text-center space-y-4">
-            <div className="mx-auto h-10 w-10 rounded-full border-2 border-surface-border border-t-brand-500 animate-spin" />
-            <p className="text-xs text-slate-400">
-              Preparando sua configuração...
-            </p>
-          </div>
-        </div>
-      </OnboardingLayout>
-    );
-  }
+  if (isLoadingRegistration) return <OnboardingLoadingState />;
 
-  if (isGoogleOnboarding && registrationType === null) {
-    return (
-      <OnboardingLayout>
-        <OnboardingError message={error} />
-        <GoogleOnboardingStep onSelect={handleGoogleRegistrationType} />
-      </OnboardingLayout>
-    );
-  }
+  if (isGoogleOnboarding && registrationType === null) return <GoogleOnboardingSelection error={error} onSelect={handleGoogleRegistrationType} />;
 
   if (isGoogleOnboarding && registrationType === "join_company") {
     return (

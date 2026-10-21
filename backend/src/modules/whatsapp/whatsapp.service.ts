@@ -53,10 +53,28 @@ export class WhatsappService {
       company.id,
     );
 
+    const successMessage =
+      '✅ Movimentação registrada com sucesso na MetricsFlow AI!';
+
+    try {
+      await this.demoService.recordDemoMessage({
+        companyId: company.id,
+        userId: user.id,
+        direction: 'outbound',
+        messageType: 'text',
+        text: successMessage,
+        pendingTransactionId: pendingId,
+        transactionId,
+      });
+      console.log('Mensagem de sucesso gravada no banco com sucesso!');
+    } catch (dbError) {
+      console.error('ERRO AO GRAVAR MENSAGEM NO BANCO:', dbError);
+    }
+
     return {
       ok: true,
       transactionId,
-      message: 'Movimentação confirmada com sucesso.',
+      message: successMessage,
     };
   }
 

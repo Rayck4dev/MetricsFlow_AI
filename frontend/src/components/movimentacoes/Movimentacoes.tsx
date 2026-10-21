@@ -2,20 +2,12 @@
 
 import { useState } from "react";
 
-import { AnimatePresence, motion } from "framer-motion";
-
 import { MovimentacoesHeader } from "./MovimentacoesHeader";
 import { MovimentacoesCards } from "./MovimentacoesCards";
-import { MovimentacoesFilters } from "./MovimentacoesFilters";
-import { MovimentacoesSearch } from "./MovimentacoesSearch";
 import { MovimentacoesTable } from "./MovimentacoesTable";
-import { MovimentacoesActions } from "./MovimentacoesActions";
 
-import { ReceitaModal } from "./ReceitaModal";
-import { DespesaModal } from "./DespesaModal";
-import { TransactionEditModal } from "./transactions/TransactionEditModal";
-import { TransactionDeleteDialog } from "./transactions/TransactionDeleteDialog";
-import { TransactionAttachmentsModal } from "./transactions/TransactionAttachmentsModal";
+import { MovimentacoesModals } from "./movimentacoes/MovimentacoesModals";
+import { MovimentacoesFilterPanel } from "./movimentacoes/MovimentacoesFilterPanel";
 
 import { useMovimentacoes } from "@/hooks/useMovimentacoes";
 
@@ -153,72 +145,21 @@ export function Movimentacoes({
           count={totals.count}
         />
 
-        <motion.section
-          initial={{
-            opacity: 0,
-            y: 16,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            delay: 0.15,
-            duration: 0.45,
-          }}
-          className="
-            relative
-            overflow-visible
-            rounded-2xl
-            border border-surface-border
-            bg-surface-panel/80
-            p-4
-            shadow-xl shadow-black/10
-            backdrop-blur-xl
-            sm:p-5
-          "
-        >
-          <div
-            className="
-              pointer-events-none
-              absolute -right-24 -top-24
-              h-48 w-48
-              rounded-full
-              bg-brand-500/[0.06]
-              blur-3xl
-            "
-          />
-
-          <div className="relative flex flex-col gap-4">
-            <div
-              className="
-                flex flex-col gap-3
-                xl:flex-row
-                xl:items-center
-                xl:justify-between
-              "
-            >
-              <MovimentacoesSearch value={search} onChange={setSearch} />
-
-              <MovimentacoesActions
-                onAddIncome={openIncomeModal}
-                onAddExpense={openExpenseModal}
-                onExport={handleExport}
-              />
-            </div>
-
-            <MovimentacoesFilters
-              type={typeFilter}
-              category={categoryFilter}
-              period={periodFilter}
-              categories={categories}
-              onTypeChange={setTypeFilter}
-              onCategoryChange={setCategoryFilter}
-              onPeriodChange={setPeriodFilter}
-              onClear={clearFilters}
-            />
-          </div>
-        </motion.section>
+        <MovimentacoesFilterPanel
+          search={search}
+          onSearchChange={setSearch}
+          onAddIncome={openIncomeModal}
+          onAddExpense={openExpenseModal}
+          onExport={handleExport}
+          type={typeFilter}
+          category={categoryFilter}
+          period={periodFilter}
+          categories={categories}
+          onTypeChange={setTypeFilter}
+          onCategoryChange={setCategoryFilter}
+          onPeriodChange={setPeriodFilter}
+          onClear={clearFilters}
+        />
 
         <MovimentacoesTable
           transactions={filteredTransactions}
@@ -229,49 +170,27 @@ export function Movimentacoes({
         />
       </div>
 
-      <AnimatePresence mode="wait">
-        {isIncomeModalOpen && (
-          <ReceitaModal
-            onClose={closeIncomeModal}
-            onSubmit={handleIncome}
-            categories={incomeCategories}
-          />
-        )}
-
-        {isExpenseModalOpen && (
-          <DespesaModal
-            onClose={closeExpenseModal}
-            onSubmit={handleExpense}
-            categories={expenseCategories}
-          />
-        )}
-
-        {editingTransaction && (
-          <TransactionEditModal
-            transaction={editingTransaction}
-            onClose={closeEdit}
-            onSubmit={handleEdit}
-            categories={[...incomeCategories, ...expenseCategories]}
-          />
-        )}
-
-        {deletingTransaction && (
-          <TransactionDeleteDialog
-            transaction={deletingTransaction}
-            onClose={closeDelete}
-            onConfirm={handleDelete}
-          />
-        )}
-
-        {attachmentTransaction && (
-          <TransactionAttachmentsModal
-            transaction={attachmentTransaction}
-            onClose={closeAttachment}
-            currentUserId={currentUserId ?? ""}
-            isOwner={isOwner ?? false}
-          />
-        )}
-      </AnimatePresence>
+      <MovimentacoesModals
+        isIncomeModalOpen={isIncomeModalOpen}
+        closeIncomeModal={closeIncomeModal}
+        handleIncome={handleIncome}
+        incomeCategories={incomeCategories}
+        isExpenseModalOpen={isExpenseModalOpen}
+        closeExpenseModal={closeExpenseModal}
+        handleExpense={handleExpense}
+        expenseCategories={expenseCategories}
+        editingTransaction={editingTransaction}
+        closeEdit={closeEdit}
+        handleEdit={handleEdit}
+        allCategories={[...incomeCategories, ...expenseCategories]}
+        deletingTransaction={deletingTransaction}
+        closeDelete={closeDelete}
+        handleDelete={handleDelete}
+        attachmentTransaction={attachmentTransaction}
+        closeAttachment={closeAttachment}
+        currentUserId={currentUserId}
+        isOwner={isOwner}
+      />
     </>
   );
 }

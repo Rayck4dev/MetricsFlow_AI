@@ -114,6 +114,20 @@ export class WhatsappDemoService {
     );
 
     if (actionResult) {
+      if (actionResult.message || actionResult.reply) {
+        const actionAny = actionResult as any;
+
+        await this.recordDemoMessage({
+          companyId: company.id,
+          userId: user.id,
+          direction: 'outbound',
+          messageType: 'text',
+          text: actionResult.message || actionResult.reply,
+          pendingTransactionId:
+            actionAny.pendingTransactionId ?? pending?.id ?? null,
+          transactionId: actionAny.transactionId ?? null,
+        });
+      }
       return actionResult;
     }
 

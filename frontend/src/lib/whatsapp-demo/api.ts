@@ -17,6 +17,7 @@ type BackendMessage = {
 };
 
 type HistoryResponse = {
+  historyMessage?: string;
   welcomeMessage?: string;
   messages: BackendMessage[];
   pending?: unknown;

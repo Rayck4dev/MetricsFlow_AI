@@ -1,6 +1,6 @@
 # 🧠 Inteligência Artificial
 
-O MetricsFlow AI utiliza uma camada de inteligência artificial para auxiliar na interpretação de mensagens financeiras e na extração de informações necessárias para o registro de movimentações.
+A MetricsFlow AI utiliza uma camada de inteligência artificial para auxiliar na interpretação de mensagens financeiras e na extração de informações necessárias para o registro de movimentações.
 
 A integração com a **Groq** é utilizada para disponibilizar os modelos de linguagem e transcrição de áudio, permitindo processar mensagens em texto ou áudio e transformar essas informações em dados estruturados que podem ser validados pelo backend.
 

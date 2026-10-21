@@ -259,7 +259,7 @@ Essas informações permitem personalizar o comportamento da aplicação para ca
 
 ### `companies`
 
-Representa as empresas cadastradas no MetricsFlow AI.
+Representa as empresas cadastradas na MetricsFlow AI.
 
 Principais informações:
 
@@ -325,7 +325,7 @@ A origem permite identificar se a movimentação foi criada pela aplicação web
 
 ### `attachments`
 
-Representa os anexos associados às movimentações financeiras do MetricsFlow AI.
+Representa os anexos associados às movimentações financeiras da MetricsFlow AI.
 
 A entidade mantém o relacionamento entre os arquivos e as respectivas transações, permitindo consultar os anexos de uma movimentação específica.
 
@@ -650,7 +650,7 @@ As informações de usuários, empresas, categorias e preferências também são
 
 ## 📌 Coerência entre modelagem e implementação
 
-Este documento descreve a estrutura lógica do banco de dados do MetricsFlow AI. Para manter a documentação sincronizada com a implementação, os nomes, tipos, constraints e relacionamentos devem corresponder ao schema efetivamente configurado no PostgreSQL.
+Este documento descreve a estrutura lógica do banco de dados da MetricsFlow AI. Para manter a documentação sincronizada com a implementação, os nomes, tipos, constraints e relacionamentos devem corresponder ao schema efetivamente configurado no PostgreSQL.
 
 O fluxo financeiro principal pode ser representado da seguinte forma:
 

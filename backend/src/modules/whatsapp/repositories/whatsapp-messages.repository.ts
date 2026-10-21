@@ -90,10 +90,9 @@ export class WhatsappMessagesRepository {
       .select(
         'id, direction, message_type, message_text, transcription, status, pending_transaction_id, transaction_id, created_at',
       )
-      .eq('user_id', userId)
       .eq('company_id', companyId)
       .eq('phone_number', 'demo')
       .order('created_at', { ascending: false })
       .limit(limit);
   }
-}
+}

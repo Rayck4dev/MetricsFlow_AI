@@ -1,14 +1,9 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import type { Movimentacao, PeriodFilter, TransactionType } from "@/types";
 
-import {
-  calculateTotals,
-  filterTransactions,
-  getCategories,
-} from "@/utils/movimentacoes.utils";
-
 import type { TransactionFormValues } from "@/components/movimentacoes/transactions/TransactionForm";
+import { useMovimentacoesFilters } from "./movimentacoes/useMovimentacoesFilters";
 
 interface UseMovimentacoesOptions {
   transactions: Movimentacao[];
@@ -52,22 +47,13 @@ export function useMovimentacoes({
 
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
 
-  const categories = useMemo(() => {
-    return getCategories(transactions);
-  }, [transactions]);
-
-  const filteredTransactions = useMemo(() => {
-    return filterTransactions(transactions, {
-      search,
-      type: typeFilter,
-      category: categoryFilter,
-      period: periodFilter,
-    });
-  }, [transactions, search, typeFilter, categoryFilter, periodFilter]);
-
-  const totals = useMemo(() => {
-    return calculateTotals(filteredTransactions);
-  }, [filteredTransactions]);
+  const { categories, filteredTransactions, totals } = useMovimentacoesFilters({
+    transactions,
+    search,
+    typeFilter,
+    categoryFilter,
+    periodFilter,
+  });
 
   function clearFilters() {
     setSearch("");

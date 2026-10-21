@@ -1,87 +1,24 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { WhatsAppDemoLayout } from "./_components/WhatsAppDemoLayout";
 import {
-  BarChart3,
-  CircleDashed,
-  MessageCircle,
-  Phone,
-  Users,
-} from "lucide-react";
+  BOT_ID,
+  buildDemoConversations,
+  createOptimisticAudioMessage,
+  createOptimisticTextMessage,
+  filterDemoConversations,
+  getActiveDemoConversation,
+  initialConversations,
+  toDemoMessage,
+} from "./_components/demoMessages";
 import type { DemoMessage, DemoConversation } from "@/types/whatsapp-demo";
 import type { RecordedAudio } from "@/hooks/whatsapp/useAudioRecorder";
-import { ChatList } from "@/components/whatsapp-demo/ChatList";
-import { ChatWindow } from "@/components/whatsapp-demo/ChatWindow";
 import {
   getDemoMessages,
   sendAudioToBot,
   sendTextToBot,
 } from "@/lib/whatsapp-demo/api";
-
-const BOT_ID = 1;
-
-const initialConversations: DemoConversation[] = [
-  {
-    id: BOT_ID,
-    name: "MetricsFlow AI",
-    preview: "Assistente financeiro",
-    time: "",
-    unread: 0,
-    isBot: true,
-    hue: 145,
-  },
-];
-
-type BackendMessage = {
-  id: string | number;
-  mine?: boolean;
-  direction?: "inbound" | "outbound";
-  messageType?: "text" | "audio";
-  message_type?: "text" | "audio";
-  message_text?: string | null;
-  transcription?: string | null;
-  text?: string | null;
-  createdAt?: string;
-  created_at?: string;
-  time?: string;
-  status?: "sent" | "delivered" | "read";
-};
-
-function toDemoMessage(item: BackendMessage, index: number): DemoMessage {
-  const timestamp = item.createdAt ?? item.created_at;
-  const date = timestamp ? new Date(timestamp) : null;
-  const isAudio = (item.messageType ?? item.message_type) === "audio";
-
-  const time =
-    item.time ??
-    (date && !Number.isNaN(date.getTime())
-      ? date.toLocaleTimeString("pt-BR", {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      : "");
-
-  const audioObj = isAudio
-    ? {
-        url: null as unknown as string,
-        duration: item.createdAt ? 0 : 5,
-        wave: [
-          0.2, 0.5, 0.8, 0.4, 0.9, 0.6, 0.3, 0.7, 0.5, 0.4, 0.8, 0.6, 0.3, 0.5,
-          0.7, 0.4, 0.2,
-        ],
-      }
-    : undefined;
-
-  return {
-    id: index + 1,
-    mine: item.mine ?? item.direction === "inbound",
-    messageType: isAudio ? "audio" : "text",
-    time,
-    text: item.message_text ?? item.transcription ?? item.text ?? "",
-    audio: audioObj,
-    status: item.status,
-  };
-}
 
 export default function WhatsAppDemoPage() {
   const [search, setSearch] = useState("");
@@ -131,36 +68,14 @@ export default function WhatsAppDemoPage() {
         toDemoMessage(item, index),
       );
 
-      setMessages((currentMessages) => {
-        const serverKeys = new Set(
-          serverMessages.map((item) => {
-            const dir = item.mine ? "user" : "bot";
-            if (item.messageType === "audio" || item.audio) {
-              return `${dir}:audio`;
-            }
-            return `${dir}:${item.text ?? ""}`;
-          }),
-        );
-
-        const pendingMessages = currentMessages.filter((item) => {
-          if (item.id >= 0) return false; // not optimistic
-          const dir = item.mine ? "user" : "bot";
-          const key =
-            item.messageType === "audio" || item.audio
-              ? `${dir}:audio`
-              : `${dir}:${item.text ?? ""}`;
-          return !serverKeys.has(key);
-        });
-
-        return [...serverMessages, ...pendingMessages];
-      });
+      setMessages(serverMessages);
 
       if (history.company?.name) {
         setCompanyName(history.company.name);
       }
 
       if (history.welcomeMessage) {
-        setWelcomeMessage(history.welcomeMessage);
+        setWelcomeMessage(history.historyMessage ?? history.welcomeMessage);
       }
     } catch (error) {
       console.error("Erro ao carregar histórico do WhatsApp:", error);
@@ -180,30 +95,16 @@ export default function WhatsAppDemoPage() {
   }, [loadHistory]);
 
   const demoConversations = useMemo<DemoConversation[]>(
-    () =>
-      initialConversations.map((conversation) => ({
-        ...conversation,
-        name: "Metrics",
-        preview:
-          messages.length > 0
-            ? messages[messages.length - 1].text || "Mensagem recebida"
-            : welcomeMessage,
-        time: messages[messages.length - 1]?.time ?? "",
-      })),
+    () => buildDemoConversations(initialConversations, messages, welcomeMessage),
     [messages, welcomeMessage],
   );
 
   const filteredConversations = useMemo(
-    () =>
-      demoConversations.filter((conversation) =>
-        conversation.name.toLowerCase().includes(search.toLowerCase()),
-      ),
+    () => filterDemoConversations(demoConversations, search),
     [demoConversations, search],
   );
 
-  const activeConversation =
-    demoConversations.find((conversation) => conversation.id === activeChat) ??
-    demoConversations[0];
+  const activeConversation = getActiveDemoConversation(demoConversations, activeChat);
 
   async function askBot(request: () => Promise<string>) {
     if (requestRef.current) return;
@@ -234,7 +135,9 @@ export default function WhatsAppDemoPage() {
 
       setMessages((previous) => [...previous, botMessage]);
 
-      await loadHistory();
+      setTimeout(() => {
+        void loadHistory();
+      }, 1000);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro inesperado.";
@@ -255,17 +158,11 @@ export default function WhatsAppDemoPage() {
 
     const now = new Date();
 
-    const optimisticMessage: DemoMessage = {
-      id: optimisticIdRef.current--,
-      mine: true,
-      messageType: "text",
-      time: now.toLocaleTimeString("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      text: value,
-      status: "sent",
-    };
+      const optimisticMessage = createOptimisticTextMessage(
+        optimisticIdRef.current--,
+        now,
+        value,
+      );
 
     setMessages((previous) => [...previous, optimisticMessage]);
     setMessage("");
@@ -279,22 +176,11 @@ export default function WhatsAppDemoPage() {
     }
 
     const now = new Date();
-    const optimisticMessage: DemoMessage = {
-      id: optimisticIdRef.current--,
-      mine: true,
-      messageType: "audio",
-      time: now.toLocaleTimeString("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      text: "Mensagem de voz",
-      audio: {
-        url: audio.url,
-        duration: audio.duration,
-        wave: audio.wave,
-      },
-      status: "sent",
-    };
+    const optimisticMessage = createOptimisticAudioMessage(
+      optimisticIdRef.current--,
+      now,
+      audio,
+    );
 
     setMessages((previous) => [...previous, optimisticMessage]);
 
@@ -304,94 +190,7 @@ export default function WhatsAppDemoPage() {
   const displayedMessages = messages;
 
   return (
-    <main className="h-[100dvh] w-screen overflow-hidden bg-[#161717] text-[#e9edef] fixed inset-0">
-      <div className="mx-auto flex h-full w-full max-w-[1680px]">
-        <aside className="hidden w-16 shrink-0 flex-col items-center gap-1.5 border-r border-white/[0.07] bg-[#161717] py-3 md:flex">
-          <NavIcon active label="Conversas">
-            <MessageCircle size={22} />
-          </NavIcon>
-
-          <NavIcon label="Ligações">
-            <Phone size={21} />
-          </NavIcon>
-
-          <NavIcon label="Status">
-            <CircleDashed size={22} />
-          </NavIcon>
-
-          <NavIcon label="Comunidades">
-            <Users size={22} />
-          </NavIcon>
-
-          <a
-            href="/dashboard"
-            title="Voltar a MetricsFlow AI"
-            className="mt-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#21c063]/15 text-[#21c063] hover:bg-[#21c063]/25"
-          >
-            <BarChart3 size={21} />
-          </a>
-        </aside>
-
-        <div
-          className={`h-full shrink-0 w-full md:w-[345px] lg:w-[380px] ${
-            mobileChatOpen ? "hidden md:flex" : "flex"
-          }`}
-        >
-          <ChatList
-            conversations={filteredConversations}
-            activeId={activeChat}
-            search={search}
-            onSearch={setSearch}
-            onSelect={(id) => {
-              setActiveChat(id);
-              setMobileChatOpen(true);
-            }}
-          />
-        </div>
-
-        <div
-          className={`h-full min-h-0 min-w-0 flex-1 ${
-            mobileChatOpen ? "flex" : "hidden md:flex"
-          }`}
-        >
-          <ChatWindow
-            conversation={activeConversation}
-            messages={displayedMessages}
-            message={message}
-            onMessageChange={setMessage}
-            onSend={() => sendMessage()}
-            onSendAudio={sendAudio}
-            onQuickReply={(text) => sendMessage(text)}
-            onError={showNotice}
-            onBack={() => setMobileChatOpen(false)}
-            typing={typing && activeChat === BOT_ID}
-            notice={notice}
-          />
-        </div>
-      </div>
-    </main>
+    <WhatsAppDemoLayout conversations={filteredConversations} activeChatId={activeChat} search={search} onSearchChange={setSearch} onSelectChat={(id) => { setActiveChat(id); setMobileChatOpen(true); }} mobileChatOpen={mobileChatOpen} activeConversation={activeConversation} messages={displayedMessages} message={message} onMessageChange={setMessage} onSendMessage={() => sendMessage()} onSendAudio={sendAudio} onQuickReply={(text) => sendMessage(text)} onError={showNotice} onMobileBack={() => setMobileChatOpen(false)} isTyping={typing && activeChat === BOT_ID} notice={notice} />
   );
 }
 
-function NavIcon({
-  children,
-  active = false,
-  label,
-}: {
-  children: React.ReactNode;
-  active?: boolean;
-  label: string;
-}) {
-  return (
-    <div
-      title={label}
-      className={`flex h-10 w-10 items-center justify-center rounded-full ${
-        active
-          ? "bg-[#2b2d2d] text-[#e9edef]"
-          : "text-[#c8cfd1] hover:bg-[#202222]"
-      }`}
-    >
-      {children}
-    </div>
-  );
-}

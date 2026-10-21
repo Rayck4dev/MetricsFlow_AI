@@ -60,31 +60,22 @@ export class WhatsappDemoHistoryService {
       );
     }
 
-    const formattedMessages = [...(history ?? [])].reverse().map((m, index) => ({
-      id: index + 1,
-      mine: m.direction === 'inbound',
-      messageType: m.message_type,
-      text: m.message_text ?? m.transcription ?? '',
-      transcription: m.transcription ?? null,
-      time: formatMessageTime(m.created_at),
-      status: 'read' as const,
-      pendingTransactionId: m.pending_transaction_id,
-      transactionId: m.transaction_id,
-      createdAt: m.created_at,
-    }));
+    const formattedMessages = [...(history ?? [])]
+      .reverse()
+      .map((m, index) => ({
+        id: index + 1,
+        mine: m.direction === 'inbound',
+        messageType: m.message_type,
+        text: m.message_text ?? m.transcription ?? '',
+        transcription: m.transcription ?? null,
+        time: formatMessageTime(m.created_at),
+        status: 'read' as const,
+        pendingTransactionId: m.pending_transaction_id,
+        transactionId: m.transaction_id,
+        createdAt: m.created_at,
+      }));
 
-    const seenBotMessages = new Set<string>();
-    const uniqueMessages = formattedMessages.filter((m) => {
-      if (m.mine) return true;
-      const normalizedText = m.text.trim();
-      if (seenBotMessages.has(normalizedText)) {
-        return false;
-      }
-      seenBotMessages.add(normalizedText);
-      return true;
-    });
-
-    if (uniqueMessages.length === 0) {
+    if (formattedMessages.length === 0) {
       return {
         welcomeMessage: welcomeText,
         messages: [
@@ -105,7 +96,7 @@ export class WhatsappDemoHistoryService {
 
     return {
       welcomeMessage: welcomeText,
-      messages: uniqueMessages,
+      messages: formattedMessages,
       pending: pending ?? null,
       company: { id: company.id, name: company.name },
     };

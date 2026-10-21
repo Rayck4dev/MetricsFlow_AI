@@ -1,6 +1,6 @@
 # 📦 Armazenamento de Arquivos — Supabase Storage
 
-O MetricsFlow AI utiliza o **Supabase Storage** para armazenar arquivos associados às movimentações financeiras da aplicação.
+O **MetricsFlow AI** utiliza o **Supabase Storage** para armazenar arquivos associados às movimentações financeiras da aplicação.
 
 O armazenamento de arquivos é separado do PostgreSQL: enquanto o banco mantém os registros e relacionamentos entre as entidades, o Storage é responsável por guardar os arquivos propriamente ditos.
 
@@ -74,7 +74,7 @@ Caso o bucket seja privado, o acesso aos arquivos deve ocorrer por meio de mecan
 
 ## ⚙️ Configuração
 
-A configuração do armazenamento depende do projeto Supabase utilizado pelo MetricsFlow AI.
+A configuração do armazenamento depende do projeto Supabase utilizado pela **MetricsFlow AI**.
 
 As informações que devem ser documentadas após a conferência da configuração são:
 
@@ -95,4 +95,4 @@ O Supabase Storage complementa o PostgreSQL ao separar o armazenamento físico d
 
 A tabela `attachments` mantém a associação entre os anexos e as transações, enquanto o bucket armazena os objetos correspondentes.
 
-A configuração do bucket, suas políticas e o fluxo de acesso devem permanecer sincronizados com a implementação do backend e com as regras de segurança do MetricsFlow AI.
+A configuração do bucket, suas políticas e o fluxo de acesso devem permanecer sincronizados com a implementação do backend e com as regras de segurança da **MetricsFlow AI**.

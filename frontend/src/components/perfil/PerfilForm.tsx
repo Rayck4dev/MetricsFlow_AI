@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { UserRound } from "lucide-react";
 import { motion } from "framer-motion";
 
 import { PerfilField } from "./PerfilField";
 import { PerfilInfoCard } from "./PerfilInfoCard";
-import { PerfilSubmitButton } from "./PerfilSubmitButton";
+import {
+  PerfilFormHeader,
+  PerfilFormActions,
+} from "./perfil-form/PerfilFormSections";
 
 export interface PerfilValues {
   name: string;
@@ -145,36 +147,7 @@ export function PerfilForm({ initialValues, onSubmit }: PerfilFormProps) {
         backdrop-blur-xl
       "
     >
-      <div
-        className="
-          border-b border-surface-border
-          px-5 py-4
-          sm:px-6
-        "
-      >
-        <div className="flex items-center gap-3">
-          <div
-            className="
-              flex h-9 w-9
-              items-center justify-center
-              rounded-xl
-              bg-brand-500/10
-            "
-          >
-            <UserRound size={16} className="text-brand-400" />
-          </div>
-
-          <div>
-            <h2 className="text-sm font-bold text-white">
-              Informações pessoais
-            </h2>
-
-            <p className="mt-0.5 text-[9px] text-slate-600">
-              Atualize os dados básicos da sua conta.
-            </p>
-          </div>
-        </div>
-      </div>
+      <PerfilFormHeader />
 
       <form onSubmit={handleSubmit} className="space-y-5 p-5 sm:p-6">
         <div className="grid gap-5 sm:grid-cols-2">
@@ -214,22 +187,7 @@ export function PerfilForm({ initialValues, onSubmit }: PerfilFormProps) {
 
         <PerfilInfoCard />
 
-        <div
-          className="
-            flex flex-col gap-3
-            border-t border-surface-border
-            pt-4
-            sm:flex-row
-            sm:items-center
-            sm:justify-between
-          "
-        >
-          <p className="text-[8px] text-slate-600">
-            As alterações são salvas na sua conta.
-          </p>
-
-          <PerfilSubmitButton saving={saving} saved={saved} />
-        </div>
+        <PerfilFormActions saving={saving} saved={saved} />
       </form>
     </motion.section>
   );
