@@ -85,7 +85,7 @@ Frontend e backend permanecem no mesmo repositório Git, mas são aplicações s
 
 ## 🚀 Executar o projeto
 
-> **O projeto completo utilizado para avaliação está na branch `v2`.**
+> **O projeto completo está na branch `main`.**
 
 ```bash
 git clone https://github.com/Rayck4dev/MetricsFlow_AI.git
@@ -105,7 +105,7 @@ Para consultar o passo a passo completo de instalação, configuração das vari
 
 **V1:** plataforma web de gestão financeira funcional.
 
-**V2:** frontend + backend estruturados, Supabase integrado, API REST e uma demonstração interativa de conversa em `/whatsapp/demo`, com interpretação financeira de texto, gravação de áudio e transcrição via Groq.
+**V2:** frontend + backend estruturados, Supabase integrado, API REST, demonstração interativa de conversa em `/whatsapp/demo` e prontidão para deploy na Vercel.
 
 **Importante:** `/whatsapp/demo` simula a interface do WhatsApp Web, mas não se conecta à Meta nem envia mensagens pelo WhatsApp. As mensagens são persistidas na conta autenticada e a confirmação registra movimentações na empresa ativa; use dados fictícios na apresentação. A integração oficial com WhatsApp/Meta permanece em desenvolvimento.
 
