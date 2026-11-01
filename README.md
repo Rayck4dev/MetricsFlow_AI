@@ -81,6 +81,7 @@ Frontend e backend permanecem no mesmo repositório Git, mas são aplicações s
 - [Diagramas UML](./docs/diagramas/uml.md)
 - [C4 Model](./docs/diagramas/c4.md)
 - [Status e roadmap](./docs/produto/status-e-roadmap.md)
+- [Matriz Operacional](./docs/matriz_operacional_metrics.pdf)
 
 ## 🚀 Executar o projeto
 
