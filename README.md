@@ -90,7 +90,6 @@ Frontend e backend permanecem no mesmo repositório Git, mas são aplicações s
 ```bash
 git clone https://github.com/Rayck4dev/MetricsFlow_AI.git
 cd MetricsFlow_AI
-git switch v2
 ```
 
 ---

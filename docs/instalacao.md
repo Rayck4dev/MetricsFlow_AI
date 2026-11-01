@@ -1,19 +1,16 @@
 # 🛠️ Instalação e execução
 
-> **Branch da avaliação: `v2`**
->
-> O projeto completo utilizado para avaliação está disponível na branch `v2`.
+> **O projeto completo está na branch `main` pronto para deploy.**
 
 ---
 
 ## 1. Clonar o repositório
 
-Clone o repositório e acesse a branch utilizada na avaliação:
+Clone o repositório:
 
 ```bash
 git clone https://github.com/Rayck4dev/MetricsFlow_AI.git
 cd MetricsFlow_AI
-git switch v2
 ```
 
 ---
@@ -195,21 +192,19 @@ As principais configurações podem incluir:
 - tokens e segredos de integração;
 - porta do backend.
 
-### 🌿 8. Branch utilizada na avaliação
+### 🌿 8. Branch do projeto (Deploy)
 
-A versão completa utilizada durante a avaliação está disponível na branch:
-
-```bash
-v2
-```
-
-Para acessar:
+A versão completa e unificada do projeto para execução e deploy está disponível na branch principal:
 
 ```bash
-git switch v2
+main
 ```
 
-A branch v2 contém a versão completa utilizada como referência para a demonstração do projeto.
+Caso precise alternar para a branch principal:
+
+```bash
+git switch main
+```
 
 ### ⚠️ 9. Observações
 
