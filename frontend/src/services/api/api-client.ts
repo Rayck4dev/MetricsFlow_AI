@@ -19,7 +19,8 @@ export interface RequestOptions extends Omit<RequestInit, "body"> {
 
 function getBaseUrl(): string {
   const url = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
-  return url.replace(/\/$/, "");
+  const cleanUrl = url.replace(/\/$/, "");
+  return cleanUrl.endsWith("/api") ? cleanUrl : `${cleanUrl}/api`;
 }
 
 async function getAuthToken(): Promise<string | null> {
@@ -53,7 +54,10 @@ function buildUrl(
   params?: Record<string, string | number | boolean | undefined | null>,
 ): string {
   const baseUrl = getBaseUrl();
-  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  let normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  if (normalizedPath.startsWith("/api/")) {
+    normalizedPath = normalizedPath.slice(4);
+  }
   const url = new URL(`${baseUrl}${normalizedPath}`);
 
   if (params) {

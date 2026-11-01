@@ -3,13 +3,15 @@ import { createClient } from "@/lib/supabase/client";
 import type { DemoResponse, WhatsAppConnection } from "@/types/whatsapp";
 
 function getApiUrl() {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
 
   if (!baseUrl) {
     throw new Error("NEXT_PUBLIC_API_URL não está configurada no frontend.");
   }
 
-  return baseUrl.replace(/\/$/, "");
+  const cleanUrl = baseUrl.replace(/\/$/, "");
+  return cleanUrl.endsWith("/api") ? cleanUrl : `${cleanUrl}/api`;
 }
 
 async function getAccessToken() {
@@ -46,7 +48,13 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     headers.set("Content-Type", "application/json");
   }
 
-  const response = await fetch(`${getApiUrl()}${path}`, {
+  const normalizedPath = path.startsWith("/api/")
+    ? path.slice(4)
+    : path.startsWith("/")
+      ? path
+      : `/${path}`;
+
+  const response = await fetch(`${getApiUrl()}${normalizedPath}`, {
     ...options,
     headers,
   });
