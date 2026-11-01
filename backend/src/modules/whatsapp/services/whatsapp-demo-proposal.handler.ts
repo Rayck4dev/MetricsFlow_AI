@@ -24,8 +24,14 @@ export class WhatsappDemoProposalHandler {
     pending: PendingProposalState | null;
     categories: CompanyCategory[];
   }) {
-    const { userId, companyId, companyName, normalizedText, pending, categories } =
-      params;
+    const {
+      userId,
+      companyId,
+      companyName,
+      normalizedText,
+      pending,
+      categories,
+    } = params;
 
     const isCompletingInfo =
       pending && pending.status === 'awaiting_information';

@@ -31,7 +31,9 @@ export class WhatsappConnectionService {
   }
 
   async getConnection(user: User) {
-    const { data, error } = await this.connectionsRepository.findByUser(user.id);
+    const { data, error } = await this.connectionsRepository.findByUser(
+      user.id,
+    );
 
     if (error) {
       throw new InternalServerErrorException(

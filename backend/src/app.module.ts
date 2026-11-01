@@ -29,7 +29,7 @@ import { AttachmentsModule } from './modules/attachments/attachments.module';
     WhatsappModule,
     AiModule,
     AttachmentsModule,
-    ],
+  ],
   controllers: [AppController, SupabaseTestController],
   providers: [AppService],
 })

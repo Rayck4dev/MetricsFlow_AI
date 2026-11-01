@@ -24,10 +24,7 @@ export class TransactionValidatorService {
     private readonly transactionsRepository: TransactionsRepository,
   ) {}
 
-  async ensureCompanyAccess(
-    companyId: string,
-    userId: string,
-  ): Promise<void> {
+  async ensureCompanyAccess(companyId: string, userId: string): Promise<void> {
     const { data: membership, error } =
       await this.transactionsRepository.findMembership(companyId, userId);
 

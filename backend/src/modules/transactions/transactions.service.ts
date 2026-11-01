@@ -98,7 +98,10 @@ export class TransactionsService {
         await this.transactionsRepository.findCategoryById(filters.category_id);
 
       if (categoryError) {
-        this.validator.handleDatabaseError('validar categoria do filtro', categoryError);
+        this.validator.handleDatabaseError(
+          'validar categoria do filtro',
+          categoryError,
+        );
       }
 
       if (!category) {
@@ -147,7 +150,10 @@ export class TransactionsService {
 
     const currentTransaction = transaction as TransactionRecord;
 
-    await this.validator.ensureCompanyAccess(currentTransaction.company_id, userId);
+    await this.validator.ensureCompanyAccess(
+      currentTransaction.company_id,
+      userId,
+    );
 
     const nextType = dto.type ?? currentTransaction.type;
 
@@ -204,7 +210,10 @@ export class TransactionsService {
 
     const currentTransaction = transaction as TransactionRecord;
 
-    await this.validator.ensureCompanyAccess(currentTransaction.company_id, userId);
+    await this.validator.ensureCompanyAccess(
+      currentTransaction.company_id,
+      userId,
+    );
 
     const { data, error } = await this.transactionsRepository.delete(
       transactionId,

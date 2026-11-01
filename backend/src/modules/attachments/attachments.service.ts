@@ -20,9 +20,14 @@ export class AttachmentsService {
   ) {}
 
   private async assertMembership(companyId: string, userId: string) {
-    const { data, error } = await this.repository.findMembership(companyId, userId);
+    const { data, error } = await this.repository.findMembership(
+      companyId,
+      userId,
+    );
     if (error) {
-      throw new InternalServerErrorException('Não foi possível verificar o acesso à empresa.');
+      throw new InternalServerErrorException(
+        'Não foi possível verificar o acesso à empresa.',
+      );
     }
     if (!data) {
       throw new ForbiddenException('Você não tem acesso a esta empresa.');
@@ -30,26 +35,37 @@ export class AttachmentsService {
     return data;
   }
 
-  async upload(transactionId: string, userId: string, file: Express.Multer.File) {
+  async upload(
+    transactionId: string,
+    userId: string,
+    file: Express.Multer.File,
+  ) {
     this.validator.validateFile(file);
 
     const { data: transaction, error: transactionError } =
       await this.repository.findTransaction(transactionId);
 
     if (transactionError) {
-      throw new InternalServerErrorException('Não foi possível consultar a transação.');
+      throw new InternalServerErrorException(
+        'Não foi possível consultar a transação.',
+      );
     }
     if (!transaction) {
       throw new NotFoundException('Transação não encontrada.');
     }
 
-    const membership = await this.assertMembership(transaction.company_id, userId);
+    const membership = await this.assertMembership(
+      transaction.company_id,
+      userId,
+    );
 
     const { data: previous, error: previousError } =
       await this.repository.findByTransactionId(transactionId);
 
     if (previousError) {
-      throw new InternalServerErrorException('Não foi possível consultar o comprovante atual.');
+      throw new InternalServerErrorException(
+        'Não foi possível consultar o comprovante atual.',
+      );
     }
 
     if (previous) {
@@ -65,19 +81,22 @@ export class AttachmentsService {
 
     await this.storage.uploadFile(objectKey, file.buffer, file.mimetype);
 
-    const { data: saved, error: saveError } = await this.repository.saveMetadata({
-      transaction_id: transactionId,
-      company_id: transaction.company_id,
-      file_name: file.originalname.replace(/[\\/]/g, '_').slice(0, 255),
-      object_key: objectKey,
-      content_type: file.mimetype,
-      size_bytes: file.size,
-      uploaded_by_user_id: userId,
-    });
+    const { data: saved, error: saveError } =
+      await this.repository.saveMetadata({
+        transaction_id: transactionId,
+        company_id: transaction.company_id,
+        file_name: file.originalname.replace(/[\\/]/g, '_').slice(0, 255),
+        object_key: objectKey,
+        content_type: file.mimetype,
+        size_bytes: file.size,
+        uploaded_by_user_id: userId,
+      });
 
     if (saveError || !saved) {
       await this.storage.removeFiles([objectKey]).catch(() => {});
-      throw new InternalServerErrorException('Não foi possível registrar os dados do comprovante.');
+      throw new InternalServerErrorException(
+        'Não foi possível registrar os dados do comprovante.',
+      );
     }
 
     if (previous?.object_key) {
@@ -103,7 +122,9 @@ export class AttachmentsService {
       await this.repository.findTransaction(transactionId);
 
     if (transactionError) {
-      throw new InternalServerErrorException('Não foi possível consultar a transação.');
+      throw new InternalServerErrorException(
+        'Não foi possível consultar a transação.',
+      );
     }
     if (!transaction) {
       throw new NotFoundException('Transação não encontrada.');
@@ -111,10 +132,13 @@ export class AttachmentsService {
 
     await this.assertMembership(transaction.company_id, userId);
 
-    const { data, error } = await this.repository.findByTransactionId(transactionId);
+    const { data, error } =
+      await this.repository.findByTransactionId(transactionId);
 
     if (error) {
-      throw new InternalServerErrorException('Não foi possível consultar o comprovante.');
+      throw new InternalServerErrorException(
+        'Não foi possível consultar o comprovante.',
+      );
     }
     if (!data) {
       throw new NotFoundException('Esta transação não possui comprovante.');
@@ -132,10 +156,13 @@ export class AttachmentsService {
   }
 
   async createDownloadUrl(attachmentId: string, userId: string) {
-    const { data: attachment, error } = await this.repository.findById(attachmentId);
+    const { data: attachment, error } =
+      await this.repository.findById(attachmentId);
 
     if (error) {
-      throw new InternalServerErrorException('Não foi possível consultar o comprovante.');
+      throw new InternalServerErrorException(
+        'Não foi possível consultar o comprovante.',
+      );
     }
     if (!attachment) {
       throw new NotFoundException('Comprovante não encontrado.');
@@ -158,16 +185,22 @@ export class AttachmentsService {
   }
 
   async delete(attachmentId: string, userId: string) {
-    const { data: attachment, error } = await this.repository.findById(attachmentId);
+    const { data: attachment, error } =
+      await this.repository.findById(attachmentId);
 
     if (error) {
-      throw new InternalServerErrorException('Não foi possível consultar o comprovante.');
+      throw new InternalServerErrorException(
+        'Não foi possível consultar o comprovante.',
+      );
     }
     if (!attachment) {
       throw new NotFoundException('Comprovante não encontrado.');
     }
 
-    const membership = await this.assertMembership(attachment.company_id, userId);
+    const membership = await this.assertMembership(
+      attachment.company_id,
+      userId,
+    );
 
     this.permissionService.assertCanDelete({
       role: membership.role,
@@ -177,7 +210,8 @@ export class AttachmentsService {
 
     await this.storage.removeFiles([attachment.object_key]);
 
-    const { error: metadataError } = await this.repository.deleteMetadata(attachmentId);
+    const { error: metadataError } =
+      await this.repository.deleteMetadata(attachmentId);
 
     if (metadataError) {
       throw new InternalServerErrorException(

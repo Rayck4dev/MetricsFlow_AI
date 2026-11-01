@@ -7,7 +7,8 @@ export function toTransactionUpdateData(dto: UpdateTransactionDto) {
   if (dto.type !== undefined) updateData.type = dto.type;
   if (dto.category_id !== undefined) updateData.category_id = dto.category_id;
   if (dto.amount !== undefined) updateData.amount = dto.amount;
-  if (dto.description !== undefined) updateData.description = dto.description.trim();
+  if (dto.description !== undefined)
+    updateData.description = dto.description.trim();
   if (dto.payment_method !== undefined) {
     updateData.payment_method = dto.payment_method;
   }

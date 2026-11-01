@@ -86,7 +86,6 @@ export class MetaService {
 
   async sendWhatsAppText(to: string, body: string) {
     if (process.env.WHATSAPP_DRY_RUN === 'true') {
-
       return {
         dryRun: true,
         to,

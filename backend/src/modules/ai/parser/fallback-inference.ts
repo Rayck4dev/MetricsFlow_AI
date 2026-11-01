@@ -1,5 +1,9 @@
 import type { PaymentMethod, TransactionType, WhatsAppIntent } from '../types';
-import { currentLocalDate, normalizeAmount, normalizeText } from './financial-normalizer';
+import {
+  currentLocalDate,
+  normalizeAmount,
+  normalizeText,
+} from './financial-normalizer';
 
 export const PAYMENT_ALIASES: Array<[RegExp, PaymentMethod]> = [
   [/\bpix\b/i, 'pix'],
@@ -138,9 +142,7 @@ export function inferIntent(text: string): WhatsAppIntent {
   }
 
   if (
-    /^\s*(nao|cancela|cancelar|desiste|desistir)\s*[.!?]*\s*$/.test(
-      normalized,
-    )
+    /^\s*(nao|cancela|cancelar|desiste|desistir)\s*[.!?]*\s*$/.test(normalized)
   ) {
     return 'cancel_transaction';
   }

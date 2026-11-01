@@ -40,7 +40,10 @@ export class WhatsappDemoActionHandler {
     userId: string,
     companyId: string,
   ) {
-    if (this.isConfirmation(text) && pending?.status === 'awaiting_confirmation') {
+    if (
+      this.isConfirmation(text) &&
+      pending?.status === 'awaiting_confirmation'
+    ) {
       const result = await this.handleConfirmation(pending, userId, companyId);
       await this.historyService.recordDemoMessage({
         companyId,
@@ -68,7 +71,11 @@ export class WhatsappDemoActionHandler {
     }
 
     if (this.isGenericCorrection(text) && pending) {
-      const result = await this.handleGenericCorrection(pending, userId, companyId);
+      const result = await this.handleGenericCorrection(
+        pending,
+        userId,
+        companyId,
+      );
       await this.historyService.recordDemoMessage({
         companyId,
         userId,
@@ -112,11 +119,7 @@ export class WhatsappDemoActionHandler {
     companyId: string,
   ) {
     const { data: cancelled, error: cancelError } =
-      await this.pendingRepository.cancelPending(
-        pending.id,
-        userId,
-        companyId,
-      );
+      await this.pendingRepository.cancelPending(pending.id, userId, companyId);
 
     if (cancelError) {
       throw new InternalServerErrorException(
@@ -148,11 +151,7 @@ export class WhatsappDemoActionHandler {
     companyId: string,
   ) {
     const { data: cancelled, error: cancelError } =
-      await this.pendingRepository.cancelPending(
-        pending.id,
-        userId,
-        companyId,
-      );
+      await this.pendingRepository.cancelPending(pending.id, userId, companyId);
 
     if (cancelError) {
       throw new InternalServerErrorException(
